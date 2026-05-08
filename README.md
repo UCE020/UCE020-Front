@@ -31,6 +31,18 @@ src/
 
 ## Getting Started
 
+### Node version
+
+This project is pinned to Node.js `26.0.0` via [.nvmrc](.nvmrc).
+
+If you use `nvm`, run:
+
+```bash
+nvm use
+```
+
+If you do not use a version manager, install Node.js 26.0.0 before running the app.
+
 1. Install dependencies:
 ```bash
 npm install

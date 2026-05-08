@@ -60,3 +60,5 @@ export const Button = ({
     </MuiButton>
   );
 };
+
+export default Button;

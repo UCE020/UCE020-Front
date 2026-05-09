@@ -2,17 +2,63 @@
 
 import { useState } from "react";
 import {
+  Box,
+  Typography,
+  InputBase,
+  IconButton,
+  Drawer,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  Grid,
+  Card,
+  CardContent,
+  Avatar,
+  Paper,
+} from "@mui/material";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
+import {
   Search,
   Menu,
-  X,
+  Close,
   Home,
-  FileText,
-  ClipboardList,
-  PlusCircle,
-  CalendarDays,
-  Activity,
-  User,
-} from "lucide-react";
+  Description,
+  Assignment,
+  AddCircle,
+  CalendarMonth,
+  BarChart,
+  Person,
+} from "@mui/icons-material";
+
+// ── Tema ───────────────────────────────────────────────
+const theme = createTheme({
+  palette: {
+    primary:    { main: "#1a2744" },
+    secondary:  { main: "#3dd6c8" },
+    background: { default: "#ffffff", paper: "#f4f6f9" },
+  },
+  typography: {
+    fontFamily: "'Poppins', sans-serif", // ✅ Poppins global
+    h5: { fontWeight: 700 },
+  },
+  components: {
+    MuiDrawer: {
+      styleOverrides: {
+        paper: {
+          backgroundColor: "#1a2744 !important",
+          color: "#ffffff",
+          width: 280,
+        },
+      },
+    },
+    MuiInputBase: {
+      styleOverrides: {
+        root: { fontFamily: "'Poppins', sans-serif" },
+      },
+    },
+  },
+});
 
 interface Event {
   id: string;
@@ -42,339 +88,248 @@ const mockEvents: Event[] = [
   },
 ];
 
+const NAV_ITEMS = [
+  { icon: <Home />,          label: "Início"          },
+  { icon: <Description />,   label: "Certificados"    },
+  { icon: <Assignment />,    label: "Inscrições"      },
+  { icon: <AddCircle />,     label: "Criar evento"    },
+  { icon: <CalendarMonth />, label: "Eventos Criados" },
+  { icon: <BarChart />,      label: "Monitoria"       },
+];
+
+const QUICK_ACTIONS = [
+  { line1: "criar novo",  line2: "evento",       variant: "navy" },
+  { line1: "meus",        line2: "certificados", variant: "teal" },
+  { line1: "eventos",     line2: "criados",      variant: "teal" },
+  { line1: "monitoria",   line2: "de eventos",   variant: "navy" },
+] as const;
+
 function EventCard({ event }: { event: Event }) {
   return (
-    <div className="event-card">
-      <img src={event.imageUrl} alt={event.name} className="event-img" />
-      <div className="event-info">
-        <p className="event-name">{event.name}</p>
-        <p className="event-detail">
-          <span className="label">Data:</span> {event.startDate} a {event.endDate}
-        </p>
-        <p className="event-detail">
-          <span className="label">Horário:</span> {event.time}
-        </p>
-      </div>
-    </div>
+    <Card
+      elevation={1}
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        gap: 2,
+        p: 2,
+        borderRadius: 3,
+        cursor: "pointer",
+        transition: "transform .15s, box-shadow .15s",
+        "&:hover": { transform: "translateY(-2px)", boxShadow: 4 },
+      }}
+    >
+      <Box
+        component="img"
+        src={event.imageUrl}
+        alt={event.name}
+        sx={{ width: 60, height: 60, borderRadius: 2, objectFit: "cover", flexShrink: 0 }}
+      />
+      <CardContent sx={{ p: "0 !important", flex: 1, minWidth: 0 }}>
+        <Typography fontWeight={700} fontSize={13} noWrap sx={{ mb: 0.5 }}>
+          {event.name}
+        </Typography>
+        <Typography fontSize={11} color="text.secondary" lineHeight={1.6}>
+          <Box component="span" fontWeight={600} color="text.primary">Data: </Box>
+          {event.startDate} a {event.endDate}
+        </Typography>
+        <Typography fontSize={11} color="text.secondary" lineHeight={1.6}>
+          <Box component="span" fontWeight={600} color="text.primary">Horário: </Box>
+          {event.time}
+        </Typography>
+      </CardContent>
+    </Card>
   );
 }
-
-const NAV_ITEMS = [
-  { icon: <Home size={18} />,        label: "Início"         },
-  { icon: <FileText size={18} />,    label: "Certificados"   },
-  { icon: <ClipboardList size={18}/>,label: "Inscrições"     },
-  { icon: <PlusCircle size={18} />,  label: "Criar evento"   },
-  { icon: <CalendarDays size={18}/>, label: "Eventos Criados"},
-  { icon: <Activity size={18} />,    label: "Monitoria"      },
-];
-
-const QUICK_ACTIONS: { line1: string; line2: string; color: "primary" | "secondary" }[] = [
-  { line1: "criar novo",   line2: "evento",       color: "primary"   },
-  { line1: "meus",         line2: "certificados", color: "secondary" },
-  { line1: "eventos",      line2: "criados",      color: "secondary" },
-  { line1: "monitoria", line2: "de eventos",      color: "primary"   },
-];
-
-const CSS = `
-  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
-
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-  :root {
-    --navy:    #1a2744;
-    --teal:    #3dd6c8;
-    --bg:      #ffffff;
-    --card-bg: #f4f6f9;
-    --surface: #f0f2f5;
-    --text:    #0f172a;
-    --muted:   #64748b;
-    --radius:  14px;
-    --gutter:  16px;
-    --content: 1200px;
-    --btn-size: 140px;
-    --btn-gap:  8px;
-  }
-
-  body { font-family: 'Nunito', sans-serif; background: var(--bg); color: var(--text); }
-
-  /* Shell */
-  .shell { width: 100%; min-height: 100dvh; background: var(--bg); }
-
-  .inner {
-    width: 100%;
-    max-width: var(--content);
-    margin: 0 auto;
-    padding: 0 var(--gutter);
-  }
-
-  /* Header */
-  .header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 18px var(--gutter) 10px;
-    max-width: var(--content);
-    margin: 0 auto;
-  }
-  .menu-btn {
-    background: none; border: none;
-    color: var(--text); cursor: pointer;
-    display: flex; align-items: center;
-  }
-  .avatar {
-    width: 36px; height: 36px;
-    border-radius: 50%;
-    background: var(--teal);
-    display: flex; align-items: center; justify-content: center;
-    color: var(--navy);
-  }
-
-  /* Search */
-  .search-wrap { position: relative; margin-top: 8px; }
-  .search-wrap svg {
-    position: absolute;
-    left: 14px; top: 50%;
-    transform: translateY(-50%);
-    color: var(--muted);
-    pointer-events: none;
-  }
-  .search-input {
-    width: 100%;
-    padding: 11px 14px 11px 40px;
-    border-radius: 50px;
-    border: none;
-    background: var(--surface);
-    color: var(--text);
-    font-family: inherit;
-    font-size: 14px;
-    outline: none;
-    transition: box-shadow .2s;
-  }
-  .search-input::placeholder { color: var(--muted); }
-  .search-input:focus { box-shadow: 0 0 0 2px var(--teal); }
-
-  /* Greeting */
-  .greeting { 
-    padding: 24px 0 8px; 
-    font-size: 30px; 
-    font-weight: 700; 
-    line-height: 1.4; 
-    text-align: center;
-  }
-  .greeting span { color: var(--teal); }
-
-  /* Quick Actions */
-  .actions-grid {
-    display: grid;
-    grid-template-columns: repeat(2, var(--btn-size));
-    gap: var(--btn-gap);
-    padding: 12px 0;
-    justify-content: center;
-  }
-
-  .action-btn {
-    width: var(--btn-size);
-    height: calc(var(--btn-size) * 7 / 8);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    border: none;
-    border-radius: 18px;
-    cursor: pointer;
-    font-family: 'Nunito', sans-serif;
-    font-size: 22px;
-    font-weight: 800;
-    line-height: 1.35;
-    text-align: center;
-    padding: 10px 8px;
-    transition: filter .15s, transform .15s;
-  }
-  .action-btn:hover { filter: brightness(0.93); transform: translateY(-1px); }
-  .action-btn.primary   { background: var(--navy); color: #ffffff; }
-  .action-btn.secondary { background: var(--teal); color: #ffffff; }
-
-  /* Events */
-  .section-title {
-    padding: 20px 0 10px;
-    font-size: 13px;
-    color: var(--muted);
-    font-weight: 600;
-    letter-spacing: .5px;
-    text-transform: uppercase;
-  }
-
-  .events-list {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 12px;
-    padding-bottom: 40px;
-  }
-
-  .event-card {
-    background: var(--card-bg);
-    border-radius: var(--radius);
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    padding: 14px;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
-    cursor: pointer;
-    transition: transform .15s, box-shadow .15s;
-  }
-  .event-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.10); }
-  .event-img { width: 60px; height: 60px; border-radius: 10px; object-fit: cover; flex-shrink: 0; }
-  .event-info { flex: 1; min-width: 0; }
-  .event-name {
-    font-size: 13px; font-weight: 800; margin-bottom: 4px;
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  }
-  .event-detail { font-size: 11px; color: var(--muted); line-height: 1.6; }
-  .label { color: var(--text); font-weight: 600; }
-
-  /* Overlay */
-  .overlay {
-    position: fixed; inset: 0;
-    background: rgba(0,0,0,.55);
-    z-index: 40; opacity: 0; pointer-events: none;
-    transition: opacity .25s;
-  }
-  .overlay.open { opacity: 1; pointer-events: all; }
-
-  /* Drawer */
-  .drawer {
-    position: fixed; top: 0; left: 0;
-    width: 280px; height: 100dvh;
-    background: var(--navy); z-index: 50;
-    transform: translateX(-100%);
-    transition: transform .28s cubic-bezier(.4,0,.2,1);
-    display: flex; flex-direction: column; padding: 0 0 32px;
-  }
-  .drawer.open { transform: translateX(0); }
-
-  .drawer-header {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 20px 20px 16px;
-    border-bottom: 1px solid rgba(255,255,255,.07);
-  }
-  .drawer-logo { font-size: 17px; font-weight: 800; color: var(--teal); letter-spacing: -.5px; }
-  .close-btn {
-    background: none; border: none;
-    color: rgba(255,255,255,0.5); cursor: pointer;
-    display: flex; align-items: center;
-  }
-
-  .nav-list { list-style: none; padding: 12px 0; flex: 1; }
-  .nav-item {
-    display: flex; align-items: center; gap: 14px;
-    padding: 14px 22px;
-    font-size: 14px; font-weight: 600; color: #f0f4ff;
-    cursor: pointer;
-    border-radius: 0 50px 50px 0; margin-right: 16px;
-    transition: background .15s, color .15s;
-  }
-  .nav-item:hover  { background: rgba(61,214,200,.12); color: var(--teal); }
-  .nav-item.active { background: rgba(61,214,200,.18); color: var(--teal); }
-  .nav-item svg { flex-shrink: 0; }
-
-  /* Breakpoints */
-  @media (min-width: 768px) {
-    :root { --gutter: 32px; --btn-size: 160px; }
-    .greeting { font-size: 28px; }
-    .search-input { font-size: 15px; }
-    .events-list { grid-template-columns: repeat(2, 1fr); }
-    .event-name { font-size: 14px; }
-    .event-detail { font-size: 12px; }
-  }
-
-  @media (min-width: 1024px) {
-    :root { --gutter: 48px; --btn-size: 180px; }
-    .greeting { font-size: 32px; }
-    .events-list { grid-template-columns: repeat(3, 1fr); }
-  }
-
-  @media (min-width: 1280px) {
-    :root { --gutter: 64px; }
-  }
-`;
 
 export default function HomePage() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [search, setSearch] = useState("");
 
+  const userName = "João"; // 👈 substitua pela sua fonte de dados
+
+  const filtered = mockEvents.filter(
+    (e) => search === "" || e.name.toLowerCase().includes(search.toLowerCase())
+  );
+
   return (
-    <>
-      <style>{CSS}</style>
+    <ThemeProvider theme={theme}>
+      {/* ✅ Apenas Poppins, todos os pesos necessários */}
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap');
+        * { font-family: 'Poppins', sans-serif; }
+      `}</style>
 
-      <div className="shell">
-        <div className={`overlay${drawerOpen ? " open" : ""}`} onClick={() => setDrawerOpen(false)} />
+      <Box sx={{ minHeight: "100dvh", bgcolor: "background.default" }}>
 
-        <nav className={`drawer${drawerOpen ? " open" : ""}`}>
-          <div className="drawer-header">
-            <span className="drawer-logo">Kauan</span>
-            <button className="close-btn" onClick={() => setDrawerOpen(false)}>
-              <X size={20} />
-            </button>
-          </div>
-          <ul className="nav-list">
+        {/* Drawer */}
+        <Drawer open={drawerOpen} onClose={() => setDrawerOpen(false)}>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              px: 2.5,
+              py: 2.5,
+              borderBottom: "1px solid rgba(255,255,255,.07)",
+            }}
+          >
+            <Typography fontWeight={800} fontSize={17} sx={{ color: "#3dd6c8", letterSpacing: "-.5px" }}>
+              Kauan
+            </Typography>
+            <IconButton onClick={() => setDrawerOpen(false)} sx={{ color: "rgba(255,255,255,0.5)" }}>
+              <Close />
+            </IconButton>
+          </Box>
+
+          <List sx={{ pt: 1.5 }}>
             {NAV_ITEMS.map((item, i) => (
-              <li
+              <ListItem
                 key={item.label}
-                className={`nav-item${i === 0 ? " active" : ""}`}
                 onClick={() => setDrawerOpen(false)}
+                sx={{
+                  borderRadius: "0 50px 50px 0",
+                  mr: 2,
+                  cursor: "pointer",
+                  bgcolor: i === 0 ? "rgba(61,214,200,.18)" : "transparent",
+                  color: i === 0 ? "#3dd6c8" : "rgba(255,255,255,0.85)",
+                  "&:hover": { bgcolor: "rgba(61,214,200,.12)", color: "#3dd6c8" },
+                }}
               >
-                {item.icon}
-                {item.label}
-              </li>
+                <ListItemIcon sx={{ color: "inherit", minWidth: 36 }}>{item.icon}</ListItemIcon>
+                <ListItemText
+                  primary={item.label}
+                  primaryTypographyProps={{ fontWeight: 600, fontSize: 14 }}
+                />
+              </ListItem>
             ))}
-          </ul>
-        </nav>
+          </List>
+        </Drawer>
 
-        <header className="header">
-          <button className="menu-btn" onClick={() => setDrawerOpen(true)}>
-            <Menu size={24} />
-          </button>
-          <div className="avatar">
-            <User size={18} />
-          </div>
-        </header>
+        {/* Header */}
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            px: 3,
+            py: 2,
+            maxWidth: 1200,
+            mx: "auto",
+          }}
+        >
+          <IconButton onClick={() => setDrawerOpen(true)}>
+            <Menu />
+          </IconButton>
+          <Avatar sx={{ bgcolor: "#3dd6c8", color: "#1a2744", width: 36, height: 36 }}>
+            <Person fontSize="small" />
+          </Avatar>
+        </Box>
 
-        <div className="inner">
-          <div className="search-wrap">
-            <Search size={16} />
-            <input
-              className="search-input"
-              type="text"
+        {/* Conteúdo */}
+        <Box sx={{ maxWidth: 1200, mx: "auto", px: 3 }}>
+
+          {/* Search */}
+          <Paper
+            elevation={0}
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: 1,
+              px: 2,
+              py: 1,
+              borderRadius: 50,
+              bgcolor: "#f0f2f5",
+              mt: 1,
+            }}
+          >
+            <Search sx={{ color: "text.secondary", fontSize: 18 }} />
+            <InputBase
               placeholder="procurar evento"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
+              fullWidth
             />
-          </div>
+          </Paper>
 
-          <h1 className="greeting">
-            Olá, João! O que temos para <span>hoje?</span>
-          </h1>
+          {/* Saudação */}
+          <Typography
+            variant="h5"
+            textAlign="center"
+            sx={{ py: 3, fontWeight: 700, lineHeight: 1.5 }}
+          >
+            Olá, {userName}! O que temos para{" "}
+            <Box component="span" sx={{ color: "#3dd6c8" }}>
+              hoje?
+            </Box>
+          </Typography>
 
-          <div className="actions-grid">
+          {/* Ações rápidas */}
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: "repeat(2, 140px)",
+              gap: 1,
+              justifyContent: "center",
+              mb: 1,
+            }}
+          >
             {QUICK_ACTIONS.map((action) => (
-              <button key={action.line2} className={`action-btn ${action.color}`}>
+              <Box
+                key={action.line2}
+                component="button"
+                sx={{
+                  width: 140,
+                  height: 122,
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  border: "none",
+                  borderRadius: 4,
+                  cursor: "pointer",
+                  bgcolor: action.variant === "navy" ? "#1a2744" : "#3dd6c8",
+                  color: "#fff",
+                  fontSize: 18,
+                  fontWeight: 700,
+                  lineHeight: 1.35,
+                  textAlign: "center",
+                  p: "10px 8px",
+                  transition: "filter .15s, transform .15s",
+                  "&:hover": { filter: "brightness(0.9)", transform: "translateY(-1px)" },
+                }}
+              >
                 {action.line1}<br />{action.line2}
-              </button>
+              </Box>
             ))}
-          </div>
+          </Box>
 
-          <p className="section-title">Eventos inscritos</p>
-          <div className="events-list">
-            {mockEvents
-              .filter((e) =>
-                search === "" || e.name.toLowerCase().includes(search.toLowerCase())
-              )
-              .map((event) => (
-                <EventCard key={event.id} event={event} />
-              ))}
-          </div>
-        </div>
-      </div>
-    </>
+          {/* Título seção */}
+          <Typography
+            sx={{
+              pt: 2.5,
+              pb: 1.5,
+              fontSize: 13,
+              color: "text.secondary",
+              fontWeight: 600,
+              letterSpacing: ".5px",
+              textTransform: "uppercase",
+            }}
+          >
+            Eventos inscritos
+          </Typography>
+
+          {/* Lista de eventos */}
+          <Grid container spacing={1.5} sx={{ pb: 5 }}>
+            {filtered.map((event) => (
+              <Grid key={event.id} size={{ xs: 12, sm: 6, lg: 4 }}>
+                <EventCard event={event} />
+              </Grid>
+            ))}
+          </Grid>
+
+        </Box>
+      </Box>
+    </ThemeProvider>
   );
 }

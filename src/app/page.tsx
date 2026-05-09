@@ -13,11 +13,7 @@ import {
   Activity,
   User,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 
-// ---------------------------------------------------------------------------
-// Types
-// ---------------------------------------------------------------------------
 interface Event {
   id: string;
   name: string;
@@ -27,9 +23,6 @@ interface Event {
   imageUrl: string;
 }
 
-// ---------------------------------------------------------------------------
-// Mock data
-// ---------------------------------------------------------------------------
 const mockEvents: Event[] = [
   {
     id: "1",
@@ -49,9 +42,6 @@ const mockEvents: Event[] = [
   },
 ];
 
-// ---------------------------------------------------------------------------
-// Sub-components
-// ---------------------------------------------------------------------------
 function EventCard({ event }: { event: Event }) {
   return (
     <div className="event-card">
@@ -69,316 +59,256 @@ function EventCard({ event }: { event: Event }) {
   );
 }
 
-// ---------------------------------------------------------------------------
-// Page
-// ---------------------------------------------------------------------------
+const NAV_ITEMS = [
+  { icon: <Home size={18} />,        label: "Início"         },
+  { icon: <FileText size={18} />,    label: "Certificados"   },
+  { icon: <ClipboardList size={18}/>,label: "Inscrições"     },
+  { icon: <PlusCircle size={18} />,  label: "Criar evento"   },
+  { icon: <CalendarDays size={18}/>, label: "Eventos Criados"},
+  { icon: <Activity size={18} />,    label: "Monitoria"      },
+];
+
+const QUICK_ACTIONS: { line1: string; line2: string; color: "primary" | "secondary" }[] = [
+  { line1: "criar novo",   line2: "evento",       color: "primary"   },
+  { line1: "meus",         line2: "certificados", color: "secondary" },
+  { line1: "eventos",      line2: "criados",      color: "secondary" },
+  { line1: "monitoria", line2: "de eventos",      color: "primary"   },
+];
+
+const CSS = `
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --navy:    #1a2744;
+    --teal:    #3dd6c8;
+    --bg:      #ffffff;
+    --card-bg: #f4f6f9;
+    --surface: #f0f2f5;
+    --text:    #0f172a;
+    --muted:   #64748b;
+    --radius:  14px;
+    --gutter:  16px;
+    --content: 1200px;
+    --btn-size: 140px;
+    --btn-gap:  8px;
+  }
+
+  body { font-family: 'Nunito', sans-serif; background: var(--bg); color: var(--text); }
+
+  /* Shell */
+  .shell { width: 100%; min-height: 100dvh; background: var(--bg); }
+
+  .inner {
+    width: 100%;
+    max-width: var(--content);
+    margin: 0 auto;
+    padding: 0 var(--gutter);
+  }
+
+  /* Header */
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px var(--gutter) 10px;
+    max-width: var(--content);
+    margin: 0 auto;
+  }
+  .menu-btn {
+    background: none; border: none;
+    color: var(--text); cursor: pointer;
+    display: flex; align-items: center;
+  }
+  .avatar {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: var(--teal);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--navy);
+  }
+
+  /* Search */
+  .search-wrap { position: relative; margin-top: 8px; }
+  .search-wrap svg {
+    position: absolute;
+    left: 14px; top: 50%;
+    transform: translateY(-50%);
+    color: var(--muted);
+    pointer-events: none;
+  }
+  .search-input {
+    width: 100%;
+    padding: 11px 14px 11px 40px;
+    border-radius: 50px;
+    border: none;
+    background: var(--surface);
+    color: var(--text);
+    font-family: inherit;
+    font-size: 14px;
+    outline: none;
+    transition: box-shadow .2s;
+  }
+  .search-input::placeholder { color: var(--muted); }
+  .search-input:focus { box-shadow: 0 0 0 2px var(--teal); }
+
+  /* Greeting */
+  .greeting { 
+    padding: 24px 0 8px; 
+    font-size: 30px; 
+    font-weight: 700; 
+    line-height: 1.4; 
+    text-align: center;
+  }
+  .greeting span { color: var(--teal); }
+
+  /* Quick Actions */
+  .actions-grid {
+    display: grid;
+    grid-template-columns: repeat(2, var(--btn-size));
+    gap: var(--btn-gap);
+    padding: 12px 0;
+    justify-content: center;
+  }
+
+  .action-btn {
+    width: var(--btn-size);
+    height: calc(var(--btn-size) * 7 / 8);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: 18px;
+    cursor: pointer;
+    font-family: 'Nunito', sans-serif;
+    font-size: 22px;
+    font-weight: 800;
+    line-height: 1.35;
+    text-align: center;
+    padding: 10px 8px;
+    transition: filter .15s, transform .15s;
+  }
+  .action-btn:hover { filter: brightness(0.93); transform: translateY(-1px); }
+  .action-btn.primary   { background: var(--navy); color: #ffffff; }
+  .action-btn.secondary { background: var(--teal); color: #ffffff; }
+
+  /* Events */
+  .section-title {
+    padding: 20px 0 10px;
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 600;
+    letter-spacing: .5px;
+    text-transform: uppercase;
+  }
+
+  .events-list {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+    padding-bottom: 40px;
+  }
+
+  .event-card {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    cursor: pointer;
+    transition: transform .15s, box-shadow .15s;
+  }
+  .event-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.10); }
+  .event-img { width: 60px; height: 60px; border-radius: 10px; object-fit: cover; flex-shrink: 0; }
+  .event-info { flex: 1; min-width: 0; }
+  .event-name {
+    font-size: 13px; font-weight: 800; margin-bottom: 4px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .event-detail { font-size: 11px; color: var(--muted); line-height: 1.6; }
+  .label { color: var(--text); font-weight: 600; }
+
+  /* Overlay */
+  .overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,.55);
+    z-index: 40; opacity: 0; pointer-events: none;
+    transition: opacity .25s;
+  }
+  .overlay.open { opacity: 1; pointer-events: all; }
+
+  /* Drawer */
+  .drawer {
+    position: fixed; top: 0; left: 0;
+    width: 280px; height: 100dvh;
+    background: var(--navy); z-index: 50;
+    transform: translateX(-100%);
+    transition: transform .28s cubic-bezier(.4,0,.2,1);
+    display: flex; flex-direction: column; padding: 0 0 32px;
+  }
+  .drawer.open { transform: translateX(0); }
+
+  .drawer-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 20px 20px 16px;
+    border-bottom: 1px solid rgba(255,255,255,.07);
+  }
+  .drawer-logo { font-size: 17px; font-weight: 800; color: var(--teal); letter-spacing: -.5px; }
+  .close-btn {
+    background: none; border: none;
+    color: rgba(255,255,255,0.5); cursor: pointer;
+    display: flex; align-items: center;
+  }
+
+  .nav-list { list-style: none; padding: 12px 0; flex: 1; }
+  .nav-item {
+    display: flex; align-items: center; gap: 14px;
+    padding: 14px 22px;
+    font-size: 14px; font-weight: 600; color: #f0f4ff;
+    cursor: pointer;
+    border-radius: 0 50px 50px 0; margin-right: 16px;
+    transition: background .15s, color .15s;
+  }
+  .nav-item:hover  { background: rgba(61,214,200,.12); color: var(--teal); }
+  .nav-item.active { background: rgba(61,214,200,.18); color: var(--teal); }
+  .nav-item svg { flex-shrink: 0; }
+
+  /* Breakpoints */
+  @media (min-width: 768px) {
+    :root { --gutter: 32px; --btn-size: 160px; }
+    .greeting { font-size: 28px; }
+    .search-input { font-size: 15px; }
+    .events-list { grid-template-columns: repeat(2, 1fr); }
+    .event-name { font-size: 14px; }
+    .event-detail { font-size: 12px; }
+  }
+
+  @media (min-width: 1024px) {
+    :root { --gutter: 48px; --btn-size: 180px; }
+    .greeting { font-size: 32px; }
+    .events-list { grid-template-columns: repeat(3, 1fr); }
+  }
+
+  @media (min-width: 1280px) {
+    :root { --gutter: 64px; }
+  }
+`;
+
 export default function HomePage() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [search, setSearch] = useState("");
 
-  const userName = "João";
-
-  const navItems = [
-    { icon: <Home size={18} />, label: "Início" },
-    { icon: <FileText size={18} />, label: "Certificados" },
-    { icon: <ClipboardList size={18} />, label: "Inscrições" },
-    { icon: <PlusCircle size={18} />, label: "Criar evento" },
-    { icon: <CalendarDays size={18} />, label: "Eventos Criados" },
-    { icon: <Activity size={18} />, label: "Monitoria" },
-  ];
-
-  const quickActions: { label: string; color: "primary" | "secondary" }[] = [
-    { label: "criar novo evento",   color: "primary"   },
-    { label: "meus certificados",   color: "secondary"   },
-    { label: "eventos criados",     color: "primary"  },
-    { label: "monitoria de eventos",color: "secondary" },
-  ];
-
   return (
     <>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
-
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-        :root {
-          --navy:      #1a2744;
-          --teal:      #3dd6c8;
-          --teal-dark: #2ab8ab;
-          --bg:        #ffffff;
-          --card-bg:   #f4f6f9;
-          --surface:   #f0f2f5;
-          --text:      #0f172a;
-          --muted:     #64748b;
-          --radius:    14px;
-          --gutter:    16px;
-          --content:   1200px;
-        }
-
-        body { font-family: 'Nunito', sans-serif; background: var(--bg); color: var(--text); }
-
-        /* ---- Shell ---- */
-        .shell {
-          width: 100%;
-          min-height: 100dvh;
-          background: var(--bg);
-        }
-
-        /* ---- Inner content wrapper (centers on wide screens) ---- */
-        .inner {
-          width: 100%;
-          max-width: var(--content);
-          margin: 0 auto;
-          padding: 0 var(--gutter);
-        }
-
-        /* ---- Header ---- */
-        .header {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          padding: 18px var(--gutter) 10px;
-          max-width: var(--content);
-          margin: 0 auto;
-        }
-        .menu-btn {
-          background: none;
-          border: none;
-          color: var(--text);
-          cursor: pointer;
-          display: flex;
-          align-items: center;
-        }
-        .avatar {
-          width: 36px; height: 36px;
-          border-radius: 50%;
-          background: var(--teal);
-          display: flex; align-items: center; justify-content: center;
-          color: var(--navy);
-        }
-
-        /* ---- Search ---- */
-        .search-wrap {
-          margin: 8px auto 0;
-          max-width: var(--content);
-          padding: 0 var(--gutter);
-          position: relative;
-        }
-        .search-wrap svg {
-          position: absolute;
-          left: calc(var(--gutter) + 14px); top: 50%;
-          transform: translateY(-50%);
-          color: var(--muted);
-          pointer-events: none;
-        }
-        .search-input {
-          width: 100%;
-          padding: 11px 14px 11px 40px;
-          border-radius: 50px;
-          border: none;
-          background: var(--surface);
-          color: var(--text);
-          font-family: inherit;
-          font-size: 14px;
-          outline: none;
-          transition: box-shadow .2s;
-        }
-        .search-input::placeholder { color: var(--muted); }
-        .search-input:focus { box-shadow: 0 0 0 2px var(--teal); }
-
-        /* ---- Greeting ---- */
-        .greeting {
-          padding: 24px 0 8px;
-          font-size: 22px;
-          font-weight: 700;
-          line-height: 1.4;
-        }
-        .greeting span { color: var(--teal); }
-
-        /* ---- Quick Actions Grid ---- */
-        /* Mobile: 2 cols | md+: 4 cols */
-        .actions-grid {
-          display: grid;
-          grid-template-columns: repeat(2, 1fr);
-          gap: 12px;
-          padding: 12px 0;
-        }
-
-        /* ---- Events Section ---- */
-        .section-title {
-          padding: 20px 0 10px;
-          font-size: 13px;
-          color: var(--muted);
-          font-weight: 600;
-          letter-spacing: .5px;
-          text-transform: uppercase;
-        }
-
-        /* Mobile: 1 col | md+: 2 cols | lg+: 3 cols */
-        .events-list {
-          display: grid;
-          grid-template-columns: 1fr;
-          gap: 12px;
-          padding-bottom: 40px;
-        }
-
-        .event-card {
-          background: var(--card-bg);
-          border-radius: var(--radius);
-          display: flex;
-          align-items: center;
-          gap: 14px;
-          padding: 14px;
-          transition: transform .15s, box-shadow .15s;
-          box-shadow: 0 1px 4px rgba(0,0,0,0.06);
-          cursor: pointer;
-        }
-        .event-card:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 4px 12px rgba(0,0,0,0.10);
-        }
-        .event-img {
-          width: 60px; height: 60px;
-          border-radius: 10px;
-          object-fit: cover;
-          flex-shrink: 0;
-        }
-        .event-info { flex: 1; min-width: 0; }
-        .event-name {
-          font-size: 13px;
-          font-weight: 800;
-          margin-bottom: 4px;
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
-        }
-        .event-detail {
-          font-size: 11px;
-          color: var(--muted);
-          line-height: 1.6;
-        }
-        .label { color: var(--text); font-weight: 600; }
-
-        /* ---- Drawer Overlay ---- */
-        .overlay {
-          position: fixed; inset: 0;
-          background: rgba(0,0,0,.55);
-          z-index: 40;
-          opacity: 0;
-          pointer-events: none;
-          transition: opacity .25s;
-        }
-        .overlay.open { opacity: 1; pointer-events: all; }
-
-        /* ---- Drawer ---- */
-        .drawer {
-          position: fixed;
-          top: 0; left: 0;
-          width: 280px;
-          height: 100dvh;
-          background: var(--navy);
-          z-index: 50;
-          transform: translateX(-100%);
-          transition: transform .28s cubic-bezier(.4,0,.2,1);
-          display: flex;
-          flex-direction: column;
-          padding: 0 0 32px;
-        }
-        .drawer.open { transform: translateX(0); }
-
-        .drawer-header {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          padding: 20px 20px 16px;
-          border-bottom: 1px solid rgba(255,255,255,.07);
-        }
-        .drawer-logo {
-          font-size: 17px;
-          font-weight: 800;
-          color: var(--teal);
-          letter-spacing: -.5px;
-        }
-        .close-btn {
-          background: none; border: none;
-          color: rgba(255,255,255,0.5); cursor: pointer;
-          display: flex; align-items: center;
-        }
-
-        .nav-list {
-          list-style: none;
-          padding: 12px 0;
-          flex: 1;
-        }
-        .nav-item {
-          display: flex;
-          align-items: center;
-          gap: 14px;
-          padding: 14px 22px;
-          font-size: 14px;
-          font-weight: 600;
-          color: #f0f4ff;
-          cursor: pointer;
-          border-radius: 0 50px 50px 0;
-          margin-right: 16px;
-          transition: background .15s, color .15s;
-        }
-        .nav-item:hover { background: rgba(61,214,200,.12); color: var(--teal); }
-        .nav-item.active { background: rgba(61,214,200,.18); color: var(--teal); }
-        .nav-item svg { flex-shrink: 0; }
-
-        /* ================================================================
-           RESPONSIVE BREAKPOINTS
-           ================================================================ */
-
-        /* tablet: md ≥ 768px */
-        @media (min-width: 768px) {
-          :root { --gutter: 32px; }
-
-          .greeting { font-size: 28px; }
-
-          /* 4 colunas para as ações rápidas */
-          .actions-grid {
-            grid-template-columns: repeat(4, 1fr);
-          }
-
-          /* 2 colunas para os eventos */
-          .events-list {
-            grid-template-columns: repeat(2, 1fr);
-          }
-
-          .search-input { font-size: 15px; }
-        }
-
-        /* desktop: lg ≥ 1024px */
-        @media (min-width: 1024px) {
-          :root { --gutter: 48px; }
-
-          .greeting { font-size: 32px; }
-
-          /* 3 colunas para os eventos */
-          .events-list {
-            grid-template-columns: repeat(3, 1fr);
-          }
-
-          .event-name { font-size: 14px; }
-          .event-detail { font-size: 12px; }
-        }
-
-        /* wide: xl ≥ 1280px */
-        @media (min-width: 1280px) {
-          :root { --gutter: 64px; }
-        }
-      `}</style>
+      <style>{CSS}</style>
 
       <div className="shell">
-        {/* Drawer Overlay */}
-        <div
-          className={`overlay${drawerOpen ? " open" : ""}`}
-          onClick={() => setDrawerOpen(false)}
-        />
+        <div className={`overlay${drawerOpen ? " open" : ""}`} onClick={() => setDrawerOpen(false)} />
 
-        {/* Side Drawer */}
         <nav className={`drawer${drawerOpen ? " open" : ""}`}>
           <div className="drawer-header">
             <span className="drawer-logo">Kauan</span>
@@ -387,7 +317,7 @@ export default function HomePage() {
             </button>
           </div>
           <ul className="nav-list">
-            {navItems.map((item, i) => (
+            {NAV_ITEMS.map((item, i) => (
               <li
                 key={item.label}
                 className={`nav-item${i === 0 ? " active" : ""}`}
@@ -400,7 +330,6 @@ export default function HomePage() {
           </ul>
         </nav>
 
-        {/* Header */}
         <header className="header">
           <button className="menu-btn" onClick={() => setDrawerOpen(true)}>
             <Menu size={24} />
@@ -411,7 +340,6 @@ export default function HomePage() {
         </header>
 
         <div className="inner">
-          {/* Search */}
           <div className="search-wrap">
             <Search size={16} />
             <input
@@ -423,32 +351,23 @@ export default function HomePage() {
             />
           </div>
 
-          {/* Greeting */}
-          <h1 className="greeting" style={{ padding: "24px 0 8px" }}>
-            Olá, {userName}! O que{" "}
-            temos para <span>hoje?</span>
+          <h1 className="greeting">
+            Olá, João! O que temos para <span>hoje?</span>
           </h1>
 
-          {/* Quick Action Buttons */}
           <div className="actions-grid">
-            {quickActions.map((action) => (
-              <Button
-                key={action.label}
-                color={action.color}
-                variant="contained"
-              >
-                {action.label}
-              </Button>
+            {QUICK_ACTIONS.map((action) => (
+              <button key={action.line2} className={`action-btn ${action.color}`}>
+                {action.line1}<br />{action.line2}
+              </button>
             ))}
           </div>
 
-          {/* Enrolled Events */}
           <p className="section-title">Eventos inscritos</p>
           <div className="events-list">
             {mockEvents
               .filter((e) =>
-                search === "" ||
-                e.name.toLowerCase().includes(search.toLowerCase())
+                search === "" || e.name.toLowerCase().includes(search.toLowerCase())
               )
               .map((event) => (
                 <EventCard key={event.id} event={event} />
@@ -456,6 +375,6 @@ export default function HomePage() {
           </div>
         </div>
       </div>
-      </>
+    </>
   );
 }

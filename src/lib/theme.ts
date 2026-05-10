@@ -3,7 +3,7 @@ import { colorTokens } from '@/lib/colors';
 
 const theme = createTheme({
   palette: {
-    mode: "light",
+    mode: 'light',
     primary: {
       main: colorTokens.brand.primary,
       light: colorTokens.brand.primaryLight,
@@ -54,7 +54,6 @@ const theme = createTheme({
       500: colorTokens.neutral.gray500,
       700: colorTokens.neutral.gray700,
     },
-    divider: "rgba(0,0,0,0.08)",
   },
   shape: {
     borderRadius: 14,
@@ -181,48 +180,6 @@ const theme = createTheme({
     MuiButton: {
       styleOverrides: {
         root: {
-          borderRadius: 12,
-          textTransform: 'none',
-          fontWeight: 600,
-          fontFamily: 'var(--font-poppins)',
-          transition: 'all 0.2s ease-in-out',
-        },
-        contained: {
-          boxShadow: 'none',
-          '&:hover': {
-            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
-          },
-        },
-        outlined: {
-          borderWidth: '1.5px',
-          '&:hover': {
-            borderWidth: '1.5px',
-          },
-        },
-      },
-      defaultProps: {
-        variant: 'contained',
-      },
-    },
-    MuiIconButton: {
-      styleOverrides: {
-        root: {
-          transition: 'all 0.2s ease-in-out',
-        },
-      },
-    },
-    MuiPaper: {
-      styleOverrides: {
-        root: {
-          backgroundImage: 'none',
-        },
-      },
-    },
-  },
-  components: {
-    MuiButton: {
-      styleOverrides: {
-        root: {
           boxShadow: "none",
           "&:hover": { boxShadow: "none" },
           transition: "transform .15s, filter .15s, background-color .2s",
@@ -234,16 +191,35 @@ const theme = createTheme({
             transform: "translateY(0)",
           },
         },
-        containedPrimary: {
-          backgroundColor: "#1a2744",
-          "&:hover": { backgroundColor: "#223260" },
-        },
-        containedSecondary: {
-          backgroundColor: "#3dd6c8",
-          color: "#1a2744",
-          "&:hover": { backgroundColor: "#2fc4b7" },
-        },
       },
+      variants: [
+        {
+          props: {
+            variant: "contained",
+            color: "primary",
+          },
+          style: {
+            backgroundColor: "#1a2744",
+            "&:hover": {
+              backgroundColor: "#223260",
+            },
+          },
+        },
+        {
+          props: {
+            variant: "contained",
+            color: "secondary",
+          },
+          style: {
+            backgroundColor: "#3dd6c8",
+            color: "#1a2744",
+
+            "&:hover": {
+              backgroundColor: "#2fc4b7",
+            },
+          },
+        },
+      ],
     },
     MuiCssBaseline: {
       styleOverrides: {
@@ -272,7 +248,7 @@ const theme = createTheme({
     MuiDrawer: {
       styleOverrides: {
         paper: {
-          backgroundColor: "#1a2744",  // drawer continua navy (igual ao Figma)
+          backgroundColor: "#1a2744",
           backgroundImage: "none",
         },
       },

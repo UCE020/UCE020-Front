@@ -1,10 +1,12 @@
 import { Box, Typography } from '@mui/material';
-import CalendarTodayOutlinedIcon from '@mui/icons-material/CalendarTodayOutlined';
+import CalendarTodayRoundedIcon from '@mui/icons-material/CalendarTodayRounded';
 import AccessTimeOutlinedIcon from '@mui/icons-material/AccessTimeOutlined';
 import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
 import PlaceOutlined from '@mui/icons-material/PlaceOutlined';
 import { formatActivityDate } from '@/utils/format';
 import type { ActivityDetailsProps } from '@/types/activity';
+import { ActivityStatusChip } from '@/components/modals/ActivityModal';
+
 
 const labelSx = {
   fontSize: 'clamp(8px, 3vw, 12px)',
@@ -39,7 +41,7 @@ export function ActivityDetails({
       <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: '100%', minWidth: 0, px: 1 }}>
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5, mt: 1 }}>
           <Box sx={detailRowSx}>
-            <CalendarTodayOutlinedIcon sx={iconSx} />
+            <CalendarTodayRoundedIcon sx={iconSx} />
             <Typography sx={labelSx}>{formatActivityDate(startDate, endDate)}</Typography>
           </Box>
 
@@ -59,25 +61,7 @@ export function ActivityDetails({
           </Box>
         </Box>
 
-        <Box
-          sx={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            width: 'fit-content',
-            px: 'clamp(8px, 2vw, 12px)',
-            height: 'clamp(20px, 5vw, 22px)',
-            bgcolor: 'grey.500',
-            borderRadius: '99px',
-            color: 'info.contrastText',
-            fontSize: 'clamp(8px, 2vw, 11px)',
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-          }}
-        >
-          {status}
-        </Box>
+        <ActivityStatusChip status={status}/>
       </Box>
     </Box>
   );

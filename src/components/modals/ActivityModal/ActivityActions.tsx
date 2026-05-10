@@ -1,4 +1,7 @@
-import { Box, Button } from '@mui/material';
+'use client';
+
+import Box from '@mui/material/Box';
+import { Button } from '@/components/ui/button';
 import type { ActivityActionsProps } from '@/types/activity';
 
 const buttonStyleProps = {

@@ -1,4 +1,5 @@
-export { default as DialogShell } from "./DialogShell";
-export { default as ConfirmDialog } from "./ConfirmDialog";
-export { default as GuestRegistrationModal } from "./GuestRegistrationModal";
-export { default as ActivityModal } from "./ActivityModal";
+export * from './ActivityModal';
+export * from './ConfirmModal';
+export * from './DialogModal'
+export * from './RegisterGuestModal';
+export * from './shared';

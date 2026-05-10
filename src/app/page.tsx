@@ -125,16 +125,20 @@ function EventCard({ event }: { event: Event }) {
         alt={event.name}
         sx={{ width: 60, height: 60, borderRadius: 2, objectFit: "cover", flexShrink: 0 }}
       />
-      <CardContent sx={{ p: "0 !important", flex: 1, minWidth: 0 }}>
-        <Typography fontWeight={700} fontSize={13} noWrap sx={{ mb: 0.5 }}>
+      <CardContent sx={{ p: '0 !important', flex: 1, minWidth: 0 }}>
+        <Typography noWrap sx={{ fontWeight: 700, fontSize: 13, mb: 0.5 }}>
           {event.name}
         </Typography>
-        <Typography fontSize={11} color="text.secondary" lineHeight={1.6}>
-          <Box component="span" fontWeight={600} color="text.primary">Data: </Box>
+        <Typography color="text.secondary" sx={{ fontSize: 11, lineHeight: 1.6 }}>
+          <Box component="span" color="text.primary" sx={{ fontWeight: 600 }}>
+            Data:
+          </Box>
           {event.startDate} a {event.endDate}
         </Typography>
-        <Typography fontSize={11} color="text.secondary" lineHeight={1.6}>
-          <Box component="span" fontWeight={600} color="text.primary">Horário: </Box>
+        <Typography color="text.secondary" sx={{ fontSize: 11, lineHeight: 1.6 }}>
+          <Box component="span" color="text.primary" sx={{ fontWeight: 600 }}>
+            Horário:
+          </Box>
           {event.time}
         </Typography>
       </CardContent>
@@ -174,7 +178,8 @@ export default function HomePage() {
               borderBottom: "1px solid rgba(255,255,255,.07)",
             }}
           >
-            <Typography fontWeight={800} fontSize={17} sx={{ color: "#3dd6c8", letterSpacing: "-.5px" }}>
+            <Typography sx={{ color: '#3dd6c8', letterSpacing: '-.5px', fontSize: 17, fontWeight: 800 }}
+            >
               Kauan
             </Typography>
             <IconButton onClick={() => setDrawerOpen(false)} sx={{ color: "rgba(255,255,255,0.5)" }}>
@@ -199,7 +204,14 @@ export default function HomePage() {
                 <ListItemIcon sx={{ color: "inherit", minWidth: 36 }}>{item.icon}</ListItemIcon>
                 <ListItemText
                   primary={item.label}
-                  primaryTypographyProps={{ fontWeight: 600, fontSize: 14 }}
+                  slotProps={{
+                    primary: {
+                      sx: {
+                        fontWeight: 600,
+                        fontSize: 14,
+                      },
+                    },
+                  }}
                 />
               </ListItem>
             ))}
@@ -255,8 +267,7 @@ export default function HomePage() {
           {/* Saudação */}
           <Typography
             variant="h5"
-            textAlign="center"
-            sx={{ py: 3, fontWeight: 700, lineHeight: 1.5 }}
+            sx={{ textAlign: 'center', py: 3, fontWeight: 700, lineHeight: 1.5 }}
           >
             Olá, {userName}! O que temos para{" "}
             <Box component="span" sx={{ color: "#3dd6c8" }}>

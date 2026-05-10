@@ -30,6 +30,7 @@ import {
   BarChart,
   Person,
 } from "@mui/icons-material";
+import Header from "@/components/ui/Header";
 
 // ── Tema ───────────────────────────────────────────────
 const theme = createTheme({
@@ -166,6 +167,9 @@ export default function HomePage() {
 
       <Box sx={{ minHeight: "100dvh", bgcolor: "background.default" }}>
 
+        {/* Header - Exemplo com usuário autenticado */}
+        <Header user={{ name: "João" }} />
+
         {/* Drawer */}
         <Drawer open={drawerOpen} onClose={() => setDrawerOpen(false)}>
           <Box
@@ -217,26 +221,6 @@ export default function HomePage() {
             ))}
           </List>
         </Drawer>
-
-        {/* Header */}
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            px: 3,
-            py: 2,
-            maxWidth: 1200,
-            mx: "auto",
-          }}
-        >
-          <IconButton onClick={() => setDrawerOpen(true)}>
-            <Menu />
-          </IconButton>
-          <Avatar sx={{ bgcolor: "#3dd6c8", color: "#1a2744", width: 36, height: 36 }}>
-            <Person fontSize="small" />
-          </Avatar>
-        </Box>
 
         {/* Conteúdo */}
         <Box sx={{ maxWidth: 1200, mx: "auto", px: 3 }}>

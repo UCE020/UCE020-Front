@@ -3,11 +3,8 @@
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
-//import LogoSvg from "@/assets/logo_white.svg";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
-
 interface NavLink {
   label: string;
   href: string;
@@ -20,19 +17,25 @@ interface User {
 interface HeaderProps {
   /** Links de navegação exibidos no desktop e no drawer mobile */
   navLinks?: NavLink[];
-  /** Usuário autenticado. Se null/undefined, exibe os botões Entrar / Criar Conta */
+  /** Usuário autenticado. Se null/undefined → tema claro (landing). Com user → tema escuro (app). */
   user?: User | null;
   /** Callback acionado ao clicar em "Sair" */
   onLogout?: () => void;
 }
 
 // ─── Logo ─────────────────────────────────────────────────────────────────────
-function Logo() {
-    return (
-        <Link href="/" aria-label="Ir para a página inicial">
-        <Image src="/logo.svg" alt="Logo" width={32} height={32} />
-        </Link>
-    );
+
+interface LogoProps {
+  isDark: boolean;
+}
+
+function Logo({ isDark }: LogoProps) {
+    const logoSrc = isDark ? "/logo.svg" : "/logo_white.svg";
+  return (
+    <Link href="/" aria-label="Ir para a página inicial">
+      <Image src={logoSrc} alt="Logo" width={32} height={32} />
+    </Link>
+  );
 }
 
 // ─── Avatar + Dropdown ────────────────────────────────────────────────────────
@@ -210,19 +213,34 @@ export function Header({
 }: HeaderProps) {
   const [drawerOpen, setDrawerOpen] = useState(false);
 
+  const isDark = !!user; // logado → dark, landing → light
+
+  const styles = {
+    header: isDark
+      ? "bg-[#0F1D35] border-transparent"
+      : "bg-white border-b border-gray-100",
+    hamburger: isDark ? "text-white" : "text-[#0F1D35]",
+    navLink: isDark
+      ? "text-white hover:text-[#2EC4A0]"
+      : "text-[#0F1D35] hover:text-[#2EC4A0]",
+    btnPrimary: "bg-[#2EC4A0] text-white hover:bg-[#27b090]",
+    btnSecondary: isDark
+      ? "border-2 border-white text-white hover:bg-white/10"
+      : "border-2 border-[#0F1D35] text-[#0F1D35] hover:bg-gray-50",
+  };
+
   return (
     <>
-      <header className="w-full bg-[#0F1D35] px-4 sm:px-8">
+      <header className={`w-full px-4 sm:px-8 ${styles.header}`}>
         <div className="mx-auto max-w-7xl flex items-center justify-between h-16">
 
           {/* ── Mobile ── */}
           <div className="flex items-center justify-between w-full md:hidden">
-            {/* Hamburger */}
             <button
               onClick={() => setDrawerOpen(true)}
               aria-label="Abrir menu"
               aria-expanded={drawerOpen}
-              className="text-white hover:opacity-70 transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2EC4A0] rounded"
+              className={`hover:opacity-70 transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2EC4A0] rounded ${styles.hamburger}`}
             >
               <svg
                 width="24"
@@ -240,7 +258,6 @@ export function Header({
               </svg>
             </button>
 
-            {/* Avatar ou espaço vazio */}
             {user ? (
               <AvatarMenu user={user} onLogout={onLogout} />
             ) : (
@@ -250,22 +267,20 @@ export function Header({
 
           {/* ── Desktop ── */}
           <div className="hidden md:flex items-center justify-between w-full">
-            <Logo />
+            <Logo isDark={isDark} />
 
-            {/* Links de navegação */}
             <nav aria-label="Navegação principal" className="flex items-center gap-8">
               {navLinks.map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="text-white text-[14px] font-medium hover:text-[#2EC4A0] transition-colors"
+                  className={`text-[14px] font-medium transition-colors ${styles.navLink}`}
                 >
                   {link.label}
                 </Link>
               ))}
             </nav>
 
-            {/* Ações */}
             <div className="flex items-center gap-3">
               {user ? (
                 <AvatarMenu user={user} onLogout={onLogout} />
@@ -273,13 +288,13 @@ export function Header({
                 <>
                   <Link
                     href="/entrar"
-                    className="px-5 py-2 text-[14px] font-semibold rounded-lg bg-[#2EC4A0] text-white hover:bg-[#27b090] transition-colors"
+                    className={`px-5 py-2 text-[14px] font-semibold rounded-lg transition-colors ${styles.btnPrimary}`}
                   >
                     Entrar
                   </Link>
                   <Link
                     href="/criar-conta"
-                    className="px-5 py-2 text-[14px] font-semibold rounded-lg border-2 border-white text-white hover:bg-white/10 transition-colors"
+                    className={`px-5 py-2 text-[14px] font-semibold rounded-lg transition-colors ${styles.btnSecondary}`}
                   >
                     Criar Conta
                   </Link>
@@ -291,7 +306,6 @@ export function Header({
         </div>
       </header>
 
-      {/* Drawer mobile */}
       <MobileDrawer
         open={drawerOpen}
         navLinks={navLinks}

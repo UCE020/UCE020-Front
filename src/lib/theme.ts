@@ -1,107 +1,258 @@
-import { createTheme } from "@mui/material/styles";
+import { createTheme } from '@mui/material/styles';
+import { colorTokens } from '@/lib/colors';
 
 const theme = createTheme({
   palette: {
-    mode: "light",
+    mode: 'light',
     primary: {
-      main: "#1a2744",        // navy — botões escuros (criar evento, certificados)
-      light: "#223260",
-      dark: "#111b30",
-      contrastText: "#ffffff",
+      main: colorTokens.brand.primary,
+      light: colorTokens.brand.primaryLight,
+      dark: colorTokens.brand.primaryDark,
+      contrastText: colorTokens.neutral.black,
     },
     secondary: {
-      main: "#3dd6c8",        // teal — botões claros (eventos criados, monitoria)
-      light: "#6fe4da",
-      dark: "#2ab8ab",
-      contrastText: "#1a2744",
+      main: colorTokens.brand.secondary,
+      light: colorTokens.brand.secondaryLight,
+      dark: colorTokens.brand.secondaryDark,
+      contrastText: colorTokens.text.inverse,
+    },
+    error: {
+      main: colorTokens.status.error,
+      light: colorTokens.status.errorLight,
+      dark: colorTokens.status.errorDark,
+      contrastText: colorTokens.text.inverse,
+    },
+    warning: {
+      main: colorTokens.status.warning,
+      contrastText: colorTokens.text.inverse,
+    },
+    success: {
+      main: colorTokens.status.success,
+      contrastText: colorTokens.text.inverse,
+    },
+    info: {
+      main: colorTokens.status.info,
+      contrastText: colorTokens.text.inverse,
     },
     background: {
-      default: "#ffffff",     // fundo geral branco
-      paper: "#f4f6f9",       // cards e superfícies elevadas
+      default: colorTokens.surface.background,
+      paper: colorTokens.surface.paper,
     },
+    divider: colorTokens.neutral.border,
     text: {
-      primary: "#0f172a",
-      secondary: "#64748b",
+      primary: colorTokens.text.primary,
+      secondary: colorTokens.text.secondary,
     },
-    divider: "rgba(0,0,0,0.08)",
+    action: {
+      hover: colorTokens.navigation.hover,
+      active: colorTokens.navigation.default,
+      disabled: colorTokens.neutral.border,
+      disabledBackground: colorTokens.surface.paper,
+    },
+    grey: {
+      300: colorTokens.neutral.gray300,
+      500: colorTokens.neutral.gray500,
+      700: colorTokens.neutral.gray700,
+    },
   },
   shape: {
     borderRadius: 14,
   },
   typography: {
-    fontFamily: "var(--font-geist-sans), Inter, system-ui, sans-serif",
+    fontFamily: 'var(--font-poppins), Inter, system-ui, sans-serif',
     h1: {
       fontWeight: 800,
-      letterSpacing: "-0.04em",
+      letterSpacing: '-0.04em',
+      fontFamily: 'var(--font-poppins)',
     },
     h2: {
       fontWeight: 800,
-      letterSpacing: "-0.035em",
+      letterSpacing: '-0.035em',
+      fontFamily: 'var(--font-poppins)',
+    },
+    h3: {
+      fontWeight: 700,
+      fontFamily: 'var(--font-poppins)',
+    },
+    h4: {
+      fontWeight: 600,
+      fontFamily: 'var(--font-poppins)',
     },
     button: {
-      textTransform: "none",
-      fontWeight: 700,
+      textTransform: 'none',
+      fontWeight: 600,
+      fontFamily: 'var(--font-poppins)',
+    },
+    body1: {
+      fontFamily: 'var(--font-poppins)',
+    },
+    body2: {
+      fontFamily: 'var(--font-poppins)',
     },
   },
   components: {
-    MuiButton: {
-      styleOverrides: {
-        root: {
-          boxShadow: "none",
-          "&:hover": { boxShadow: "none" },
-          transition: "transform .15s, filter .15s, background-color .2s",
-          "&:hover:not(:disabled)": {
-            transform: "translateY(-2px)",
-            filter: "brightness(1.08)",
-          },
-          "&:active": {
-            transform: "translateY(0)",
-          },
-        },
-        containedPrimary: {
-          backgroundColor: "#1a2744",
-          "&:hover": { backgroundColor: "#223260" },
-        },
-        containedSecondary: {
-          backgroundColor: "#3dd6c8",
-          color: "#1a2744",
-          "&:hover": { backgroundColor: "#2fc4b7" },
-        },
-      },
-    },
-    MuiCssBaseline: {
-      styleOverrides: {
-        body: {
-          backgroundColor: "#ffffff",
-          color: "#0f172a",
-        },
-      },
-    },
-    MuiCard: {
-      styleOverrides: {
-        root: {
-          backgroundColor: "#f4f6f9",
-          backgroundImage: "none",
-          boxShadow: "0 1px 4px rgba(0,0,0,0.06)",
-        },
-      },
-    },
-    MuiPaper: {
-      styleOverrides: {
-        root: {
-          backgroundImage: "none",
-        },
-      },
-    },
-    MuiDrawer: {
+    MuiDialog: {
       styleOverrides: {
         paper: {
-          backgroundColor: "#1a2744",  // drawer continua navy (igual ao Figma)
-          backgroundImage: "none",
+          borderRadius: 20,
+          padding: 0,
+          backgroundImage: 'none',
+          backgroundColor: colorTokens.surface.paper,
         },
       },
     },
-  },
+    MuiOutlinedInput: {
+      styleOverrides: {
+        root: {
+          borderRadius: 12,
+          backgroundColor: colorTokens.neutral.white,
+          '& .MuiOutlinedInput-notchedOutline': {
+            borderColor: colorTokens.navigation.default,
+          },
+          '&:hover .MuiOutlinedInput-notchedOutline': {
+            borderColor: colorTokens.navigation.hover,
+          },
+          '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+            borderColor: colorTokens.navigation.hover,
+          },
+          '&.Mui-error .MuiOutlinedInput-notchedOutline': {
+            borderColor: colorTokens.status.error,
+          },
+          '& input::placeholder': {
+            color: colorTokens.neutral.gray500,
+            opacity: 1,
+          },
+          '& textarea::placeholder': {
+            color: colorTokens.neutral.gray500,
+            opacity: 1,
+          },
+        },
+      },
+    },
+    MuiInputLabel: {
+      styleOverrides: {
+        root: {
+          color: colorTokens.navigation.default,
+          fontWeight: 600,
+          fontSize: '0.875rem',
+          '&.Mui-focused': {
+            color: colorTokens.navigation.hover,
+          },
+          '&.Mui-error': {
+            color: colorTokens.status.error,
+          },
+        },
+      },
+    },
+    MuiFormHelperText: {
+      styleOverrides: {
+        root: {
+          fontSize: '0.75rem',
+          '&.Mui-error': {
+            color: colorTokens.status.error,
+          },
+        },
+      },
+    },
+    MuiMenuItem: {
+      styleOverrides: {
+        root: {
+          backgroundColor: colorTokens.surface.paper,
+          '&:hover': {
+            backgroundColor: colorTokens.neutral.gray300,
+          },
+          '&.Mui-selected': {
+            backgroundColor: colorTokens.neutral.border,
+          },
+          '&.Mui-selected:hover': {
+            backgroundColor: colorTokens.neutral.gray300,
+          },
+        },
+      },
+    },
+    MuiSelect: {
+      styleOverrides: {
+        icon: {
+          color: colorTokens.neutral.gray700,
+        },
+      },
+    },
+    MuiButton: { 
+      styleOverrides: { 
+        root: { 
+          boxShadow: "none", 
+          "&:hover": { boxShadow: "none" }, 
+          transition: "transform .15s, filter .15s, background-color .2s", 
+          "&:hover:not(:disabled)": { 
+            transform: "translateY(-2px)", 
+            filter: "brightness(1.08)", 
+          }, 
+          "&:active": { 
+            transform: "translateY(0)", 
+          }, 
+        }, 
+      }, 
+      variants: [ 
+        { 
+          props: { 
+            variant: "contained", 
+            color: "primary", 
+          }, 
+          style: { 
+            backgroundColor: "#1a2744", 
+            "&:hover": { 
+              backgroundColor: "#223260", 
+            }, 
+          }, 
+        }, 
+        { 
+          props: { 
+            variant: "contained", 
+            color: "secondary", 
+          }, 
+          style: { 
+            backgroundColor: "#3dd6c8", 
+            color: "#1a2744", 
+            "&:hover": { 
+              backgroundColor: "#2fc4b7", 
+            },
+          },
+        },
+      ],
+    },
+    MuiCssBaseline: { 
+      styleOverrides: { 
+        body: { 
+          backgroundColor: colorTokens.neutral.white, 
+          color: "#0f172a", 
+        }, 
+      }, 
+    }, 
+    MuiCard: { 
+      styleOverrides: { 
+        root: { 
+          backgroundColor: "#f4f6f9", 
+          backgroundImage: "none", 
+          boxShadow: "0 1px 4px rgba(0,0,0,0.06)", 
+        }, 
+      }, 
+    }, 
+    MuiPaper: { 
+      styleOverrides: { 
+        root: { 
+          backgroundImage: "none", 
+        }, 
+      }, 
+    }, 
+    MuiDrawer: { 
+      styleOverrides: { 
+        paper: { 
+          backgroundColor: "#1a2744", 
+          backgroundImage: "none", 
+        }, 
+      }, 
+    }, 
+  }, 
 });
 
 export default theme;

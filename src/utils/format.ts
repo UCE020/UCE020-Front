@@ -31,3 +31,27 @@ export function formatNumber(value: number, decimals: number = 2): string {
     maximumFractionDigits: decimals,
   }).format(value);
 }
+
+export function formatActivityDate(startDate: Date | string, endDate?: Date | string): string {
+  try {
+    if (startDate) {
+      const start = new Date(startDate);
+      const startDay = start.getUTCDate();
+      const month = start.toLocaleString('pt-BR', { month: 'long' });
+      const year = start.getUTCFullYear();
+
+      if (endDate) {
+        const end = new Date(endDate);
+        const endDay = end.getUTCDate();
+        if (startDay !== endDay) {
+          return `${startDay} a ${endDay} de ${month} de ${year}`;
+        }
+      }
+      return `${startDay} de ${month} de ${year}`;
+    } else {
+      return 'Data não informada';
+    }
+  } catch {
+    return 'Data indisponível';
+  }
+}

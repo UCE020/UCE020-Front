@@ -177,83 +177,82 @@ const theme = createTheme({
         },
       },
     },
-    MuiButton: {
-      styleOverrides: {
-        root: {
-          boxShadow: "none",
-          "&:hover": { boxShadow: "none" },
-          transition: "transform .15s, filter .15s, background-color .2s",
-          "&:hover:not(:disabled)": {
-            transform: "translateY(-2px)",
-            filter: "brightness(1.08)",
-          },
-          "&:active": {
-            transform: "translateY(0)",
-          },
-        },
-      },
-      variants: [
-        {
-          props: {
-            variant: "contained",
-            color: "primary",
-          },
-          style: {
-            backgroundColor: "#1a2744",
-            "&:hover": {
-              backgroundColor: "#223260",
-            },
-          },
-        },
-        {
-          props: {
-            variant: "contained",
-            color: "secondary",
-          },
-          style: {
-            backgroundColor: "#3dd6c8",
-            color: "#1a2744",
-
-            "&:hover": {
-              backgroundColor: "#2fc4b7",
+    MuiButton: { 
+      styleOverrides: { 
+        root: { 
+          boxShadow: "none", 
+          "&:hover": { boxShadow: "none" }, 
+          transition: "transform .15s, filter .15s, background-color .2s", 
+          "&:hover:not(:disabled)": { 
+            transform: "translateY(-2px)", 
+            filter: "brightness(1.08)", 
+          }, 
+          "&:active": { 
+            transform: "translateY(0)", 
+          }, 
+        }, 
+      }, 
+      variants: [ 
+        { 
+          props: { 
+            variant: "contained", 
+            color: "primary", 
+          }, 
+          style: { 
+            backgroundColor: "#1a2744", 
+            "&:hover": { 
+              backgroundColor: "#223260", 
+            }, 
+          }, 
+        }, 
+        { 
+          props: { 
+            variant: "contained", 
+            color: "secondary", 
+          }, 
+          style: { 
+            backgroundColor: "#3dd6c8", 
+            color: "#1a2744", 
+            "&:hover": { 
+              backgroundColor: "#2fc4b7", 
             },
           },
         },
       ],
     },
-    MuiCssBaseline: {
-      styleOverrides: {
-        body: {
-          backgroundColor: colorTokens.neutral.white,
-          color: "#0f172a",
-        },
-      },
-    },
-    MuiCard: {
-      styleOverrides: {
-        root: {
-          backgroundColor: "#f4f6f9",
-          backgroundImage: "none",
-          boxShadow: "0 1px 4px rgba(0,0,0,0.06)",
-        },
-      },
-    },
-    MuiPaper: {
-      styleOverrides: {
-        root: {
-          backgroundImage: "none",
-        },
-      },
-    },
-    MuiDrawer: {
-      styleOverrides: {
-        paper: {
-          backgroundColor: "#1a2744",
-          backgroundImage: "none",
-        },
-      },
-    },
-  },
+    MuiCssBaseline: { 
+      styleOverrides: { 
+        body: { 
+          backgroundColor: colorTokens.neutral.white, 
+          color: "#0f172a", 
+        }, 
+      }, 
+    }, 
+    MuiCard: { 
+      styleOverrides: { 
+        root: { 
+          backgroundColor: "#f4f6f9", 
+          backgroundImage: "none", 
+          boxShadow: "0 1px 4px rgba(0,0,0,0.06)", 
+        }, 
+      }, 
+    }, 
+    MuiPaper: { 
+      styleOverrides: { 
+        root: { 
+          backgroundImage: "none", 
+        }, 
+      }, 
+    }, 
+    MuiDrawer: { 
+      styleOverrides: { 
+        paper: { 
+          backgroundColor: "#1a2744", 
+          backgroundImage: "none", 
+        }, 
+      }, 
+    }, 
+  }, 
 });
 
 export default theme;

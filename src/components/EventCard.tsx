@@ -21,7 +21,7 @@ export function EventCard({ event }: { event: Event }) {
         component="img"
         src={event.imageUrl}
         alt={event.name}
-        sx={{ width: 60, height: 60, borderRadius: 6, objectFit: "cover", flexShrink: 0 }}
+        sx={{ width: 80, height: 80, borderRadius: 10, objectFit: "cover", flexShrink: 0 }}
       />
       <CardContent sx={{ p: '0 !important', flex: 1, minWidth: 0 }}>
         <Typography noWrap sx={{ fontWeight: 700, fontSize: 13, mb: 0.5 }}>

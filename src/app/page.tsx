@@ -12,8 +12,6 @@ import {
   ListItemIcon,
   ListItemText,
   Grid,
-  Card,
-  CardContent,
   Avatar,
   Paper,
 } from "@mui/material";
@@ -30,7 +28,8 @@ import {
   BarChart,
   Person,
 } from "@mui/icons-material";
-import Header from "@/components/ui/Header";
+import { Event } from "@/types/event";
+import { EventCard } from "@/components/EventCard";
 
 // ── Tema ───────────────────────────────────────────────
 const theme = createTheme({
@@ -60,15 +59,6 @@ const theme = createTheme({
     },
   },
 });
-
-interface Event {
-  id: string;
-  name: string;
-  startDate: string;
-  endDate: string;
-  time: string;
-  imageUrl: string;
-}
 
 const mockEvents: Event[] = [
   {
@@ -104,48 +94,6 @@ const QUICK_ACTIONS = [
   { line1: "eventos",     line2: "criados",      variant: "teal" },
   { line1: "monitoria",   line2: "de eventos",   variant: "navy" },
 ] as const;
-
-function EventCard({ event }: { event: Event }) {
-  return (
-    <Card
-      elevation={1}
-      sx={{
-        display: "flex",
-        alignItems: "center",
-        gap: 2,
-        p: 2,
-        borderRadius: 3,
-        cursor: "pointer",
-        transition: "transform .15s, box-shadow .15s",
-        "&:hover": { transform: "translateY(-2px)", boxShadow: 4 },
-      }}
-    >
-      <Box
-        component="img"
-        src={event.imageUrl}
-        alt={event.name}
-        sx={{ width: 60, height: 60, borderRadius: 2, objectFit: "cover", flexShrink: 0 }}
-      />
-      <CardContent sx={{ p: '0 !important', flex: 1, minWidth: 0 }}>
-        <Typography noWrap sx={{ fontWeight: 700, fontSize: 13, mb: 0.5 }}>
-          {event.name}
-        </Typography>
-        <Typography color="text.secondary" sx={{ fontSize: 11, lineHeight: 1.6 }}>
-          <Box component="span" color="text.primary" sx={{ fontWeight: 600 }}>
-            Data:
-          </Box>
-          {event.startDate} a {event.endDate}
-        </Typography>
-        <Typography color="text.secondary" sx={{ fontSize: 11, lineHeight: 1.6 }}>
-          <Box component="span" color="text.primary" sx={{ fontWeight: 600 }}>
-            Horário:
-          </Box>
-          {event.time}
-        </Typography>
-      </CardContent>
-    </Card>
-  );
-}
 
 export default function HomePage() {
   const [drawerOpen, setDrawerOpen] = useState(false);

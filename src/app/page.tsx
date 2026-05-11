@@ -39,7 +39,7 @@ const theme = createTheme({
     background: { default: "#ffffff", paper: "#f4f6f9" },
   },
   typography: {
-    fontFamily: "'Poppins', sans-serif", // ✅ Poppins global
+    fontFamily: "'Poppins', sans-serif",
     h5: { fontWeight: 700 },
   },
   components: {
@@ -95,11 +95,47 @@ const QUICK_ACTIONS = [
   { line1: "monitoria",   line2: "de eventos",   variant: "navy" },
 ] as const;
 
+// ── Header Component ───────────────────────────────────
+interface HeaderProps {
+  user: { name: string };
+  onMenuClick: () => void;
+}
+
+function Header({ user, onMenuClick }: HeaderProps) {
+  return (
+    <Box
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        px: 3,
+        py: 1.5,
+        bgcolor: "#1a2744",
+      }}
+    >
+      <IconButton onClick={onMenuClick} sx={{ color: "#fff" }}>
+        <Menu />
+      </IconButton>
+
+      <Typography
+        sx={{ color: "#3dd6c8", fontWeight: 800, fontSize: 18, letterSpacing: "-.5px" }}
+      >
+        Kauan
+      </Typography>
+
+      <Avatar sx={{ bgcolor: "#3dd6c8", color: "#1a2744", width: 34, height: 34, fontSize: 14, fontWeight: 700 }}>
+        {user.name.charAt(0).toUpperCase()}
+      </Avatar>
+    </Box>
+  );
+}
+
+// ── Page ───────────────────────────────────────────────
 export default function HomePage() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [search, setSearch] = useState("");
 
-  const userName = "João"; // 👈 substitua pela sua fonte de dados
+  const userName = "João";
 
   const filtered = mockEvents.filter(
     (e) => search === "" || e.name.toLowerCase().includes(search.toLowerCase())
@@ -107,7 +143,6 @@ export default function HomePage() {
 
   return (
     <ThemeProvider theme={theme}>
-      {/* ✅ Apenas Poppins, todos os pesos necessários */}
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap');
         * { font-family: 'Poppins', sans-serif; }
@@ -115,8 +150,8 @@ export default function HomePage() {
 
       <Box sx={{ minHeight: "100dvh", bgcolor: "background.default" }}>
 
-        {/* Header - Exemplo com usuário autenticado */}
-        <Header user={{ name: "João" }} />
+        {/* ✅ Header agora recebe onMenuClick */}
+        <Header user={{ name: "João" }} onMenuClick={() => setDrawerOpen(true)} />
 
         {/* Drawer */}
         <Drawer open={drawerOpen} onClose={() => setDrawerOpen(false)}>
@@ -130,8 +165,7 @@ export default function HomePage() {
               borderBottom: "1px solid rgba(255,255,255,.07)",
             }}
           >
-            <Typography sx={{ color: '#3dd6c8', letterSpacing: '-.5px', fontSize: 17, fontWeight: 800 }}
-            >
+            <Typography sx={{ color: "#3dd6c8", letterSpacing: "-.5px", fontSize: 17, fontWeight: 800 }}>
               Kauan
             </Typography>
             <IconButton onClick={() => setDrawerOpen(false)} sx={{ color: "rgba(255,255,255,0.5)" }}>
@@ -157,12 +191,7 @@ export default function HomePage() {
                 <ListItemText
                   primary={item.label}
                   slotProps={{
-                    primary: {
-                      sx: {
-                        fontWeight: 600,
-                        fontSize: 14,
-                      },
-                    },
+                    primary: { sx: { fontWeight: 600, fontSize: 14 } },
                   }}
                 />
               </ListItem>
@@ -199,7 +228,7 @@ export default function HomePage() {
           {/* Saudação */}
           <Typography
             variant="h5"
-            sx={{ textAlign: 'center', py: 3, fontWeight: 700, lineHeight: 1.5 }}
+            sx={{ textAlign: "center", py: 3, fontWeight: 700, lineHeight: 1.5 }}
           >
             Olá, {userName}! O que temos para{" "}
             <Box component="span" sx={{ color: "#3dd6c8" }}>

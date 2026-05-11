@@ -28,6 +28,7 @@ import {
   BarChart,
   Person,
 } from "@mui/icons-material";
+import { Header } from "@/components/ui/Header";
 import { Event } from "@/types/event";
 import { EventCard } from "@/components/EventCard";
 

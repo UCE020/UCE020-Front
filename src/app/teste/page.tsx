@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import Divider from '@mui/material/Divider';
@@ -45,11 +45,8 @@ export default function TestePage() {
   const [openActivityManage, setOpenActivityManage] = useState(false);
   const [openShell, setOpenShell] = useState(false);
 
-  const canSubmit = useMemo(
-    () =>
-      name.trim().length > 2 && email.includes('@') && role.length > 0 && password.length >= 6,
-    [name, email, password, role]
-  );
+  const canSubmit =
+    name.trim().length > 2 && email.includes('@') && role.length > 0 && password.length >= 6;
 
   const hasNameError = name.trim().length > 0 && name.trim().length < 3;
   const hasEmailError = email.trim().length > 0 && !email.includes('@');
@@ -388,6 +385,7 @@ export default function TestePage() {
         open={openGuest}
         onClose={() => setOpenGuest(false)}
         activityTitle="Título da atividade"
+        activityDate='2026/08/19'
         activityLocation="Auditório Central - UEFS"
         roleOptions={[...roleOptions]}
         onSubmit={async () => Promise.resolve()}

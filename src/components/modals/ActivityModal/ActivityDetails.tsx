@@ -2,8 +2,7 @@ import { Box, Typography } from '@mui/material';
 import CalendarTodayRoundedIcon from '@mui/icons-material/CalendarTodayRounded';
 import AccessTimeOutlinedIcon from '@mui/icons-material/AccessTimeOutlined';
 import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
-import PlaceOutlined from '@mui/icons-material/PlaceOutlined';
-import { formatActivityDate } from '@/utils/format';
+import PlaceOutlinedIcon from '@mui/icons-material/PlaceOutlined';import { formatActivityDate } from '@/utils/format';
 import type { ActivityDetailsProps } from '@/types/activity';
 import { ActivityStatusChip } from '@/components/modals/ActivityModal';
 
@@ -38,7 +37,16 @@ export function ActivityDetails({
 }: ActivityDetailsProps) {
   return (
     <Box sx={{ width: '50%', aspectRatio: '1/1', position: 'relative', flexShrink: 0 }}>
-      <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: '100%', minWidth: 0, px: 1 }}>
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'space-between',
+          height: '100%',
+          minWidth: 0,
+          px: 1,
+        }}
+      >
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5, mt: 1 }}>
           <Box sx={detailRowSx}>
             <CalendarTodayRoundedIcon sx={iconSx} />
@@ -46,7 +54,7 @@ export function ActivityDetails({
           </Box>
 
           <Box sx={detailRowSx}>
-            <PlaceOutlined sx={iconSx} />
+            <PlaceOutlinedIcon sx={iconSx} />
             <Typography sx={labelSx}>{location}</Typography>
           </Box>
 
@@ -61,7 +69,7 @@ export function ActivityDetails({
           </Box>
         </Box>
 
-        <ActivityStatusChip status={status}/>
+        <ActivityStatusChip status={status} />
       </Box>
     </Box>
   );

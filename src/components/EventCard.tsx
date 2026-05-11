@@ -1,9 +1,10 @@
 import { Box, Card, CardContent, Typography } from "@mui/material";
-import { Event } from "@/types/event";
+import { EventCardProps } from "@/types/event";
 
-export function EventCard({ event }: { event: Event }) {
+export function EventCard({ event, onClick }: EventCardProps) {
   return (
     <Card
+      onClick={onClick ? () => onClick(event) : undefined}
       elevation={1}
       sx={{
         display: "flex",

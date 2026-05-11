@@ -6,3 +6,8 @@ export interface Event {
   time: string;
   imageUrl: string;
 }
+
+export interface EventCardProps {
+  event: Event;
+  onClick?: (event: Event) => void;
+}

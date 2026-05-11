@@ -4,7 +4,7 @@ import Stack from "@mui/material/Stack";
 
 export default function Home() {
 
-  redirect("/home");
+  redirect("/home"); //Para chamar home (acho que isso é rota né?)
 
    return (
      <Stack spacing={1} sx={{ py: 2 }}>

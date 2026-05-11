@@ -10,11 +10,7 @@ import {
   ListItemText,
 } from "@mui/material";
 import { FormatListBulleted, ChevronRight } from "@mui/icons-material";
-
-export interface Activity {
-  id: string;
-  title: string;
-}
+import type { Activity } from "@/types/activity";
 
 interface ActivityListProps {
   activities: Activity[];
@@ -94,16 +90,16 @@ export function ActivityList({
                   <ListItemText
                     primary={activity.title}
                     slotProps={{
-                        primary: {
+                      primary: {
                         sx: {
-                            fontFamily: "'Poppins', sans-serif",
-                            fontWeight: 500,
-                            fontSize: "0.875rem",
-                            color: "#0f172a",
+                          fontFamily: "'Poppins', sans-serif",
+                          fontWeight: 500,
+                          fontSize: "0.875rem",
+                          color: "#0f172a",
                         },
-                        },
+                      },
                     }}
-                    />
+                  />
                   <ChevronRight sx={{ color: "#64748b", fontSize: 20 }} />
                 </ListItemButton>
               </ListItem>

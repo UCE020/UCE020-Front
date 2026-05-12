@@ -64,7 +64,7 @@ export function AppDrawer({ open, onClose, activeHref = "/home" }: AppDrawerProp
           fontSize={17}
           sx={{ color: "#3dd6c8", letterSpacing: "-.5px" }}
         >
-          Kauan
+          Assinae
         </Typography>
         <IconButton onClick={onClose} sx={{ color: "rgba(255,255,255,0.5)" }}>
           <Close />

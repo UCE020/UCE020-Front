@@ -4,10 +4,10 @@ import { Box } from "@mui/material";
 import { useRouter } from "next/navigation";
 
 const QUICK_ACTIONS = [
-  { line1: "criar novo",  line2: "evento",       variant: "navy", href: "/criar-evento"    },
-  { line1: "meus",        line2: "certificados", variant: "teal", href: "/certificados"    },
-  { line1: "eventos",     line2: "criados",      variant: "teal", href: "/eventos-criados" },
-  { line1: "monitoria",   line2: "de eventos",   variant: "navy", href: "/monitoria"       },
+  { line1: "Criar novo",  line2: "evento",       variant: "navy", href: "/criar-evento"    },
+  { line1: "Meus",        line2: "certificados", variant: "teal", href: "/certificados"    },
+  { line1: "Eventos",     line2: "criados",      variant: "teal", href: "/eventos-criados" },
+  { line1: "Monitoria",   line2: "de eventos",   variant: "navy", href: "/monitoria"       },
 ] as const;
 
 export function QuickActions() {

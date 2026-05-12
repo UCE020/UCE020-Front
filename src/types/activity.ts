@@ -45,3 +45,9 @@ export interface ActivityActionsProps {
   onCancelParticipation?: AsyncVoidHandler;
   onMarkPresence?: AsyncVoidHandler;
 }
+
+export interface Activity {
+  id: string;
+  title: string;
+}
+

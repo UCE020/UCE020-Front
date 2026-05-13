@@ -1,14 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import Box from "@mui/material/Box";
-import Typography from "@mui/material/Typography";
-import CalendarTodayOutlinedIcon from '@mui/icons-material/CalendarTodayOutlined';
-import PlaceOutlinedIcon from '@mui/icons-material/PlaceOutlined';
-
+import {Box, Typography} from "@mui/material";
 import { Button, SelectInput, TextInput } from "@/components/ui";
 import { ModalContainer, CloseButton, ModalContent } from "@/components/modals";
-import { formatDate } from "@/utils/format";
+import { ActivityDetail } from "@/components";
 import type { RegisterGuestModalProps, FieldErrors } from "@/types/registerGuestModal";
 
 export default function RegisterGuestModal({
@@ -59,16 +55,6 @@ export default function RegisterGuestModal({
     setTouched((prev) => ({ ...prev, [field]: true }));
   };
 
-  const displayActivityDate = (() => {
-    if (!activityDate) return "Data não informada";
-
-    try {
-      return formatDate(activityDate);
-    } catch {
-      return "Data indisponível";
-    }
-  })();
-
   const handleSubmit = async () => {
     if (isSubmitting || !canSubmit) return;
     try {
@@ -98,46 +84,11 @@ export default function RegisterGuestModal({
             Preencha os dados abaixo para cadastrar palestrantes ou ministrantes do evento
           </Typography>
 
-          <Box
-            sx={{
-              display: 'flex',
-              gap: 1.5,
-              alignItems: 'flex-start',
-              mb: 2,
-            }}
-          >
-            <Box
-              sx={{
-                width: 60,
-                height: 60,
-                borderRadius: '50%',
-                bgcolor: 'divider',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                flexShrink: 0,
-              }}
-            >
-              <CalendarTodayOutlinedIcon sx={{ fontSize: 30, color: 'text.secondary' }} />
-            </Box>
-            <Box sx={{ flex: 1 }}>
-              <Typography sx={{ fontSize: 12, color: 'text.primary', mb: 0.5 }}>
-                {activityTitle}
-              </Typography>
-              <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-                <CalendarTodayOutlinedIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
-                <Typography sx={{ fontSize: 12, color: 'text.secondary' }}>
-                  {displayActivityDate}
-                </Typography>
-              </Box>
-              <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', mt: 0.5 }}>
-                <PlaceOutlinedIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
-                <Typography sx={{ fontSize: 12, color: 'text.secondary' }}>
-                  {activityLocation}
-                </Typography>
-              </Box>
-            </Box>
-          </Box>
+          <ActivityDetail
+            title={activityTitle}
+            date={activityDate}
+            location={activityLocation}
+          />
         </Box>
 
         <Box sx={{ px: 3 }}>

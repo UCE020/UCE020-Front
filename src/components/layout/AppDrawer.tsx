@@ -10,6 +10,7 @@ import {
   Close, Home, Description,
   Assignment, AddCircle,
   CalendarMonth, BarChart,
+  AccountCircle,
 } from "@mui/icons-material";
 import { useRouter } from "next/navigation";
 
@@ -20,6 +21,7 @@ const NAV_ITEMS = [
   { icon: <AddCircle />,     label: "Criar evento",    href: "/criar-evento"    },
   { icon: <CalendarMonth />, label: "Eventos Criados", href: "/eventos-criados" },
   { icon: <BarChart />,      label: "Monitoria",       href: "/monitoria"       },
+  { icon: <AccountCircle />, label: "Perfil",          href: "/perfil"          },
 ];
 
 interface AppDrawerProps {

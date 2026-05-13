@@ -1,8 +1,8 @@
 import { Box, Typography } from '@mui/material';
 import { useState } from 'react';
-import type { ActivityDescriptionProps } from '@/types/activity';
+import type { ScheduleDescriptionProps } from '@/types/scheduleCard';
 
-export function ActivityDescription({ description }: ActivityDescriptionProps) {
+export default function ScheduleDescription({ description }: ScheduleDescriptionProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 
   const toggleExpand = () => setIsExpanded(!isExpanded);

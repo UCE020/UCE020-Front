@@ -1,13 +1,13 @@
 import { Paper, InputBase } from "@mui/material";
 import { Search } from "@mui/icons-material";
 
-interface SearchBarProps {
+interface SearchbarProps {
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
 }
 
-export function SearchBar({ value, onChange, placeholder = "procurar evento" }: SearchBarProps) {
+export function Searchbar({ value, onChange, placeholder = "procurar evento" }: SearchbarProps) {
   return (
     <Paper
       elevation={0}
@@ -33,3 +33,5 @@ export function SearchBar({ value, onChange, placeholder = "procurar evento" }: 
     </Paper>
   );
 }
+
+export default Searchbar;

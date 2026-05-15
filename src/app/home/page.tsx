@@ -4,10 +4,9 @@ import { useState } from "react";
 import { Box } from "@mui/material";
 import { Event } from "@/types/event";
 
-import { Header } from "@/components/ui/Header";
+import { Header, Searchbar, } from "@/components/ui";
 import { ActivityModal } from "@/components/modals";
-import {
-  SearchBar,
+import { 
   GreetingSection,
   QuickActions,
   EventList,
@@ -47,7 +46,7 @@ export default function HomePage() {
       />
 
       <Box sx={{ maxWidth: 1200, mx: "auto", px: 3 }}>
-        <SearchBar value={search} onChange={setSearch} />
+        <Searchbar value={search} onChange={setSearch} />
         <GreetingSection userName={USER.name} />
         <QuickActions />
         <EventList

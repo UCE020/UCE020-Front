@@ -125,7 +125,11 @@ export function Sidebar({ open, onClose, navLinks, user, onLogout }: SidebarProp
 
         {/* Rodapé: info do usuário + sair */}
         <div className="border-t border-white/10 px-4 py-4">
-          <div className="flex items-center gap-3 mb-3">
+          <Link
+            href="/perfil"
+            onClick={onClose}
+            className="flex items-center gap-3 mb-3 rounded-lg p-2 hover:bg-white/10 transition-colors"
+          >
             <div className="w-8 h-8 rounded-full border border-[#2EC4A0] flex items-center justify-center flex-shrink-0">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2EC4A0" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
                 <circle cx="12" cy="8" r="4" />
@@ -135,7 +139,7 @@ export function Sidebar({ open, onClose, navLinks, user, onLogout }: SidebarProp
             <span className="text-white text-[13px] font-medium truncate">
               {user.name}
             </span>
-          </div>
+          </Link>
 
           <button
             onClick={() => { onClose(); onLogout(); }}

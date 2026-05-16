@@ -7,8 +7,10 @@ export function EventCard({ event, onClick }: EventCardProps) {
       onClick={onClick ? () => onClick(event) : undefined}
       elevation={1}
       sx={{
+        width: "100%",
         display: "flex",
-        alignItems: "center",
+        flexWrap: "wrap",
+        alignItems: "flex-start",
         gap: 2,
         p: 2,
         borderRadius: 8,
@@ -24,7 +26,7 @@ export function EventCard({ event, onClick }: EventCardProps) {
         alt={event.name}
         sx={{ width: 80, height: 80, borderRadius: 10, objectFit: "cover", flexShrink: 0 }}
       />
-      <CardContent sx={{ p: '0 !important', flex: 1, minWidth: 0 }}>
+      <CardContent sx={{ p: '0 !important', flex: 1, minWidth: 0, overflow: 'hidden' }}>
         <Typography noWrap sx={{ fontWeight: 700, fontSize: 13, mb: 0.5 }}>
           {event.name}
         </Typography>

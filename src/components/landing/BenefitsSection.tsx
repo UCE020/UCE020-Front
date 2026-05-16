@@ -1,5 +1,6 @@
 'use client';
 
+import React, { useRef } from 'react';
 import Image from 'next/image';
 
 import { Box, Typography, Container } from '@mui/material';
@@ -38,6 +39,34 @@ const cards = [
 ];
 
 export function BenefitsSection() {
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const isDownRef = useRef(false);
+  const startXRef = useRef(0);
+  const scrollLeftRef = useRef(0);
+
+  const onMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+    isDownRef.current = true;
+    const el = containerRef.current;
+    if (!el) return;
+    el.style.cursor = 'grabbing';
+    startXRef.current = e.pageX - el.offsetLeft;
+    scrollLeftRef.current = el.scrollLeft;
+  };
+
+  const onMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!isDownRef.current) return;
+    const el = containerRef.current;
+    if (!el) return;
+    const x = e.pageX - el.offsetLeft;
+    const walk = (x - startXRef.current) * 1;
+    el.scrollLeft = scrollLeftRef.current - walk;
+  };
+
+  const endDrag = () => {
+    isDownRef.current = false;
+    const el = containerRef.current;
+    if (el) el.style.cursor = 'grab';
+  };
   return (
     <Box
       sx={{
@@ -95,6 +124,11 @@ export function BenefitsSection() {
         </Typography>
 
         <Box
+          ref={containerRef}
+          onMouseDown={onMouseDown}
+          onMouseMove={onMouseMove}
+          onMouseUp={endDrag}
+          onMouseLeave={endDrag}
           sx={{
             display: 'flex',
 
@@ -114,13 +148,12 @@ export function BenefitsSection() {
               md: 0,
             },
 
+            cursor: 'grab',
+            msOverflowStyle: 'none',
+            scrollbarWidth: 'none',
+            WebkitOverflowScrolling: 'touch',
             '&::-webkit-scrollbar': {
-              height: '8px',
-            },
-
-            '&::-webkit-scrollbar-thumb': {
-              backgroundColor: '#D1D5DB',
-              borderRadius: '999px',
+              display: 'none',
             },
           }}
         >
@@ -173,11 +206,7 @@ export function BenefitsSection() {
 
                 transition: '0.3s ease',
 
-                cursor: 'grab',
-
-                '&:hover': {
-                  transform: 'translateY(-6px)',
-                },
+                cursor: 'default',
               }}
             >
               <Box

@@ -48,7 +48,7 @@ export function HeroSection() {
           overflow: 'hidden',
         }}
       >
-        <Box
+            <Box
           sx={{
             flex: {
               xs: 1.5,
@@ -62,6 +62,10 @@ export function HeroSection() {
 
             alignItems: 'flex-start',
             textAlign: 'left',
+            pl: {
+              xs: 2,
+              md: 12,
+            },
 
             zIndex: 2,
           }}
@@ -176,14 +180,14 @@ export function HeroSection() {
 
               width: {
                 xs: '300px',
-                sm: '700px',
-                md: '900px',
+                sm: '450px',
+                md: '720px',
               },
 
               height: {
                 xs: '280px',
-                sm: '700px',
-                md: '900px',
+                sm: '400px',
+                md: '600px',
               },
             }}
           >
@@ -195,9 +199,7 @@ export function HeroSection() {
               style={{
                 objectFit: 'contain',
               }}
-                sizes="(max-width: 600px) 260px,
-                (max-width: 900px) 700px,
-                900px"
+                sizes="(max-width: 600px) 300px, (max-width: 900px) 450px, 720px"
             />
           </Box>
         </Box>

@@ -24,7 +24,7 @@ export function Navbar() {
       <Toolbar
         sx={{
           width: '100%',
-          maxWidth: '1280px',
+          maxWidth: '1500px',
 
           margin: '0 auto',
 

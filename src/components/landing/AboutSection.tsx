@@ -104,9 +104,11 @@ export function AboutSection() {
             }}
           >
             <Image
-              src="/images/aboutImage.png"
+              src="/images/aboutImage.jpg"
               alt="Evento universitário"
               fill
+              sizes="(max-width:600px) 180px, (max-width:900px) 220px, 280px"
+              loading="eager"
               style={{
                 objectFit: 'cover',
               }}

@@ -55,7 +55,11 @@ function Field({
 }
 
 // ── Wrapper comum (header + card) ────────────────────────
-function AuthCard({ onBack, children }: { onBack: () => void; children: React.ReactNode }) {
+function AuthCard({ onBack, children, hideBack = false }: { 
+  onBack: () => void; 
+  children: React.ReactNode;
+  hideBack?: boolean;
+}) {
   return (
     <Box sx={{ minHeight: "100dvh", bgcolor: "#e8eaf0", display: "flex", flexDirection: "column" }}>
       <Box sx={{ bgcolor: "#1a2744", px: 3, py: 2 }}>
@@ -64,7 +68,7 @@ function AuthCard({ onBack, children }: { onBack: () => void; children: React.Re
           border: "2.5px solid #3dd6c8",
           display: "flex", alignItems: "center", justifyContent: "center",
           fontWeight: 800, fontSize: 20, color: "#3dd6c8",
-        }}>K</Box>
+        }}>A</Box>
       </Box>
 
       <Box sx={{
@@ -72,9 +76,12 @@ function AuthCard({ onBack, children }: { onBack: () => void; children: React.Re
         width: "100%", maxWidth: 440,
         bgcolor: "#fff", borderRadius: 4, px: 3, py: 3,
       }}>
-        <IconButton onClick={onBack} size="small" sx={{ mb: 1, ml: -1, color: "#1a2744" }}>
-          <ArrowBackIos fontSize="small" />
-        </IconButton>
+        {}
+        {!hideBack && (
+          <IconButton onClick={onBack} size="small" sx={{ mb: 1, ml: -1, color: "#1a2744" }}>
+            <ArrowBackIos fontSize="small" />
+          </IconButton>
+        )}
 
         <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 3 }}>
           <Typography sx={{ fontSize: 24, fontWeight: 700, color: "#1a2744", whiteSpace: "nowrap" }}>
@@ -97,7 +104,7 @@ function StepForm({ onSubmit, loading, error }: {
 }) {
   const [fields, setFields] = useState({
     nome: "", sobrenome: "", email: "",
-    senha: "", confirmaSenha: "", nacionalidade: "", cpf: "",
+    senha: "", confirmaSenha: "", cpf: "",
   });
   const [showSenha, setShowSenha]     = useState(false);
   const [showConfirma, setShowConfirma] = useState(false);
@@ -113,6 +120,7 @@ function StepForm({ onSubmit, loading, error }: {
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     const allTouched = Object.fromEntries(Object.keys(fields).map((k) => [k, true]));
+    console.log(fields);
     setTouched(allTouched);
     setTermosError(!termos);
     const hasEmpty = Object.values(fields).some((v) => v.trim() === "");
@@ -211,14 +219,14 @@ function StepCode({ code, setCode, onSubmit, loading, error }: {
 }) {
   return (
     <Box>
-      {/* Logo grande */}
+      {/*Logo grande */}
       <Box sx={{ textAlign: "center", mb: 3 }}>
         <Box sx={{
           width: 90, height: 90, borderRadius: "20px",
           border: "3px solid #3dd6c8",
           display: "inline-flex", alignItems: "center", justifyContent: "center",
           fontWeight: 900, fontSize: 48, color: "#3dd6c8",
-        }}>K</Box>
+        }}>A</Box>
       </Box>
 
       <Typography sx={{ textAlign: "center", color: "#1a2744", fontWeight: 600, mb: 2.5, fontSize: 14 }}>
@@ -253,7 +261,7 @@ function StepSuccess({ onAccess }: { onAccess: () => void }) {
         border: "3px solid #3dd6c8",
         display: "inline-flex", alignItems: "center", justifyContent: "center",
         fontWeight: 900, fontSize: 48, color: "#3dd6c8", mb: 3,
-      }}>K</Box>
+      }}>A</Box>
 
       <Typography sx={{ color: "#1a2744", fontWeight: 600, mb: 4, fontSize: 15 }}>
         E-mail confirmado com sucesso
@@ -269,15 +277,15 @@ function StepSuccess({ onAccess }: { onAccess: () => void }) {
 // ── Componente principal ─────────────────────────────────
 export function RegisterForm() {
   const router = useRouter();
-  const { step, loading, error, code, setCode, submitForm, submitCode } = useRegister();
+  const { step, loading, error, code, setCode, submitForm, submitCode, resetForm } = useRegister();
 
   function handleBack() {
     if (step === "form") router.back();
-    // nas etapas seguintes o back não navega (fluxo linear)
+    if (step === "code") resetForm();
   }
 
   return (
-    <AuthCard onBack={handleBack}>
+    <AuthCard onBack={handleBack} hideBack={step === "success"}>
       {step === "form"    && <StepForm    onSubmit={submitForm} loading={loading} error={error} />}
       {step === "code"    && <StepCode    code={code} setCode={setCode} onSubmit={submitCode} loading={loading} error={error} />}
       {step === "success" && <StepSuccess onAccess={() => router.push("/home")} />}

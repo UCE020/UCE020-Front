@@ -58,7 +58,7 @@ export function LoginForm() {
             fontWeight: 800, fontSize: 20, color: "#3dd6c8",
           }}
         >
-          K
+          A
         </Box>
       </Box>
 

@@ -15,17 +15,19 @@ export interface RegisterFormData {
 }
 
 export function useRegister() {
-  const [step, setStep]     = useState<RegisterStep>("form");
+  const [step, setStep]       = useState<RegisterStep>("form");
   const [loading, setLoading] = useState(false);
-  const [error, setError]   = useState<string | null>(null);
-  const [code, setCode]     = useState("");
+  const [error, setError]     = useState<string | null>(null);
+  const [code, setCode]       = useState("");
+  const [formData, setFormData] = useState<RegisterFormData | null>(null);
 
   async function submitForm(data: RegisterFormData) {
     setLoading(true);
     setError(null);
     try {
-      // substitua pela chamada real: await authService.register(data)
+      // await authService.register(data)
       await new Promise((r) => setTimeout(r, 1000));
+      setFormData(data);
       setStep("code");
     } catch {
       setError("Erro ao cadastrar. Tente novamente.");
@@ -35,10 +37,14 @@ export function useRegister() {
   }
 
   async function submitCode() {
+    if (!code.trim()) {
+      setError("Digite o código recebido por e-mail.");
+      return;
+    }
     setLoading(true);
     setError(null);
     try {
-      // substitua pela chamada real: await authService.verifyCode(code)
+      // await authService.verifyCode({ email: formData?.email, code })
       await new Promise((r) => setTimeout(r, 1000));
       setStep("success");
     } catch {
@@ -48,5 +54,12 @@ export function useRegister() {
     }
   }
 
-  return { step, loading, error, code, setCode, submitForm, submitCode };
+  function resetForm() {
+    setStep("form");
+    setCode("");
+    setFormData(null);
+    setError(null);
+  }
+
+  return { step, loading, error, code, setCode, submitForm, submitCode, resetForm, formData };
 }

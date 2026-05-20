@@ -11,7 +11,7 @@ export function GreetingSection({ userName }: GreetingSectionProps) {
       sx={{ py: 3, fontWeight: 700, lineHeight: 1.5, textAlign: "center" }}
     >
       Olá, {userName}! O que temos para{" "}
-      <Box component="span" sx={{ color: "#3dd6c8" }}>
+      <Box component="span" sx={{ color: "#35A384" }}>
         hoje?
       </Box>
     </Typography>

@@ -38,14 +38,21 @@ export default function HomePage() {
   }
 
   return (
-    <Box sx={{ minHeight: "100dvh", bgcolor: "background.default" }}>
+    <Box sx={{ minHeight: "100dvh", 
+    bgcolor: "background.default" }}>
       <Header
         user={USER}
         navLinks={NAV_LINKS}
         onLogout={() => console.log("logout")}
       />
 
-      <Box sx={{ maxWidth: 1200, mx: "auto", px: 3 }}>
+      <Box sx={{ 
+        maxWidth: 1200, 
+        mx: "auto", 
+        px: 3,
+        py: 3, 
+        }}>
+
         <Searchbar value={search} onChange={setSearch} />
         <GreetingSection userName={USER.name} />
         <QuickActions />

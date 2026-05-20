@@ -14,7 +14,7 @@ export function EventCard({ event, onClick }: EventCardProps) {
         gap: 2,
         p: 2,
         borderRadius: 8,
-        bgcolor: "#e8eaed",
+        bgcolor: "#FFF",
         cursor: "pointer",
         transition: "transform .15s, box-shadow .15s",
         "&:hover": { transform: "translateY(-2px)", boxShadow: 4 },

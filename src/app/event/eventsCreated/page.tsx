@@ -1,8 +1,10 @@
-import { Box, Container, Typography } from "@mui/material";
+import { Box, Container, Typography, IconButton } from "@mui/material";
 
 import Header from "@/components/ui/Header";
 import { EventsList } from "@/components/EventsList";
 import { Event } from "@/types/event";
+import { ArrowBack } from "@mui/icons-material";
+
 
 const sampleEvents: Event[] = [
   {
@@ -49,28 +51,40 @@ const sampleEvents: Event[] = [
 
 export default function EventCreatedPage() {
   return (
-    <Box sx={{ minHeight: "100vh", bgcolor: "#F8FAFC" }}>
+    <Box sx={{ minHeight: "100vh", bgcolor: "background.default" }}>
       <Header user={{ name: "Sara" }} />
 
       <Container maxWidth="lg" sx={{ py: { xs: 2, md: 8 } }}>
+        <Box sx={{ display: "flex", flexDirection: "row", alignItems: "center", gap: 2 }}>
+            <IconButton
+              size="small"
+              sx={{
+                color: "text.secondary",
+                "&:hover": { bgcolor: "background.default" },
+              }}
+            >
+              <ArrowBack />
+
+            </IconButton>
+            <Typography
+              variant="h5"
+              sx={{
+                fontWeight: 600,
+                color: "text.primary",
+              }}
+            >
+              Eventos Criados
+            </Typography>
+          </Box>
+          
         <Box sx={{ display: "flex", flexDirection: "column", gap: 2, alignItems: "center" }}>
-          <Typography
-            variant="h3"
-            component="h1"
-            sx={{
-              fontWeight: 700,
-              color: "#0F1D35",
-              textAlign: "center",
-            }}
-          >
-            Eventos Criados
-          </Typography>
 
           {/* Lista de eventos criados - substitua pelo mapeamento real dos seus dados */}
           <Box sx={{ width: "100%", maxWidth: 860 }}>
             <EventsList events={sampleEvents} />
           </Box>
         </Box>
+        
       </Container>
     </Box>
   );

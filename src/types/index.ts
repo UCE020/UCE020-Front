@@ -4,3 +4,5 @@ export * from './confirmModal';
 export * from './dialogModal';
 export * from './inputs';
 export * from './registerGuestModal';
+export * from './userProfile';
+export * from './scheduleCard';

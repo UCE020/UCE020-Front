@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Typography, Box } from '@mui/material';
 import WarningAmberRoundedIcon from '@mui/icons-material/WarningAmberRounded';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui';
 import { ModalContainer, CloseButton, ModalContent, ModalFooter } from '@/components/modals';
 import type { ConfirmModalProps } from '@/types/confirmModal';
 

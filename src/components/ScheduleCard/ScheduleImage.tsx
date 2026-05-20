@@ -1,8 +1,11 @@
+import { useState } from 'react';
 import { Box, Skeleton } from '@mui/material';
 import Image from 'next/image';
-import type { ActivityImageProps } from '@/types/activity';
+import type { ScheduleImageProps } from '@/types/scheduleCard';
 
-export function ActivityImage({ title, image }: ActivityImageProps) {
+export default function ScheduleImage({ title, image }: ScheduleImageProps) {
+  const [hasError, setHasError] = useState(false);
+
   return (
     <Box
       sx={{
@@ -13,20 +16,21 @@ export function ActivityImage({ title, image }: ActivityImageProps) {
         flexShrink: 0,
       }}
     >
-      {image ? (
+      {image && !hasError ? (
         <Image
           src={image}
           alt={title}
           fill
           sizes="50vw"
           className="object-cover"
+          onError={() => setHasError(true)}
         />
       ) : (
         <Skeleton
           variant="rectangular"
           width="100%"
           height="100%"
-          animation="wave"
+          animation="pulse"
         />
       )}
     </Box>

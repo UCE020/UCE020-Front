@@ -1,5 +1,5 @@
 import { Box, Typography, Grid } from "@mui/material";
-import { type Event } from "@/types";
+import { Event } from "@/types/event";
 import { EventCard } from "@/components/EventCard";
 
 

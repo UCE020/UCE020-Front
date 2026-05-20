@@ -3,7 +3,8 @@
 import {
   Drawer, Box, Typography,
   IconButton, List, ListItem,
-  ListItemIcon, ListItemText,
+  ListItemButton, ListItemIcon,
+  ListItemText,
 } from "@mui/material";
 import {
   Close, Home, Description,
@@ -60,9 +61,7 @@ export function AppDrawer({ open, onClose, activeHref = "/home" }: AppDrawerProp
         }}
       >
         <Typography
-          fontWeight={800}
-          fontSize={17}
-          sx={{ color: "#3dd6c8", letterSpacing: "-.5px" }}
+          sx={{ color: "#3dd6c8", letterSpacing: "-.5px", fontWeight: 800, fontSize: 17 }}
         >
           Assinae
         </Typography>
@@ -75,30 +74,31 @@ export function AppDrawer({ open, onClose, activeHref = "/home" }: AppDrawerProp
         {NAV_ITEMS.map((item) => {
           const isActive = item.href === activeHref;
           return (
-            <ListItem
-              key={item.href}
-              onClick={() => handleNav(item.href)}
-              sx={{
-                borderRadius: "0 50px 50px 0",
-                mr: 2,
-                cursor: "pointer",
-                bgcolor: isActive ? "rgba(61,214,200,.18)" : "transparent",
-                color: isActive ? "#3dd6c8" : "rgba(255,255,255,0.85)",
-                "&:hover": {
-                  bgcolor: "rgba(61,214,200,.12)",
-                  color: "#3dd6c8",
-                },
-              }}
-            >
-              <ListItemIcon sx={{ color: "inherit", minWidth: 36 }}>
-                {item.icon}
-              </ListItemIcon>
-              <ListItemText
-                primary={item.label}
-                slotProps={{
-                  primary: { style: { fontWeight: 600, fontSize: 14 } },
+            <ListItem key={item.href} disablePadding>
+              <ListItemButton
+                onClick={() => handleNav(item.href)}
+                sx={{
+                  borderRadius: "0 50px 50px 0",
+                  mr: 2,
+                  cursor: "pointer",
+                  bgcolor: isActive ? "rgba(61,214,200,.18)" : "transparent",
+                  color: isActive ? "#3dd6c8" : "rgba(255,255,255,0.85)",
+                  "&:hover": {
+                    bgcolor: "rgba(61,214,200,.12)",
+                    color: "#3dd6c8",
+                  },
                 }}
-              />
+              >
+                <ListItemIcon sx={{ color: "inherit", minWidth: 36 }}>
+                  {item.icon}
+                </ListItemIcon>
+                <ListItemText
+                  primary={item.label}
+                  slotProps={{
+                    primary: { style: { fontWeight: 600, fontSize: 14 } },
+                  }}
+                />
+              </ListItemButton>
             </ListItem>
           );
         })}

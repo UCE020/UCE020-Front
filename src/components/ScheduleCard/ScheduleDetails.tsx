@@ -2,10 +2,10 @@ import { Box, Typography } from '@mui/material';
 import CalendarTodayRoundedIcon from '@mui/icons-material/CalendarTodayRounded';
 import AccessTimeOutlinedIcon from '@mui/icons-material/AccessTimeOutlined';
 import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
-import PlaceOutlinedIcon from '@mui/icons-material/PlaceOutlined';import { formatActivityDate } from '@/utils/format';
-import type { ActivityDetailsProps } from '@/types/activity';
-import { ActivityStatusChip } from '@/components/modals/ActivityModal';
-
+import PlaceOutlinedIcon from '@mui/icons-material/PlaceOutlined';
+import { formatActivityDate } from '@/utils/format';
+import type { ScheduleDetailsProps } from '@/types/scheduleCard';
+import { LabelChip } from '@/components';
 
 const labelSx = {
   fontSize: 'clamp(8px, 3vw, 12px)',
@@ -27,14 +27,14 @@ const detailRowSx = {
   gap: 1,
 };
 
-export function ActivityDetails({
+export default function ScheduleDetails({
   startDate,
   endDate,
   location,
   hours,
   participantsCount,
   status,
-}: ActivityDetailsProps) {
+}: ScheduleDetailsProps) {
   return (
     <Box sx={{ width: '50%', aspectRatio: '1/1', position: 'relative', flexShrink: 0 }}>
       <Box
@@ -69,7 +69,7 @@ export function ActivityDetails({
           </Box>
         </Box>
 
-        <ActivityStatusChip status={status} />
+        <LabelChip status={status} />
       </Box>
     </Box>
   );

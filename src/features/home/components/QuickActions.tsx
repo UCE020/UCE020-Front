@@ -1,7 +1,7 @@
 "use client";
 
+import Link from "next/link";
 import { Box } from "@mui/material";
-import { useRouter } from "next/navigation";
 
 const QUICK_ACTIONS = [
   { line1: "Criar novo",  line2: "evento",       variant: "navy", href: "/criar-evento"    },
@@ -11,8 +11,6 @@ const QUICK_ACTIONS = [
 ] as const;
 
 export function QuickActions() {
-  const router = useRouter();
-
   return (
     <Box
       sx={{
@@ -26,8 +24,8 @@ export function QuickActions() {
       {QUICK_ACTIONS.map((action) => (
         <Box
           key={action.href}
-          component="button"
-          onClick={() => router.push(action.href)}
+          component={Link}
+          href={action.href}
           sx={{
             width: 140,
             height: 122,
@@ -46,6 +44,7 @@ export function QuickActions() {
             textAlign: "center",
             p: "10px 8px",
             fontFamily: "inherit",
+            textDecoration: "none",
             transition: "filter .15s, transform .15s",
             "&:hover": { filter: "brightness(0.88)", transform: "translateY(-1px)" },
           }}

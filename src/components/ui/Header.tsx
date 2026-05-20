@@ -93,9 +93,11 @@ export function Header({
             </button>
 
             {/* Logo — centralizado via absolute */}
+            {/*  
             <div className="absolute left-1/2 -translate-x-1/2">
               <Logo isDark />
             </div>
+            */}
 
           </div>
         </header>

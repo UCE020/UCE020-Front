@@ -1,5 +1,5 @@
 import { Box, Typography, Grid } from "@mui/material";
-import { type Event } from "@/types";
+import { Event } from "@/types/event";
 import { EventCard } from "@/components/EventCard";
 
 
@@ -27,7 +27,7 @@ export function EventList({ events, title = "Eventos inscritos", onEventClick }:
       </Typography>
 
       {events.length === 0 ? (
-        <Typography fontSize={14} color="text.secondary" textAlign="center" sx={{ py: 4 }}>
+        <Typography sx={{ fontSize: 14, color: "text.secondary", textAlign: "center", py: 4 }}>
           Nenhum evento encontrado.
         </Typography>
       ) : (

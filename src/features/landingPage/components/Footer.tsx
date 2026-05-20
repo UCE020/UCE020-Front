@@ -184,7 +184,7 @@ export function Footer() {
               textAlign: 'center',
             }}
           >
-            Desenvolvido por estudantes de Engenharia de Computação.
+            Desenvolvido por estudantes de Engenharia de Computação - UEFS.
           </Typography>
         </Box>
       </Container>

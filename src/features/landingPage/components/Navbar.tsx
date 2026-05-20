@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+import Link from 'next/link';
 
 import {
   AppBar,
@@ -77,6 +78,8 @@ export function Navbar() {
           }}
         >
           <Button
+            component={Link}
+            href="#hero-section"
             variant="text"
             sx={{
               fontSize: {
@@ -98,6 +101,8 @@ export function Navbar() {
           </Button>
 
           <Button
+            component={Link}
+            href="#about-section"
             variant="text"
             sx={{
               fontSize: {

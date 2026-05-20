@@ -1,8 +1,7 @@
-import { HeroSection } from '@/components/landing/HeroSection';
-import { Navbar } from '@/components/landing/Navbar';
-import { BenefitsSection } from '@/components/landing/BenefitsSection';
-import { AboutSection } from '@/components/landing/AboutSection';
-import { Footer } from '@/components/landing/Footer';
+"use client";
+
+import { HeroSection, Navbar, BenefitsSection, AboutSection, Footer} from "@/features/landingPage";
+
 
 export default function HomePage() {
   return (

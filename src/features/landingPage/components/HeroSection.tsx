@@ -13,6 +13,7 @@ import { Button } from '@/components/ui';
 export function HeroSection() {
   return (
     <Box
+      id = "hero-section"
       sx={{
         width: '100%',
         overflow: 'hidden',

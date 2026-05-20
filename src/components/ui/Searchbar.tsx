@@ -18,7 +18,7 @@ export function Searchbar({ value, onChange, placeholder = "procurar evento" }: 
         px: 2,
         py: 1,
         borderRadius: 50,
-        bgcolor: "#f0f2f5",
+        bgcolor: "#FFF",
         mt: 1,
       }}
     >

@@ -111,6 +111,7 @@ export default function EventForm({ mode }: { mode: EventFormMode }) {
     { id: '1', title: 'Atividade 1' },
     { id: '2', title: 'Atividade 2' },
   ]);
+  const [editingActivityId, setEditingActivityId] = useState<string | null>(null);
 
   const errors = useMemo(() => getErrors(form, touched), [form, touched]);
   const canSubmit =
@@ -164,6 +165,19 @@ export default function EventForm({ mode }: { mode: EventFormMode }) {
 
   function handleRemoveActivity(id: string) {
     setActivities((current) => current.filter((activity) => activity.id !== id));
+  }
+
+  function handleEditActivity(id: string) {
+    setEditingActivityId(id);
+  }
+
+  function handleSaveActivityTitle(id: string, newTitle: string) {
+    setActivities((current) =>
+      current.map((activity) =>
+        activity.id === id ? { ...activity, title: newTitle } : activity
+      )
+    );
+    setEditingActivityId(null);
   }
 
   return (
@@ -416,10 +430,27 @@ export default function EventForm({ mode }: { mode: EventFormMode }) {
                       gap: 1,
                     }}
                   >
-                    <Typography sx={{ fontSize: 14, color: colorTokens.text.primary, fontWeight: 400 }}>{activity.title}</Typography>
+                    {editingActivityId === activity.id ? (
+                      <TextInput
+                        value={activity.title}
+                        onChange={(value) => handleSaveActivityTitle(activity.id, value)}
+                        onBlur={() => setEditingActivityId(null)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            handleSaveActivityTitle(activity.id, activity.title);
+                          }
+                        }}
+                        size="small"
+                        fullWidth
+                        autoFocus
+                        sx={{ fontSize: 14 }}
+                      />
+                    ) : (
+                      <Typography sx={{ fontSize: 14, color: colorTokens.text.primary, fontWeight: 400 }}>{activity.title}</Typography>
+                    )}
 
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                      <IconButton size="small" aria-label={`Editar ${activity.title}`} sx={{ color: colorTokens.neutral.gray500 }}>
+                      <IconButton size="small" aria-label={`Editar ${activity.title}`} onClick={() => handleEditActivity(activity.id)} sx={{ color: colorTokens.neutral.gray500 }}>
                         <EditOutlinedIcon sx={{ fontSize: 18 }} />
                       </IconButton>
 

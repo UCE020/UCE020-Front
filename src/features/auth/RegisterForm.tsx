@@ -10,6 +10,7 @@ import {
 } from "@mui/material";
 import { Visibility, VisibilityOff, ArrowBackIos } from "@mui/icons-material";
 import { useRegister } from "./useRegister";
+import { UserProfile } from "../../types/userProfile";
 
 // ── Estilos reutilizáveis ────────────────────────────────
 const labelSx = { fontSize: 12, fontWeight: 600, color: "#1a2744", mb: 0.5 };
@@ -98,12 +99,12 @@ function AuthCard({ onBack, children, hideBack = false }: {
 
 // ── ETAPA 1: Formulário ──────────────────────────────────
 function StepForm({ onSubmit, loading, error }: {
-  onSubmit: (data: any) => void;
+  onSubmit: (data: UserProfile) => void;
   loading: boolean;
   error: string | null;
 }) {
   const [fields, setFields] = useState({
-    nome: "", sobrenome: "", email: "",
+    nome: "", email: "",
     senha: "", confirmaSenha: "", cpf: "",
   });
   const [showSenha, setShowSenha]     = useState(false);
@@ -125,7 +126,17 @@ function StepForm({ onSubmit, loading, error }: {
     setTermosError(!termos);
     const hasEmpty = Object.values(fields).some((v) => v.trim() === "");
     if (hasEmpty || !termos || senhasDiferem) return;
-    onSubmit(fields);
+
+    // Mapeia para UserProfile (id vazio pois ainda não existe no backend)
+  const userProfile: UserProfile = {
+    id: "",
+    name: fields.nome,
+    email: fields.email,
+    cpf: fields.cpf,
+    password: fields.senha,
+  };
+  
+    onSubmit(userProfile);
   }
 
   const eyeBtn = (show: boolean, toggle: () => void) => (
@@ -140,12 +151,10 @@ function StepForm({ onSubmit, loading, error }: {
     <Box component="form" onSubmit={handleSubmit} noValidate>
       {error && <Alert severity="error" sx={{ mb: 2, borderRadius: 2 }}>{error}</Alert>}
 
-      {/* Nome + Sobrenome */}
-      <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 1.5, mb: 1.5 }}>
+      {/* Nome */}
+      <Box sx={{ mb: 1.5 }}>
         <Field label="Nome"      value={fields.nome}      onChange={set("nome")}
-               onBlur={blur("nome")}      error={err("nome")}      helperText="Obrigatório" placeholder="João" />
-        <Field label="Sobrenome" value={fields.sobrenome} onChange={set("sobrenome")}
-               onBlur={blur("sobrenome")} error={err("sobrenome")} helperText="Obrigatório" placeholder="Silva" />
+               onBlur={blur("nome")}      error={err("nome")}      helperText="Obrigatório" placeholder="Nome Completo" />
       </Box>
 
       {/* E-mail */}

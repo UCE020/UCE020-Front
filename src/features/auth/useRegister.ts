@@ -1,27 +1,20 @@
 "use client";
 
 import { useState } from "react";
+import { UserProfile } from "../../types/userProfile";
 
 export type RegisterStep = "form" | "code" | "success";
 
-export interface RegisterFormData {
-  nome: string;
-  sobrenome: string;
-  email: string;
-  senha: string;
-  confirmaSenha: string;
-  nacionalidade: string;
-  cpf: string;
-}
+const [formData, setFormData] = useState<UserProfile | null>(null);
 
 export function useRegister() {
   const [step, setStep]       = useState<RegisterStep>("form");
   const [loading, setLoading] = useState(false);
   const [error, setError]     = useState<string | null>(null);
   const [code, setCode]       = useState("");
-  const [formData, setFormData] = useState<RegisterFormData | null>(null);
+  const [formData, setFormData] = useState<UserProfile | null>(null);
 
-  async function submitForm(data: RegisterFormData) {
+  async function submitForm(data: UserProfile) {
     setLoading(true);
     setError(null);
     try {

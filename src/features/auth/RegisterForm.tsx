@@ -9,7 +9,7 @@ import {
   Checkbox, FormControlLabel,
 } from "@mui/material";
 import { Visibility, VisibilityOff, ArrowBackIos } from "@mui/icons-material";
-import { useRegister } from "./useRegister";
+import { UseRegister } from "./useRegister";
 import { UserProfile } from "../../types/userProfile";
 
 // ── Estilos reutilizáveis ────────────────────────────────
@@ -286,7 +286,7 @@ function StepSuccess({ onAccess }: { onAccess: () => void }) {
 // ── Componente principal ─────────────────────────────────
 export function RegisterForm() {
   const router = useRouter();
-  const { step, loading, error, code, setCode, submitForm, submitCode, resetForm } = useRegister();
+  const { step, loading, error, code, setCode, submitForm, submitCode, resetForm } = UseRegister();
 
   function handleBack() {
     if (step === "form") router.back();

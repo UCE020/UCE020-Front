@@ -5,9 +5,7 @@ import { UserProfile } from "../../types/userProfile";
 
 export type RegisterStep = "form" | "code" | "success";
 
-const [formData, setFormData] = useState<UserProfile | null>(null);
-
-export function useRegister() {
+export function UseRegister() {
   const [step, setStep]       = useState<RegisterStep>("form");
   const [loading, setLoading] = useState(false);
   const [error, setError]     = useState<string | null>(null);

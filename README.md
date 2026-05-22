@@ -2,18 +2,18 @@
 
 Frontend organizado com Next.js, Tailwind CSS e Material UI.
 
-## Tech Stack
+## Tecnologias Utilizadas
 
-- **Next.js 16** - React framework with App Router
-- **React 19** - UI library
-- **TypeScript** - Type safety
-- **Tailwind CSS v4** - Utility-first CSS framework
-- **Material UI v9** - React component library
-- **Geist Fonts** - Optimized fonts from Vercel
+- **Next.js 16** - Framework React com App Router
+- **React 19** - Biblioteca para construção de interfaces
+- **TypeScript** - Tipagem estática
+- **Tailwind CSS v4** - Framework CSS utilitário
+- **Material UI v9** - Biblioteca de componentes React
+- **Geist Fonts** - Fontes otimizadas da Vercel
 
 ---
 
-# Project Structure
+# Estrutura do Projeto
 
 ```txt
 src/
@@ -32,9 +32,9 @@ src/
 │   ├── landing-page/
 │   └── user-profile/
 │
-├── hooks/                # Custom React hooks
-├── lib/                  # Configurações globais (theme, libs, etc)
-├── providers/            # Context providers
+├── hooks/                # Hooks customizados do React
+├── lib/                  # Configurações globais (tema, bibliotecas, etc.)
+├── providers/            # Providers de contexto
 ├── services/             # Camada de comunicação com API
 ├── types/                # Tipagens TypeScript
 ├── utils/                # Funções utilitárias
@@ -48,17 +48,17 @@ src/
 O projeto segue uma arquitetura baseada em:
 
 - **Next.js App Router**
-- **Feature-based architecture**
+- **Arquitetura orientada a features**
 - **Componentização modular**
 - **Separação clara de responsabilidades**
 
 ---
 
-# Estrutura do `app/`
+# Estrutura da pasta `app/`
 
 A pasta `app/` representa as rotas da aplicação utilizando o App Router do Next.js.
 
-## Route Groups
+## Grupos de Rotas (Route Groups)
 
 O projeto utiliza **Route Groups**:
 
@@ -103,7 +103,7 @@ Essas rotas compartilham:
 app/(private)/layout.tsx
 ```
 
-Usado para conter as rotas de visualização interna do sistema;
+Utilizado para conter as rotas de visualização interna do sistema.
 
 ---
 
@@ -115,11 +115,11 @@ app/(public)/
 └── landing-page/
 ```
 
-Usado para conter as de visualização externa do sistema;
+Utilizado para conter as rotas de visualização externa do sistema.
 
 ### `(auth)`
 
-Agrupa páginas relacionadas à autenticação:
+Agrupa páginas relacionadas à autenticação.
 
 Exemplos:
 
@@ -138,7 +138,7 @@ O projeto segue uma convenção de nomenclatura consistente.
 ## Pastas → `kebab-case`
 
 ```txt
-cetificate
+certificate
 landing-page
 forgot-password
 ```
@@ -151,11 +151,11 @@ TextInput.tsx
 CertificateForm.tsx
 ```
 
-### Observação: 
-Arquivos page, layout e index (minúsculo) 
+### Observação
+
+Arquivos `page`, `layout` e `index` permanecem em minúsculo.
 
 ---
-
 
 # Separação de Responsabilidades
 
@@ -203,7 +203,7 @@ utils/
 
 # Padrões Arquiteturais Utilizados
 
-## Feature-Based Architecture
+## Arquitetura Orientada a Features
 
 Organização baseada em domínio:
 
@@ -251,23 +251,23 @@ para compartilhamento de:
 
 ---
 
-# Getting Started
+# Primeiros Passos
 
-## Node version
+## Versão do Node
 
-This project is pinned to Node.js `26.0.0` via `.nvmrc`.
+Este projeto utiliza a versão `26.0.0` do Node.js definida no arquivo `.nvmrc`.
 
-If you use `nvm`, run:
+Se você utiliza `nvm`, execute:
 
 ```bash
 nvm use
 ```
 
-If you do not use a version manager, install Node.js `26.0.0` before running the app.
+Caso não utilize um gerenciador de versões, instale o Node.js `26.0.0` antes de executar a aplicação.
 
 ---
 
-## Install dependencies
+## Instalar dependências
 
 ```bash
 npm install
@@ -275,7 +275,7 @@ npm install
 
 ---
 
-## Copy environment variables
+## Copiar variáveis de ambiente
 
 ```bash
 cp .env.example .env.local
@@ -283,13 +283,13 @@ cp .env.example .env.local
 
 ---
 
-## Run development server
+## Executar servidor de desenvolvimento
 
 ```bash
 npm run dev
 ```
 
-Open:
+Abra no navegador:
 
 ```txt
 http://localhost:3000
@@ -297,36 +297,36 @@ http://localhost:3000
 
 ---
 
-# Environment Variables
+# Variáveis de Ambiente
 
-See `.env.example` for available environment variables:
+Consulte o arquivo `.env.example` para visualizar as variáveis disponíveis:
 
-- `NEXT_PUBLIC_API_URL` - API base URL
-- `NEXT_PUBLIC_APP_NAME` - Application name
-- `NEXTAUTH_SECRET` - NextAuth secret key
+- `NEXT_PUBLIC_API_URL` - URL base da API
+- `NEXT_PUBLIC_APP_NAME` - Nome da aplicação
+- `NEXTAUTH_SECRET` - Chave secreta do NextAuth
 
 ---
 
-# Available Scripts
+# Scripts Disponíveis
 
-| Command | Description |
+| Comando | Descrição |
 |---|---|
-| `npm run dev` | Start development server |
-| `npm run build` | Build for production |
-| `npm start` | Start production server |
-| `npm run lint` | Run ESLint |
+| `npm run dev` | Inicia o servidor de desenvolvimento |
+| `npm run build` | Gera a build de produção |
+| `npm start` | Inicia o servidor em produção |
+| `npm run lint` | Executa o ESLint |
 
 ---
 
-# Learn More
+# Saiba Mais
 
-- Next.js Documentation
-- Tailwind CSS Documentation
-- Material UI Documentation
-- TypeScript Documentation
+- Documentação do Next.js
+- Documentação do Tailwind CSS
+- Documentação do Material UI
+- Documentação do TypeScript
 
 ---
 
-# Deploy on Vercel
+# Deploy na Vercel
 
-The easiest way to deploy your Next.js app is to use the Vercel Platform.
+A forma mais simples de realizar o deploy da aplicação Next.js é utilizando a plataforma da Vercel.

@@ -1,1 +1,0 @@
-export { CertificateForm } from "./CertificateForm";

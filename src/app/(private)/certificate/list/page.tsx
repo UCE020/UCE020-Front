@@ -10,7 +10,6 @@ import {
 import { ArrowBack } from "@mui/icons-material";
 import { useRouter } from "next/navigation";
 
-import { Header } from "@/components/ui/Header";
 import { CertificateCard } from "@/components/certificate";
 
 // Mock data

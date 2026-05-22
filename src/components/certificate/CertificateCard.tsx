@@ -12,7 +12,7 @@ export function CertificateCard({ id, title, issuedDate }: CertificateCardProps)
   return (
     <Card
       component={Link}
-      href={`/certificados/${id}`}
+      href={`/certificate/${id}`}
       sx={{
         bgcolor: "#00856F",
         color: "#FFFFFF",

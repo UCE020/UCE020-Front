@@ -1,4 +1,4 @@
-# Assinae Front
+# Assinaê Front
 
 Frontend organizado com Next.js, Tailwind CSS e Material UI.
 
@@ -150,6 +150,9 @@ ScheduleCard.tsx
 TextInput.tsx
 CertificateForm.tsx
 ```
+
+### Observação: 
+Arquivos page, layout e index (minúsculo) 
 
 ---
 

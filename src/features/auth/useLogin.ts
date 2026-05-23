@@ -13,7 +13,7 @@ export function useLogin() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  async function handleLogin(data: LoginFormData) {
+  async function handleLogin(_data: LoginFormData) {
     setLoading(true);
     setError(null);
     try {

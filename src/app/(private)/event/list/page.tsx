@@ -1,6 +1,5 @@
 import { Box, Container, Typography, IconButton } from '@mui/material';
 
-import Header from '@/components/ui/Header';
 import { EventsList } from '@/components/event/EventsList';
 import { Event } from '@/types/event';
 import { ArrowBack } from '@mui/icons-material';

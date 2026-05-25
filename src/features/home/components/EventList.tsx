@@ -1,7 +1,6 @@
-import { Box, Typography, Grid } from "@mui/material";
-import { Event } from "@/types/event";
-import { EventCard } from "@/components/EventCard";
-
+import { Box, Typography, Grid } from '@mui/material';
+import { Event } from '@/types/event';
+import { EventCard } from '@/components/event/EventCard';
 
 interface EventListProps {
   events: Event[];
@@ -9,7 +8,7 @@ interface EventListProps {
   onEventClick?: (event: Event) => void;
 }
 
-export function EventList({ events, title = "Eventos inscritos", onEventClick }: EventListProps) {
+export function EventList({ events, title = 'Eventos inscritos', onEventClick }: EventListProps) {
   return (
     <Box>
       <Typography
@@ -17,17 +16,17 @@ export function EventList({ events, title = "Eventos inscritos", onEventClick }:
           pt: 2.5,
           pb: 1.5,
           fontSize: 13,
-          color: "text.secondary",
+          color: 'text.secondary',
           fontWeight: 600,
-          letterSpacing: ".5px",
-          textTransform: "uppercase",
+          letterSpacing: '.5px',
+          textTransform: 'uppercase',
         }}
       >
         {title}
       </Typography>
 
       {events.length === 0 ? (
-        <Typography sx={{ fontSize: 14, color: "text.secondary", textAlign: "center", py: 4 }}>
+        <Typography sx={{ fontSize: 14, color: 'text.secondary', textAlign: 'center', py: 4 }}>
           Nenhum evento encontrado.
         </Typography>
       ) : (

@@ -9,3 +9,9 @@ export interface Certificate {
   updatedAt: string;
 }
 
+export interface EditCertificateFormData {
+  title: string;
+  participantName: string;
+  hours: number;
+}
+

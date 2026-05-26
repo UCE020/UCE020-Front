@@ -3,7 +3,11 @@ import QrCodeScannerRoundedIcon from '@mui/icons-material/QrCodeScannerRounded';
 import { ContentCard } from '@/components/layout/ContentCard';
 import { colorTokens } from '@/lib/colors';
 
-export function PresenceValidationPanel() {
+interface PresenceValidationPanelProps {
+  onScan?: () => void;
+}
+
+export function PresenceValidationPanel({ onScan }: PresenceValidationPanelProps) {
   return (
     <>
       <Typography
@@ -29,6 +33,10 @@ export function PresenceValidationPanel() {
         </Typography>
 
         <Box
+          component="button"
+          type="button"
+          onClick={onScan}
+          aria-label="Clique para simular a leitura do QR Code"
           sx={{
             width: '100%',
             aspectRatio: '1',
@@ -42,6 +50,9 @@ export function PresenceValidationPanel() {
             justifyContent: 'center',
             gap: 1,
             mb: 2,
+            cursor: onScan ? 'pointer' : 'default',
+            p: 0,
+            '&:hover': onScan ? { bgcolor: colorTokens.neutral.gray300 } : undefined,
           }}
         >
           <QrCodeScannerRoundedIcon

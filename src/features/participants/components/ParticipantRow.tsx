@@ -1,51 +1,53 @@
 import { Box, Typography, IconButton } from '@mui/material';
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import QrCode2RoundedIcon from '@mui/icons-material/QrCode2Rounded';
 import { colorTokens } from '@/lib/colors';
+import {
+  managementIconButtonSx,
+  managementListNameSx,
+  managementListRowSx,
+} from '@/features/management/components/listRowStyles';
 import type { Participant } from '@/types/participant';
 import { PresenceStatusIcon } from './PresenceStatusIcon';
 
 interface ParticipantRowProps {
   participant: Participant;
   showQrAction?: boolean;
+  showEditAction?: boolean;
   onValidateParticipant?: (participantId: string) => void;
+  onEditPresence?: (participantId: string) => void;
 }
 
 export function ParticipantRow({
   participant,
   showQrAction = false,
+  showEditAction = false,
   onValidateParticipant,
+  onEditPresence,
 }: ParticipantRowProps) {
+  const isConfirmed = participant.presenceStatus === 'confirmed';
+
   return (
-    <Box
-      sx={{
-        bgcolor: colorTokens.neutral.white,
-        borderRadius: '12px',
-        p: 1,
-        display: 'flex',
-        alignItems: 'center',
-        gap: 1,
-        border: `1px solid ${colorTokens.neutral.border}`,
-        boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
-      }}
-    >
-      <Typography
-        sx={{
-          flex: 1,
-          fontWeight: 500,
-          fontSize: 'clamp(12px, 3vw, 14px)',
-          color: colorTokens.text.primary,
-        }}
-      >
-        {participant.name}
-      </Typography>
+    <Box sx={managementListRowSx}>
+      <Typography sx={managementListNameSx}>{participant.name}</Typography>
 
       {showQrAction && participant.presenceStatus === 'pending' && (
         <IconButton
           onClick={() => onValidateParticipant?.(participant.id)}
           aria-label={`Validar presença de ${participant.name}`}
-          sx={{ p: 0 }}
+          sx={managementIconButtonSx}
         >
           <QrCode2RoundedIcon sx={{ fontSize: 20, color: colorTokens.navigation.default }} />
+        </IconButton>
+      )}
+
+      {showEditAction && isConfirmed && (
+        <IconButton
+          onClick={() => onEditPresence?.(participant.id)}
+          aria-label={`Remover presença de ${participant.name}`}
+          sx={managementIconButtonSx}
+        >
+          <EditOutlinedIcon sx={{ fontSize: 20, color: colorTokens.navigation.default }} />
         </IconButton>
       )}
 

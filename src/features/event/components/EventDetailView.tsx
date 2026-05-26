@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import { ActivityModal, ScheduleCard } from '@/components/modals';
 import { ContentCard } from '@/components/layout/ContentCard';
 import { AppPageContainer } from '@/components/layout/AppPageContainer';
-import { ROUTES } from '@/constants/routes';
 import { MOCK_EVENT } from '@/mocks/event';
 import { MOCK_USER } from '@/mocks/user';
 import { getActivityModalVariant } from '@/features/event/utils/getActivityModalVariant';

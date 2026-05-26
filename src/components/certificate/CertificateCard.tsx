@@ -8,7 +8,11 @@ interface CertificateCardProps {
   issuedDate: string;
 }
 
-export function CertificateCard({ id, title, issuedDate }: CertificateCardProps) {
+export function CertificateCard({
+  id,
+  title,
+  issuedDate,
+}: CertificateCardProps) {
   return (
     <Card
       component={Link}
@@ -18,6 +22,7 @@ export function CertificateCard({ id, title, issuedDate }: CertificateCardProps)
         color: "#FFFFFF",
         borderRadius: 3,
         p: 3,
+        mb: 2,
         cursor: "pointer",
         textDecoration: "none",
         display: "flex",
@@ -44,6 +49,7 @@ export function CertificateCard({ id, title, issuedDate }: CertificateCardProps)
         >
           {title}
         </Typography>
+
         <Typography
           variant="body2"
           sx={{
@@ -53,6 +59,7 @@ export function CertificateCard({ id, title, issuedDate }: CertificateCardProps)
           {new Date(issuedDate).toLocaleDateString("pt-BR")}
         </Typography>
       </Box>
+
       <ChevronRight
         sx={{
           color: "#FFFFFF",

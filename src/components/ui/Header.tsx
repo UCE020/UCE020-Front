@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { usePathname } from 'next/navigation';
 import { Sidebar, type NavLink } from '@/components/ui/Sidebar';
 import { Home, Article, Event, PostAdd, FindInPage, DocumentScanner } from '@mui/icons-material';
 import { AppBar, Box, Toolbar } from '@mui/material';
@@ -56,6 +57,8 @@ export function Header({
 }: HeaderProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const isLoggedIn = !!user;
+  const pathname = usePathname();
+  const isPageLearnMore = pathname.includes('/landing-page/learn-more');
 
   // ── Logado: header dark com hamburger ──────────────────
   if (isLoggedIn) {
@@ -87,161 +90,274 @@ export function Header({
   }
 
   // ── Não Logado: header white com login/register ──────────────────
-  return (
-    <AppBar
-      position="fixed"
-      elevation={0}
-      sx={{
-        backgroundColor: 'white',
-        color: '#111',
-        borderBottom: '1px solid #e5e7eb',
-      }}
-    >
-      <Toolbar
+  // Verifica se ta no saiba mais
+  if (isPageLearnMore) {
+    return (
+      <AppBar
+        position="fixed"
+        elevation={0}
         sx={{
-          width: '100%',
-          maxWidth: '1500px',
-
-          margin: '0 auto',
-
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-
-          px: {
-            xs: 2,
-            sm: 3,
-            md: 4,
-          },
-
-          py: 1.5,
-
-          gap: 2,
-
-          minHeight: '80px',
+          backgroundColor: 'white',
+          color: '#111',
+          borderBottom: '1px solid #e5e7eb',
         }}
       >
-        <Box
+        <Toolbar
           sx={{
-            display: 'flex',
-            alignItems: 'center',
-            flexShrink: 0,
-          }}
-        >
-          <Image src="/images/logos/logo1.png" alt="Logo" width={40} height={40} />
-        </Box>
+            width: '100%',
+            maxWidth: '1500px',
 
-        <Box
-          sx={{
+            margin: '0 auto',
+
             display: 'flex',
+            justifyContent: 'space-between',
             alignItems: 'center',
 
-            gap: {
-              xs: 0.5,
-              sm: 1,
-              md: 2,
+            px: {
+              xs: 2,
+              sm: 3,
+              md: 4,
             },
 
-            flexWrap: 'wrap',
+            py: 1.5,
 
-            justifyContent: 'flex-end',
+            gap: 2,
+
+            minHeight: '80px',
           }}
         >
-          <Button
-            component={Link}
-            href="#hero-section"
-            variant="text"
+          <Box
             sx={{
-              fontSize: {
-                xs: '0.7rem',
-                sm: '0.8rem',
-                md: '0.9rem',
-              },
+              display: 'flex',
+              alignItems: 'center',
+              flexShrink: 0,
+            }}
+          >
+            <Image src="/images/logos/logo1.png" alt="Logo" width={40} height={40} />
+          </Box>
 
-              minWidth: 'auto',
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
 
-              px: {
-                xs: 1,
-                sm: 1.5,
+              gap: {
+                xs: 0.5,
+                sm: 1,
                 md: 2,
               },
+
+              flexWrap: 'wrap',
+
+              justifyContent: 'flex-end',
             }}
           >
-            Início
-          </Button>
+            <Button
+              component={Link}
+              href="/login"
+              variant="contained"
+              sx={{
+                fontSize: {
+                  xs: '0.7rem',
+                  sm: '0.8rem',
+                  md: '0.9rem',
+                },
 
-          <Button
-            component={Link}
-            href="#about-section"
-            variant="text"
+                minWidth: 'auto',
+
+                px: {
+                  xs: 1.5,
+                  sm: 2,
+                  md: 3,
+                },
+              }}
+            >
+              Entrar
+            </Button>
+
+            <Button
+              component={Link}
+              href="/register"
+              variant="outlined"
+              sx={{
+                fontSize: {
+                  xs: '0.7rem',
+                  sm: '0.8rem',
+                  md: '0.9rem',
+                },
+
+                minWidth: 'auto',
+
+                px: {
+                  xs: 1.5,
+                  sm: 2,
+                  md: 3,
+                },
+              }}
+            >
+              Criar Conta
+            </Button>
+          </Box>
+        </Toolbar>
+      </AppBar>
+    );
+  } else {
+    return (
+      <AppBar
+        position="fixed"
+        elevation={0}
+        sx={{
+          backgroundColor: 'white',
+          color: '#111',
+          borderBottom: '1px solid #e5e7eb',
+        }}
+      >
+        <Toolbar
+          sx={{
+            width: '100%',
+            maxWidth: '1500px',
+
+            margin: '0 auto',
+
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+
+            px: {
+              xs: 2,
+              sm: 3,
+              md: 4,
+            },
+
+            py: 1.5,
+
+            gap: 2,
+
+            minHeight: '80px',
+          }}
+        >
+          <Box
             sx={{
-              fontSize: {
-                xs: '0.7rem',
-                sm: '0.8rem',
-                md: '0.9rem',
-              },
+              display: 'flex',
+              alignItems: 'center',
+              flexShrink: 0,
+            }}
+          >
+            <Image src="/images/logos/logo1.png" alt="Logo" width={40} height={40} />
+          </Box>
 
-              minWidth: 'auto',
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
 
-              px: {
-                xs: 1,
-                sm: 1.5,
+              gap: {
+                xs: 0.5,
+                sm: 1,
                 md: 2,
               },
+
+              flexWrap: 'wrap',
+
+              justifyContent: 'flex-end',
             }}
           >
-            Sobre
-          </Button>
+            <Button
+              component={Link}
+              href="#hero-section"
+              variant="text"
+              sx={{
+                fontSize: {
+                  xs: '0.7rem',
+                  sm: '0.8rem',
+                  md: '0.9rem',
+                },
 
-          <Button
-            component={Link}
-            href="/login"
-            variant="contained"
-            sx={{
-              fontSize: {
-                xs: '0.7rem',
-                sm: '0.8rem',
-                md: '0.9rem',
-              },
+                minWidth: 'auto',
 
-              minWidth: 'auto',
+                px: {
+                  xs: 1,
+                  sm: 1.5,
+                  md: 2,
+                },
+              }}
+            >
+              Início
+            </Button>
 
-              px: {
-                xs: 1.5,
-                sm: 2,
-                md: 3,
-              },
-            }}
-          >
-            Entrar
-          </Button>
+            <Button
+              component={Link}
+              href="#about-section"
+              variant="text"
+              sx={{
+                fontSize: {
+                  xs: '0.7rem',
+                  sm: '0.8rem',
+                  md: '0.9rem',
+                },
 
-          <Button
-            component={Link}
-            href="/register"
-            variant="outlined"
-            sx={{
-              fontSize: {
-                xs: '0.7rem',
-                sm: '0.8rem',
-                md: '0.9rem',
-              },
+                minWidth: 'auto',
 
-              minWidth: 'auto',
+                px: {
+                  xs: 1,
+                  sm: 1.5,
+                  md: 2,
+                },
+              }}
+            >
+              Sobre
+            </Button>
 
-              px: {
-                xs: 1.5,
-                sm: 2,
-                md: 3,
-              },
-            }}
-          >
-            Criar Conta
-          </Button>
-        </Box>
-      </Toolbar>
-    </AppBar>
-  );
+            <Button
+              component={Link}
+              href="/login"
+              variant="contained"
+              sx={{
+                fontSize: {
+                  xs: '0.7rem',
+                  sm: '0.8rem',
+                  md: '0.9rem',
+                },
+
+                minWidth: 'auto',
+
+                px: {
+                  xs: 1.5,
+                  sm: 2,
+                  md: 3,
+                },
+              }}
+            >
+              Entrar
+            </Button>
+
+            <Button
+              component={Link}
+              href="/register"
+              variant="outlined"
+              sx={{
+                fontSize: {
+                  xs: '0.7rem',
+                  sm: '0.8rem',
+                  md: '0.9rem',
+                },
+
+                minWidth: 'auto',
+
+                px: {
+                  xs: 1.5,
+                  sm: 2,
+                  md: 3,
+                },
+              }}
+            >
+              Criar Conta
+            </Button>
+          </Box>
+        </Toolbar>
+      </AppBar>
+    );
+  }
 }
 
 export default Header;

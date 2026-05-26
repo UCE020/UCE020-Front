@@ -27,7 +27,7 @@ const cards = [
     title: 'Eventos Universitários',
     description:
       'Criado especialmente para instituições e projetos acadêmicos.',
-    color: '#35A384',
+    color: '#43A68D',
   },
   {
     icon: CheckCircleRoundedIcon,
@@ -41,7 +41,7 @@ const cards = [
     title: 'Check-in com QR Code',
     description:
       'Confirme presença rapidamente utilizando QR Code.',
-    color: '#35A384',
+    color: '#43A68D',
   },
   {
     icon: WorkspacePremiumRoundedIcon,

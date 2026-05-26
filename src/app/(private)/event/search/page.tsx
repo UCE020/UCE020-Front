@@ -1,15 +1,14 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { Suspense, useState, useEffect, useCallback } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { Box, Typography } from "@mui/material";
+import { Box, Typography, CircularProgress } from "@mui/material";
 import { Event } from "@/types/event";
 
 import { Searchbar } from "@/components/ui";
 import { ActivityModal } from "@/components/modals";
 import { EventCard } from "@/components/event/EventCard";
 
-// Mock — substitua pela chamada real em services/api.ts
 async function fetchEventByCode(code: string): Promise<Event | null> {
   const MOCK: Record<string, Event> = {
     "EVT001": {
@@ -24,7 +23,8 @@ async function fetchEventByCode(code: string): Promise<Event | null> {
   return MOCK[code.toUpperCase()] ?? null;
 }
 
-export default function EventSearchPage() {
+//Componente interno dentro do Suspense
+function EventSearchContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const initialCode = searchParams.get("code") ?? "";
@@ -35,17 +35,17 @@ export default function EventSearchPage() {
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
 
   useEffect(() => {
-  if (!initialCode) return;
-  fetchEventByCode(initialCode).then((result) => {
-    if (result) {
-      setEvent(result);
-      setNotFound(false);
-    } else {
-      setEvent(null);
-      setNotFound(true);
-    }
-  });
-}, [initialCode]);
+    if (!initialCode) return;
+    fetchEventByCode(initialCode).then((result) => {
+      if (result) {
+        setEvent(result);
+        setNotFound(false);
+      } else {
+        setEvent(null);
+        setNotFound(true);
+      }
+    });
+  }, [initialCode]);
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -54,11 +54,13 @@ export default function EventSearchPage() {
     }
   }
 
+  const handleSelectEvent = useCallback((e: Event) => {
+    setSelectedEvent(e);
+  }, []);
+
   return (
     <Box sx={{ minHeight: "100dvh", bgcolor: "background.default" }}>
       <Box sx={{ maxWidth: 1200, mx: "auto", px: 3, py: 3 }}>
-
-        {/* Searchbar — mesmo da home */}
         <form onSubmit={handleSubmit}>
           <Searchbar
             value={code}
@@ -67,17 +69,12 @@ export default function EventSearchPage() {
           />
         </form>
 
-        {/* Evento encontrado */}
         {event && (
           <Box sx={{ mt: 3 }}>
-            <EventCard
-              event={event}
-              onClick={(e) => setSelectedEvent(e)}
-            />
+            <EventCard event={event} onClick={handleSelectEvent} />
           </Box>
         )}
 
-        {/* Evento não encontrado */}
         {notFound && (
           <Typography
             sx={{
@@ -111,5 +108,14 @@ export default function EventSearchPage() {
         />
       )}
     </Box>
+  );
+}
+
+//Page exportada com tudo no Suspense
+export default function EventSearchPage() {
+  return (
+    <Suspense fallback={<CircularProgress />}>
+      <EventSearchContent />
+    </Suspense>
   );
 }

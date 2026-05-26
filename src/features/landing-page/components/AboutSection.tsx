@@ -2,11 +2,9 @@
 
 import Image from 'next/image';
 
-import {
-  Box,
-  Typography,
-  Container,
-} from '@mui/material';
+import { Box, Typography, Container } from '@mui/material';
+
+import Link from 'next/link';
 
 import ArrowOutwardRoundedIcon from '@mui/icons-material/ArrowOutwardRounded';
 
@@ -89,8 +87,7 @@ export function AboutSection() {
 
             mx: 'auto',
 
-            background:
-              'linear-gradient(180deg, #F8FAFC 0%, #F3F4F6 100%)',
+            background: 'linear-gradient(180deg, #F8FAFC 0%, #F3F4F6 100%)',
 
             borderRadius: {
               xs: '38px',
@@ -118,8 +115,7 @@ export function AboutSection() {
 
             textAlign: 'center',
 
-            boxShadow:
-              '0 20px 45px rgba(15, 23, 42, 0.06)',
+            boxShadow: '0 20px 45px rgba(15, 23, 42, 0.06)',
           }}
         >
           <Box
@@ -150,8 +146,7 @@ export function AboutSection() {
                 md: 5,
               },
 
-              boxShadow:
-                '0 18px 40px rgba(0,0,0,0.12)',
+              boxShadow: '0 18px 40px rgba(0,0,0,0.12)',
             }}
           >
             <Image
@@ -199,11 +194,10 @@ export function AboutSection() {
             >
               Assinaê
             </Box>{' '}
-            é uma plataforma desenvolvida através de um
-            projeto de extensão do curso de Engenharia de
-            Computação. 
+            é uma plataforma desenvolvida através de um projeto de extensão do curso de Engenharia
+            de Computação.
           </Typography>
-<Typography
+          <Typography
             sx={{
               color: '#1F2937',
 
@@ -222,14 +216,14 @@ export function AboutSection() {
               },
             }}
           >
-            Seu principal objetivo é simplificar a gestão
-            de eventos universitários, automatizando o
-            controle de presença, a contabilização de carga
-            horária e a emissão de certificados. 
+            Seu principal objetivo é simplificar a gestão de eventos universitários, automatizando o
+            controle de presença, a contabilização de carga horária e a emissão de certificados.
           </Typography>
 
           <Button
             variant="contained"
+            component={Link}
+            href="/landing-page/learn-more"
             endIcon={<ArrowOutwardRoundedIcon />}
             sx={{
               backgroundColor: '#059669',
@@ -254,8 +248,7 @@ export function AboutSection() {
 
               textTransform: 'none',
 
-              boxShadow:
-                '0 10px 25px rgba(5,150,105,0.22)',
+              boxShadow: '0 10px 25px rgba(5,150,105,0.22)',
 
               transition: '0.25s ease',
 

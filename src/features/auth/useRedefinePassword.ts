@@ -66,6 +66,7 @@ export function useRedefinePassword() {
   const [error, setError]     = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
+  // data vai ser mockado
   async function handleRedefine(data: RedefinePasswordFormData) {
     setLoading(true);
     setError(null);

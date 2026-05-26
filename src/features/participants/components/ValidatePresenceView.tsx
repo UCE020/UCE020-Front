@@ -4,11 +4,11 @@ import { useRouter } from 'next/navigation';
 import { IconButton } from '@mui/material';
 import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded';
 import { AppPageContainer } from '@/components/layout/AppPageContainer';
-import { PresenceValidationPanel } from '@/features/participants';
+import { ROUTES } from '@/constants/routes';
 import { colorTokens } from '@/lib/colors';
+import { PresenceValidationPanel } from './PresenceValidationPanel';
 
-
-export default function ValidatePresencePage() {
+export function ValidatePresenceView() {
   const router = useRouter();
 
   return (

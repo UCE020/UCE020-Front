@@ -1,8 +1,9 @@
+import type { ReactNode } from 'react';
 import { Box, type BoxProps } from '@mui/material';
 import { colorTokens } from '@/lib/colors';
 
 interface AppPageContainerProps extends BoxProps {
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 export function AppPageContainer({ children, sx, ...props }: AppPageContainerProps) {

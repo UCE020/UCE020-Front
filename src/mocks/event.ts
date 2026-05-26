@@ -5,8 +5,7 @@ export const MOCK_EVENT = {
   name: 'Semana de Integração de Eng. de Computação',
   startDate: '2026-04-15T07:00:00',
   endDate: '2026-04-19T18:00:00',
-  imageUrl:
-    'https://th.bing.com/th/id/R.8e49b8ccde38ab5b0973123b8f46c19c?rik=1d8g28rlCrtSFw&pid=ImgRaw&r=0',
+  imageUrl: '',
   location: 'Auditório Central - UEFS',
   description:
     'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.',

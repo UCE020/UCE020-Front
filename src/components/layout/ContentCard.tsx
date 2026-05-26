@@ -1,8 +1,9 @@
+import type { ReactNode } from 'react';
 import { Box, type BoxProps } from '@mui/material';
 import { colorTokens } from '@/lib/colors';
 
 interface ContentCardProps extends BoxProps {
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 export function ContentCard({ children, sx, ...props }: ContentCardProps) {

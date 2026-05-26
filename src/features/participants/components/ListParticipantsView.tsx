@@ -3,18 +3,15 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { AppPageContainer } from '@/components/layout/AppPageContainer';
+import { ROUTES } from '@/constants/routes';
 import { MOCK_PARTICIPANTS } from '@/mocks/participants';
 import { MOCK_USER } from '@/mocks/user';
-import {
-  ParticipantsListCard,
-  ValidatePresencesButton,
-  filterParticipants,
-  togglePresenceFilter,
-} from '@/features/participants';
+import { ParticipantsListCard } from './ParticipantsListCard';
+import { ValidatePresencesButton } from './ValidatePresencesButton';
+import { filterParticipants, togglePresenceFilter } from '../utils/filterParticipants';
 import type { PresenceFilter } from '@/types/participant';
 
-
-export default function ListParticipantsPage() {
+export function ListParticipantsView() {
   const router = useRouter();
   const isMonitor = MOCK_USER.role === 'monitor';
 

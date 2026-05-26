@@ -25,7 +25,7 @@ export function PresenceValidationPanel() {
             textAlign: 'center',
           }}
         >
-          Aponte a câmera para o QR Code do participante para validar a sua presença
+          Aponte a câmera para o QR Code do participante para validar a presença
         </Typography>
 
         <Box

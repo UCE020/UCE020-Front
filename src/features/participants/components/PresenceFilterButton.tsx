@@ -1,9 +1,10 @@
+import type { ReactNode } from 'react';
 import { IconButton, type IconButtonProps } from '@mui/material';
 import { colorTokens } from '@/lib/colors';
 
 interface PresenceFilterButtonProps extends Omit<IconButtonProps, 'sx'> {
   isActive: boolean;
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 export function PresenceFilterButton({ isActive, children, ...props }: PresenceFilterButtonProps) {

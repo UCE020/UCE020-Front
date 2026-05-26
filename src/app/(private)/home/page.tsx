@@ -1,11 +1,9 @@
 "use client";
 
-import { useState } from "react";
 import { Box } from "@mui/material";
 import { Event } from "@/types/event";
-
+import { useRouter } from 'next/navigation';
 import { Searchbar, } from "@/components/ui";
-import { ActivityModal } from "@/components/modals";
 import { 
   GreetingSection,
   QuickActions,
@@ -17,15 +15,11 @@ import {
 const USER = { name: "João" };
 
 export default function HomePage() {
+  const router = useRouter();
   const { search, setSearch, filteredEvents } = useHomeEvents();
-  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
 
   function handleEventClick(event: Event) {
-    setSelectedEvent(event);
-  }
-
-  function handleCloseModal() {
-    setSelectedEvent(null);
+    router.push(`/event/${event.id}`);
   }
 
   return (
@@ -48,25 +42,6 @@ export default function HomePage() {
         />
       </Box>
 
-      {selectedEvent && (
-        <ActivityModal
-          open={!!selectedEvent}
-          onClose={handleCloseModal}
-          // Campos que existem no Event
-          title={selectedEvent.name}
-          image={selectedEvent.imageUrl}
-          startDate={selectedEvent.startDate}
-          endDate={selectedEvent.endDate}
-          // TODO: substituir pelos dados reais da API
-          location="A definir"
-          hours={0}
-          participantsCount={0}
-          status="active"
-          description=""
-          variant="signup"
-          onSignup={() => console.log("Inscrever:", selectedEvent.id)}
-        />
-      )}
     </Box>
   );
 }

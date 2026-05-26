@@ -4,45 +4,39 @@ import { use } from 'react';
 import { Box, Container, Typography, IconButton } from '@mui/material';
 import { CalendarToday, AccessTime, ArrowBack } from '@mui/icons-material';
 import { useRouter } from 'next/navigation';
-import { Header } from '@/components/ui/Header';
 import { Button } from '@/components/ui/Button';
 import { MOCK_CERTIFICATES } from '@/mocks/certificates';
 import { mockUser } from '@/mocks/user';
-
-const NAV_LINKS = [
-  { label: 'Início', href: '/home' },
-  { label: 'Certificados', href: '/certificados' },
-  { label: 'Inscrições', href: '/inscricoes' },
-  { label: 'Criar evento', href: '/criar-evento' },
-  { label: 'Eventos Criados', href: '/eventos-criados' },
-  { label: 'Monitoria', href: '/monitoria' },
-];
-
-const USER = { name: 'João' };
 
 function formatCardDate(dateString: string) {
   const [year, month, day] = dateString.split('-');
   return `${day}/${month}/${year}`;
 }
 
-export default function CertificateViewPage({ params }: { params: Promise<{ id: string }> }) {
+export default function CertificateViewPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
   const { id } = use(params);
   const router = useRouter();
 
   const cert = MOCK_CERTIFICATES.find((c) => c.id === id);
   const isAdmin = mockUser.role === 'admin';
 
-  function handleEditCertificate() {
-    console.log('Editar certificado:', cert?.id);
-  }
-
-  function handleDownloadCertificate() {
-    console.log('Baixar certificado:', cert?.id);
-  }
-
   if (!cert) {
     router.push('/certificados');
     return null;
+  }
+
+  const certificate = cert;
+
+  function handleEditCertificate() {
+    router.push('/certificate/edit');
+  }
+
+  function handleDownloadCertificate() {
+    console.log('Baixar certificado:', certificate.id);
   }
 
   return (
@@ -67,8 +61,8 @@ export default function CertificateViewPage({ params }: { params: Promise<{ id: 
 
         <Box
           component="img"
-          src={cert.imageUrl}
-          alt={`Certificado - ${cert.title}`}
+          src={certificate.imageUrl}
+          alt={`Certificado - ${certificate.title}`}
           sx={{
             width: '100%',
             borderRadius: '14px',
@@ -86,12 +80,13 @@ export default function CertificateViewPage({ params }: { params: Promise<{ id: 
             mb: 2,
           }}
         >
-          {cert.title}
+          {certificate.title}
         </Typography>
 
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.8, mb: 4 }}>
           <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
             <CalendarToday sx={{ fontSize: 16, color: '#64748b', mt: '2px' }} />
+
             <Box>
               <Typography
                 sx={{
@@ -100,7 +95,7 @@ export default function CertificateViewPage({ params }: { params: Promise<{ id: 
                   color: '#0f172a',
                 }}
               >
-                {formatCardDate(cert.issuedDate)}
+                {formatCardDate(certificate.issuedDate)}
               </Typography>
 
               <Typography
@@ -110,7 +105,7 @@ export default function CertificateViewPage({ params }: { params: Promise<{ id: 
                   color: '#64748b',
                 }}
               >
-                {cert.location}
+                {certificate.location}
               </Typography>
             </Box>
           </Box>
@@ -125,12 +120,20 @@ export default function CertificateViewPage({ params }: { params: Promise<{ id: 
                 color: '#0f172a',
               }}
             >
-              {cert.hours} horas de carga horária
+              {certificate.hours} horas de carga horária
             </Typography>
           </Box>
         </Box>
 
-        <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mt: 8, flexWrap: 'wrap' }}>
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            gap: 2,
+            mt: 8,
+            flexWrap: 'wrap',
+          }}
+        >
           {isAdmin && (
             <Button
               variant="outlined"

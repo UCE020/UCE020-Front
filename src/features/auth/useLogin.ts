@@ -13,6 +13,7 @@ export function useLogin() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // varial data vai ser mockada?
   async function handleLogin(data: LoginFormData) {
     setLoading(true);
     setError(null);

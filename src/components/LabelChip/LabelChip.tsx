@@ -23,6 +23,7 @@ export default function LabelChip({ status }: LabelChipProps) {
         whiteSpace: 'nowrap',
         overflow: 'hidden',
         textOverflow: 'ellipsis',
+        mt: 0.5
       }}
     >
       {status}

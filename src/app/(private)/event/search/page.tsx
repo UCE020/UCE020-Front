@@ -35,15 +35,17 @@ export default function EventSearchPage() {
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
 
   useEffect(() => {
-    if (!initialCode) return;
-    setEvent(null);
-    setNotFound(false);
-
-    fetchEventByCode(initialCode).then((result) => {
-      if (result) setEvent(result);
-      else setNotFound(true);
-    });
-  }, [initialCode]);
+  if (!initialCode) return;
+  fetchEventByCode(initialCode).then((result) => {
+    if (result) {
+      setEvent(result);
+      setNotFound(false);
+    } else {
+      setEvent(null);
+      setNotFound(true);
+    }
+  });
+}, [initialCode]);
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();

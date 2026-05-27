@@ -8,7 +8,7 @@ import type { ScheduleDetailsProps } from '@/types/scheduleCard';
 import { LabelChip } from '@/components';
 
 const labelSx = {
-  fontSize: 'clamp(8px, 3vw, 12px)',
+  fontSize: 'clamp(8px, 3vw, 11px)',
   color: 'text.primary',
   display: '-webkit-box',
   WebkitLineClamp: 2,

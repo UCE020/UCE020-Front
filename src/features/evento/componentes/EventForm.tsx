@@ -18,7 +18,6 @@ import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined
 import AddRoundedIcon from '@mui/icons-material/AddRounded';
 
 import { Button, TextInput } from '@/components/ui';
-import { ImageUpload } from '@/components/ui/inputs';
 import { colorTokens } from '@/lib/colors';
 
 type EventFormMode = 'create' | 'edit';
@@ -37,7 +36,6 @@ type FormState = {
   endDate: string;
   startTime: string;
   endTime: string;
-  certificateImage: string | null;
 };
 
 type TouchedState = Record<keyof FormState, boolean>;
@@ -51,7 +49,6 @@ const DEFAULT_FORM: FormState = {
   endDate: '',
   startTime: '',
   endTime: '',
-  certificateImage: null,
 };
 
 const EDIT_FORM: FormState = {
@@ -64,7 +61,6 @@ const EDIT_FORM: FormState = {
   endDate: '2026-05-22',
   startTime: '08:00',
   endTime: '18:00',
-  certificateImage: null,
 };
 
 function createTouchedState(): TouchedState {
@@ -77,7 +73,6 @@ function createTouchedState(): TouchedState {
     endDate: false,
     startTime: false,
     endTime: false,
-    certificateImage: false,
   };
 }
 
@@ -105,10 +100,6 @@ function getErrors(form: FormState, touched: TouchedState) {
       touched.startTime && !form.startTime ? 'Selecione o horário de início.' : '',
     endTime:
       touched.endTime && !form.endTime ? 'Selecione o horário de término.' : '',
-    certificateImage:
-      touched.certificateImage && !form.certificateImage
-        ? 'Adicione a imagem do evento.'
-        : '',
   };
 }
 
@@ -132,8 +123,7 @@ export default function EventForm({ mode }: { mode: EventFormMode }) {
     form.startDate.length > 0 &&
     form.endDate.length > 0 &&
     form.startTime.length > 0 &&
-    form.endTime.length > 0 &&
-    form.certificateImage !== null;
+    form.endTime.length > 0;
 
   const title = isEdit ? 'Edição de Evento' : 'Cadastrar Evento';
   const subtitle = isEdit
@@ -141,7 +131,7 @@ export default function EventForm({ mode }: { mode: EventFormMode }) {
     : 'Preencha os dados abaixo para cadastrar um novo evento';
   const actionLabel = isEdit ? 'Salvar' : 'Cadastrar';
 
-  function updateField(field: keyof FormState, value: string | null) {
+  function updateField(field: keyof FormState, value: string) {
     setForm((current) => ({ ...current, [field]: value }));
   }
 
@@ -159,7 +149,6 @@ export default function EventForm({ mode }: { mode: EventFormMode }) {
       endDate: true,
       startTime: true,
       endTime: true,
-      certificateImage: true,
     });
 
     if (!canSubmit) return;
@@ -190,7 +179,6 @@ export default function EventForm({ mode }: { mode: EventFormMode }) {
     );
     setEditingActivityId(null);
   }
-
 
   return (
     <Box sx={{ minHeight: '100dvh', background: colorTokens.surface.background, overflowX: 'hidden' }}>
@@ -304,15 +292,6 @@ export default function EventForm({ mode }: { mode: EventFormMode }) {
                 />
                 {errors.description ? <Typography sx={{ mt: 0.4, fontSize: 11, color: 'error.main' }}>{errors.description}</Typography> : null}
               </Box>
-
-              <ImageUpload
-                label="Imagem do Evento"
-                value={form.certificateImage}
-                onChange={(value) => updateField('certificateImage', value)}
-                onBlur={() => markTouched('certificateImage')}
-                error={Boolean(errors.certificateImage)}
-                helperText={errors.certificateImage}
-              />
 
               <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 1.5 }}>
                 <Box sx={{ minWidth: 0 }}>

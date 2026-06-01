@@ -32,6 +32,21 @@ export function formatNumber(value: number, decimals: number = 2): string {
   }).format(value);
 }
 
+export function formatTime(date: Date | string): string {
+  const d = typeof date === 'string' ? new Date(date) : date;
+  return new Intl.DateTimeFormat('pt-BR', {
+    hour: '2-digit',
+    minute: '2-digit',
+  }).format(d);
+}
+
+export function formatActivitySchedule(startDate: Date | string, endDate: Date | string) {
+  return {
+    dayMonth: formatDate(startDate),
+    timeRange: `${formatTime(startDate)} - ${formatTime(endDate)}`,
+  };
+}
+
 export function formatActivityDate(startDate: Date | string, endDate?: Date | string): string {
   try {
     if (startDate) {

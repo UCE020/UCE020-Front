@@ -1,4 +1,4 @@
-type ActivityModalVariant = 'signup' | 'manage';
+export type ActivityModalVariant = 'signup' | 'manage' | 'monitor' | 'organizer';
 export type DateLike = string | Date;
 export type AsyncVoidHandler = () => void | Promise<void>;
 
@@ -18,6 +18,8 @@ export interface ActivityModalProps {
   onSignup?: AsyncVoidHandler;
   onCancelParticipation?: AsyncVoidHandler;
   onMarkPresence?: AsyncVoidHandler;
+  onValidatePresences?: AsyncVoidHandler;
+  onListParticipants?: AsyncVoidHandler;
   isLoading?: boolean;
 }
 
@@ -30,4 +32,8 @@ export interface ActivityDetailProps {
 export interface Activity {
   id: string;
   title: string;
+  description?: string;
+  startDate?: string;
+  endDate?: string;
+  status?: string;
 }

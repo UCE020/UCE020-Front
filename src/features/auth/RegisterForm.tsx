@@ -311,16 +311,26 @@ export function RegisterForm() {
   return (
     <Box sx={{
       minHeight: "100dvh",
-      bgcolor: "#e8eaf0",
+      bgcolor: { xs: "#fff", sm: "#e8eaf0" },
       display: "flex",
       flexDirection: "column",
+      alignItems: "center",
+      justifyContent: { xs: "flex-start", sm: "center" },
+      px: { xs: 0, sm: 2 },
+      py: { xs: 0, sm: 4 },
     }}>
       <Box sx={{
-        mx: "auto", mt: 3, mb: 4,
-        width: "100%", maxWidth: 420,
+        mx: "auto",
+        mt: { xs: 0, sm: 3 },
+        mb: { xs: 0, sm: 4 },
+        width: "100%",
+        maxWidth: { xs: "100%", sm: 420 },
+        minHeight: { xs: "100dvh", sm: "auto" },
         bgcolor: "#fff",
-        borderRadius: 4,
-        px: 3, py: 4,
+        borderRadius: { xs: 0, sm: 4 },
+        px: { xs: 3, sm: 3 },
+        py: { xs: 5, sm: 4 },
+        boxShadow: { xs: "none", sm: "0 4px 24px rgba(0,0,0,0.08)" },
       }}>
         {/* Botão voltar */}
         {step !== "success" && (

@@ -8,9 +8,18 @@ import {
   FormControl, OutlinedInput, FormHelperText,
 } from "@mui/material";
 import { Button } from "@/components/ui/button";
-import { Visibility, VisibilityOff, ArrowBackIos } from "@mui/icons-material";
+import { Visibility, VisibilityOff, ArrowBackIos, CheckCircle, RadioButtonUnchecked } from "@mui/icons-material";
 import { UseRegister } from "./useRegister";
 import { UserProfile } from "../../types/userProfile";
+
+// ── Requisitos de senha segura ───────────────────────────
+const SECURITY_RULES = [
+  { label: "Mínimo de 8 caracteres",           test: (v: string) => v.length >= 8 },
+  { label: "Pelo menos uma letra maiúscula",   test: (v: string) => /[A-Z]/.test(v) },
+  { label: "Pelo menos uma letra minúscula",   test: (v: string) => /[a-z]/.test(v) },
+  { label: "Pelo menos um número",             test: (v: string) => /[0-9]/.test(v) },
+  { label: "Pelo menos um caractere especial", test: (v: string) => /[^A-Za-z0-9]/.test(v) },
+];
 
 // ── Estilos reutilizáveis ────────────────────────────────
 const labelSx = {
@@ -76,7 +85,16 @@ function StepForm({ onSubmit, loading, error }: {
   const [showConfirma, setShowConfirma] = useState(false);
   const [touched, setTouched]           = useState<Record<string, boolean>>({});
 
-  const set  = (k: string) => (v: string) => setFields((f) => ({ ...f, [k]: v }));
+  const formatCpf = (v: string) => {
+    const digits = v.replace(/\D/g, "").slice(0, 11);
+    return digits
+      .replace(/(\d{3})(\d)/, "$1.$2")
+      .replace(/(\d{3})\.(\d{3})(\d)/, "$1.$2.$3")
+      .replace(/(\d{3})\.(\d{3})\.(\d{3})(\d)/, "$1.$2.$3-$4");
+  };
+
+  const set = (k: string) => (v: string) =>
+    setFields((f) => ({ ...f, [k]: k === "cpf" ? formatCpf(v) : v }));
   const blur = (k: string) => () => setTouched((t) => ({ ...t, [k]: true }));
   const err  = (k: string) => touched[k] && fields[k as keyof typeof fields].trim() === "";
 
@@ -108,7 +126,8 @@ function StepForm({ onSubmit, loading, error }: {
     setTouched(Object.fromEntries(Object.keys(fields).map((k) => [k, true])));
     const isEmailValid = validateEmail(fields.email);
     const isCpfValid   = validateCpf(fields.cpf);
-    if (Object.values(fields).some((v) => v.trim() === "") || senhasDiferem || !isEmailValid || !isCpfValid) return;
+    const isSenhaValid = SECURITY_RULES.every((r) => r.test(fields.senha));
+    if (Object.values(fields).some((v) => v.trim() === "") || senhasDiferem || !isEmailValid || !isCpfValid || !isSenhaValid) return;
 
     const userProfile: UserProfile = {
       id: "",
@@ -150,6 +169,34 @@ function StepForm({ onSubmit, loading, error }: {
              type={showSenha ? "text" : "password"} mt={2.5}
              onBlur={blur("senha")} error={err("senha")} helperText="A senha é obrigatória."
              endAdornment={eyeBtn(showSenha, () => setShowSenha((p) => !p))} />
+
+      {/* ── Dicas de segurança ── */}
+      {touched.senha && (
+        <Box sx={{
+          mt: 1.5, mb: 1, p: 1.5,
+          bgcolor: "#f8fafc",
+          border: "1px solid #e2e8f0",
+          borderRadius: 2,
+        }}>
+          <Typography sx={{ fontSize: 12, fontWeight: 700, color: "#1a2744", mb: 0.75 }}>
+            Requisitos de senha:
+          </Typography>
+          {SECURITY_RULES.map((rule) => {
+            const valid = rule.test(fields.senha);
+            return (
+              <Box key={rule.label} sx={{ display: "flex", alignItems: "flex-start", gap: 0.75, mb: 0.5 }}>
+                {valid
+                  ? <CheckCircle sx={{ fontSize: 14, color: "#3dd6c8", mt: "1px", flexShrink: 0 }} />
+                  : <RadioButtonUnchecked sx={{ fontSize: 14, color: "#cbd5e1", mt: "1px", flexShrink: 0 }} />
+                }
+                <Typography sx={{ fontSize: 12, color: valid ? "#1a2744" : "#94a3b8", lineHeight: 1.4 }}>
+                  {rule.label}
+                </Typography>
+              </Box>
+            );
+          })}
+        </Box>
+      )}
 
       {/* Confirma senha */}
       <Field label="Confirme sua senha" value={fields.confirmaSenha} onChange={set("confirmaSenha")}

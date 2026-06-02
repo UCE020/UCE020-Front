@@ -5,14 +5,11 @@ import { Button as MuiButton, ButtonProps as MuiButtonProps, CircularProgress } 
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
-/**
- * Utilitário para fundir classes Tailwind sem conflitos
- */
+/* Utilitário para fundir classes Tailwind sem conflitos */
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-// Corrigido: Removidos caracteres especiais 'ç', 'ó' e '/' que causavam erro de sintaxe
 interface ButtonProps extends Omit<MuiButtonProps, 'color'> {
   variant?: 'contained' | 'outlined' | 'text';
   color?: 'primary' | 'secondary' | 'error' | 'success' | 'warning';

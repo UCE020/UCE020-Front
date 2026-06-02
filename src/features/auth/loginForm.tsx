@@ -5,13 +5,12 @@ import { useRouter } from "next/navigation";
 import {
   Box,
   Typography,
-  Button,
   IconButton,
   InputAdornment,
-  CircularProgress,
   Alert,
   FormHelperText,
 } from "@mui/material";
+import { Button } from "@/components/ui/button";
 import { FormControl } from "@mui/material";
 import { OutlinedInput } from "@mui/material";
 import { Visibility, VisibilityOff, ArrowBackIos } from "@mui/icons-material";
@@ -47,20 +46,6 @@ export function LoginForm() {
         flexDirection: "column",
       }}
     >
-      {/* ── Header ── */}
-      <Box sx={{ bgcolor: "#1a2744", px: 3, py: 2, display: "flex", alignItems: "center" }}>
-        <Box
-          sx={{
-            width: 36, height: 36,
-            borderRadius: "10px",
-            border: "2.5px solid #3dd6c8",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            fontWeight: 800, fontSize: 20, color: "#3dd6c8",
-          }}
-        >
-          A
-        </Box>
-      </Box>
 
       {/* ── Card ── */}
       <Box
@@ -150,25 +135,23 @@ export function LoginForm() {
             </Typography>
           </Box>
 
-          {/* ── Entrar ── */}
           <Button
             type="submit"
             fullWidth
-            disabled={loading}
+            isLoading={loading}
             sx={{
               mt: 2,
               py: 1.4,
               borderRadius: 50,
-              bgcolor: "#3dd6c8",
-              color: "#fff",
+              bgcolor: "#008963",
+              color: "#ffffff",
               fontWeight: 700,
               fontSize: 15,
-              textTransform: "none",
-              "&:hover": { bgcolor: "#2bbfb2" },
-              "&.Mui-disabled": { bgcolor: "#a8ede9", color: "#fff" },
+              "&:hover": { bgcolor: "#76E3BC" },
+              "&.Mui-disabled": { bgcolor: "#b0b0b0", color: "#ffffff" },
             }}
           >
-            {loading ? <CircularProgress size={22} sx={{ color: "#fff" }} /> : "Entrar"}
+            Entrar
           </Button>
 
           {/* ── Primeiro acesso? Criar conta. ── */}

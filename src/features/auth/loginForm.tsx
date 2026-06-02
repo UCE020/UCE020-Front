@@ -27,13 +27,18 @@ export function LoginForm() {
   // ── Validação ──────────────────────────────────────────
   const [touched, setTouched] = useState({ email: false, password: false });
 
-  const emailError    = touched.email    && email.trim() === "";
+  const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  const emailEmpty   = touched.email    && email.trim() === "";
+  const emailInvalid = touched.email    && email.trim() !== "" && !EMAIL_REGEX.test(email.trim());
+  const emailError   = emailEmpty || emailInvalid;
+
   const passwordError = touched.password && password.trim() === "";
 
   function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setTouched({ email: true, password: true });
-    if (!email.trim() || !password.trim()) return;
+    if (!email.trim() || !EMAIL_REGEX.test(email.trim()) || !password.trim()) return;
     handleLogin({ email, password });
   }
 
@@ -41,20 +46,30 @@ export function LoginForm() {
     <Box
       sx={{
         minHeight: "100dvh",
-        bgcolor: "#e8eaf0",
+        bgcolor: { xs: "#fff", sm: "#e8eaf0" },
         display: "flex",
         flexDirection: "column",
+        alignItems: "center",
+        justifyContent: { xs: "flex-start", sm: "center" },
+        px: { xs: 0, sm: 2 },
+        py: { xs: 0, sm: 4 },
       }}
     >
 
       {/* ── Card ── */}
       <Box
         sx={{
-          mx: "auto", mt: 3, mb: 4,
-          width: "100%", maxWidth: 420,
+          mx: "auto",
+          mt: { xs: 0, sm: 3 },
+          mb: { xs: 0, sm: 4 },
+          width: "100%",
+          maxWidth: { xs: "100%", sm: 420 },
+          minHeight: { xs: "100dvh", sm: "auto" },
           bgcolor: "#fff",
-          borderRadius: 4,
-          px: 3, py: 4,
+          borderRadius: { xs: 0, sm: 4 },
+          px: { xs: 3, sm: 3 },
+          py: { xs: 5, sm: 4 },
+          boxShadow: { xs: "none", sm: "0 4px 24px rgba(0,0,0,0.08)" },
         }}
       >
         <IconButton onClick={() => router.back()} size="small" sx={{ mb: 1, ml: -1, color: "#1a2744" }}>
@@ -89,9 +104,8 @@ export function LoginForm() {
               onBlur={() => setTouched((t) => ({ ...t, email: true }))}
               sx={inputSx(emailError)}
             />
-            {emailError && (
-              <FormHelperText>O e-mail é obrigatório.</FormHelperText>
-            )}
+            {emailEmpty   && <FormHelperText>O e-mail é obrigatório.</FormHelperText>}
+            {emailInvalid && <FormHelperText>Digite um e-mail válido.</FormHelperText>}
           </FormControl>
 
           {/* Senha */}

@@ -5,15 +5,14 @@ import { useRouter } from "next/navigation";
 import {
   Box,
   Typography,
-  Button,
   IconButton,
   InputAdornment,
-  CircularProgress,
   Alert,
   FormHelperText,
   FormControl,
   OutlinedInput,
 } from "@mui/material";
+import { Button } from "@/components/ui/button";
 import { Visibility, VisibilityOff, ArrowBackIos, CheckCircle, RadioButtonUnchecked } from "@mui/icons-material";
 import { useRedefinePassword, validate, SECURITY_RULES } from "./useRedefinePassword";
 
@@ -37,8 +36,6 @@ export function RedefinePasswordForm() {
 
   const novaSenhaError    = touched.novaSenha    && !!errors.novaSenha;
   const repetirSenhaError = touched.repetirSenha && !!errors.repetirSenha;
-
-  // Dicas de segurança: exibir quando o campo novaSenha tem erro após interação
   const showSecurityTips = novaSenhaError;
 
   function onSubmit(e: React.FormEvent) {
@@ -53,34 +50,29 @@ export function RedefinePasswordForm() {
     <Box
       sx={{
         minHeight: "100dvh",
-        bgcolor: "#e8eaf0",
+        bgcolor: { xs: "#fff", sm: "#e8eaf0" },
         display: "flex",
         flexDirection: "column",
+        alignItems: "center",
+        justifyContent: { xs: "flex-start", sm: "center" },
+        px: { xs: 0, sm: 2 },
+        py: { xs: 0, sm: 4 },
       }}
     >
-      {/* ── Header ── */}
-      <Box sx={{ bgcolor: "#1a2744", px: 3, py: 2, display: "flex", alignItems: "center" }}>
-        <Box
-          sx={{
-            width: 36, height: 36,
-            borderRadius: "10px",
-            border: "2.5px solid #3dd6c8",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            fontWeight: 800, fontSize: 20, color: "#3dd6c8",
-          }}
-        >
-          A
-        </Box>
-      </Box>
-
       {/* ── Card ── */}
       <Box
         sx={{
-          mx: "auto", mt: 3, mb: 4,
-          width: "100%", maxWidth: 420,
+          mx: "auto",
+          mt: { xs: 0, sm: 3 },
+          mb: { xs: 0, sm: 4 },
+          width: "100%",
+          maxWidth: { xs: "100%", sm: 420 },
+          minHeight: { xs: "100dvh", sm: "auto" },
           bgcolor: "#fff",
-          borderRadius: 4,
-          px: 3, py: 4,
+          borderRadius: { xs: 0, sm: 4 },
+          px: { xs: 3, sm: 3 },
+          py: { xs: 5, sm: 4 },
+          boxShadow: { xs: "none", sm: "0 4px 24px rgba(0,0,0,0.08)" },
         }}
       >
         <IconButton
@@ -206,6 +198,7 @@ export function RedefinePasswordForm() {
           <Button
             type="submit"
             fullWidth
+            isLoading={loading}
             disabled={loading || success}
             sx={{
               mt: 3,
@@ -220,10 +213,7 @@ export function RedefinePasswordForm() {
               "&.Mui-disabled": { bgcolor: "#a0aec0", color: "#fff" },
             }}
           >
-            {loading
-              ? <CircularProgress size={22} sx={{ color: "#fff" }} />
-              : "Alterar"
-            }
+            Alterar Senha
           </Button>
 
         </Box>

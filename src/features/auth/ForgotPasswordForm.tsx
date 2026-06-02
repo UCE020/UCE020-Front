@@ -32,7 +32,6 @@ const btnSx = (bg: string, hover: string) => ({
 });
 
 // ── Logo central grande ──────────────────────────────────
-// ── Logo central grande ──────────────────────────────────
 function BigLogo() {
   return (
     <Box sx={{ display: "flex", justifyContent: "center", my: 3 }}>

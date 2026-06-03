@@ -10,7 +10,8 @@ import {
   Alert,
   FormHelperText,
 } from "@mui/material";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/Button";
+
 import { FormControl } from "@mui/material";
 import { OutlinedInput } from "@mui/material";
 import { Visibility, VisibilityOff, ArrowBackIos } from "@mui/icons-material";
@@ -28,7 +29,6 @@ export function LoginForm() {
   const [touched, setTouched] = useState({ email: false, password: false });
 
   const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
   const emailEmpty   = touched.email    && email.trim() === "";
   const emailInvalid = touched.email    && email.trim() !== "" && !EMAIL_REGEX.test(email.trim());
   const emailError   = emailEmpty || emailInvalid;
@@ -38,6 +38,7 @@ export function LoginForm() {
   function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setTouched({ email: true, password: true });
+
     if (!email.trim() || !EMAIL_REGEX.test(email.trim()) || !password.trim()) return;
     handleLogin({ email, password });
   }
@@ -135,7 +136,7 @@ export function LoginForm() {
           <Box sx={{ textAlign: "right", mt: 1 }}>
             <Typography
               component="span"
-              onClick={() => router.push("/esqueci-senha")}
+              onClick={() => router.push("/forgot-password")}
               sx={{
                 fontSize: 13,
                 color: "#1a2744",
@@ -166,6 +167,7 @@ export function LoginForm() {
             }}
           >
             Entrar
+
           </Button>
 
           {/* ── Primeiro acesso? Criar conta. ── */}
@@ -175,7 +177,7 @@ export function LoginForm() {
             </Typography>
             <Typography
               component="span"
-              onClick={() => router.push("/cadastro")}
+              onClick={() => router.push("/register")}
               sx={{
                 fontSize: 13,
                 color: "#1a2744",

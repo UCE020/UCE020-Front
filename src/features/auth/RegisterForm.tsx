@@ -7,7 +7,7 @@ import {
   InputAdornment, Alert,
   FormControl, OutlinedInput, FormHelperText,
 } from "@mui/material";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/Button";
 import { Visibility, VisibilityOff, ArrowBackIos, CheckCircle, RadioButtonUnchecked } from "@mui/icons-material";
 import { UseRegister } from "./useRegister";
 import { UserProfile } from "../../types/userProfile";
@@ -305,7 +305,7 @@ function StepCode({ code, setCode, onSubmit, loading, error }: {
           "&.Mui-disabled": { bgcolor: "#b0b0b0", color: "#ffffff" },
         }}
       >
-        Enviar
+         Enviar
       </Button>
     </Box>
   );

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   Box, Typography, Button, IconButton,
-  InputAdornment, CircularProgress, Alert,
+  InputAdornment, Alert,
   FormControl, OutlinedInput, FormHelperText,
 } from "@mui/material";
 import { ArrowBackIos, MailOutlined } from "@mui/icons-material";
@@ -105,7 +105,7 @@ function StepForm({ email, setEmail, onSubmit, loading, error }: {
       </FormControl>
 
       <Button type="submit" fullWidth disabled={loading} sx={btnSx("#1a2744", "#111c33")}>
-        {loading ? <CircularProgress size={22} sx={{ color: "#fff" }} /> : "Enviar"}
+        Enviar
       </Button>
     </Box>
   );

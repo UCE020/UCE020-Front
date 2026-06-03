@@ -12,7 +12,7 @@ import {
   FormControl,
   OutlinedInput,
 } from "@mui/material";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/Button";
 import { Visibility, VisibilityOff, ArrowBackIos, CheckCircle, RadioButtonUnchecked } from "@mui/icons-material";
 import { useRedefinePassword, validate, SECURITY_RULES } from "./useRedefinePassword";
 

@@ -42,11 +42,11 @@ function HamburgerIcon({ color }: { color: string }) {
 }
 
 const DEFAULT_NAV_LINKS: NavLink[] = [
-  { icon: <Home />, label: 'Início', href: '/' },
-  { icon: <Article />, label: 'Certificados', href: '/certificados' },
-  { icon: <Event />, label: 'Inscrições', href: '/inscricoes' },
-  { icon: <PostAdd />, label: 'Criar evento', href: '/criar-evento' },
-  { icon: <FindInPage />, label: 'Eventos Criados', href: '/eventos-criados' },
+  { icon: <Home />, label: 'Início', href: '/home' },
+  { icon: <Article />, label: 'Certificados', href: '/certificate/list' },
+  { icon: <Event />, label: 'Inscrições', href: '/event/list' },
+  { icon: <PostAdd />, label: 'Criar evento', href: '/event/register' },
+  //{ icon: <FindInPage />, label: 'Eventos Criados', href: '/event/list' },
   { icon: <DocumentScanner />, label: 'Monitoria', href: '/monitoria' },
 ];
 

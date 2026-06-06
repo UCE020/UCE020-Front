@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   Box,
   Typography,
@@ -14,10 +14,11 @@ import {
 } from "@mui/material";
 import { Button } from "@/components/ui/Button";
 import { Visibility, VisibilityOff, ArrowBackIos, CheckCircle, RadioButtonUnchecked } from "@mui/icons-material";
-import { useRedefinePassword, validate, SECURITY_RULES } from "./useRedefinePassword";
+import { useRedefinePassword, validate, SECURITY_RULES } from "../hooks/useRedefinePassword";
 
 export function RedefinePasswordForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { handleRedefine, loading, error, success } = useRedefinePassword();
 
   const [novaSenha, setNovaSenha]       = useState("");
@@ -39,11 +40,12 @@ export function RedefinePasswordForm() {
   const showSecurityTips = novaSenhaError;
 
   function onSubmit(e: React.FormEvent) {
+    const token = searchParams.get("token") || "";
     e.preventDefault();
     setTouched({ novaSenha: true, repetirSenha: true });
     const validationErrors = validate({ novaSenha, repetirSenha });
     if (Object.keys(validationErrors).length > 0) return;
-    handleRedefine({ novaSenha, repetirSenha });
+    handleRedefine({ novaSenha, repetirSenha }, token);
   }
 
   return (

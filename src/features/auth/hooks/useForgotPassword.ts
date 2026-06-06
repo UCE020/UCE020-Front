@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-
+import { authService } from "@/services/authService";
 export type ForgotStep = "form" | "success";
 
 export function useForgotPassword() {
@@ -18,8 +18,7 @@ export function useForgotPassword() {
     setLoading(true);
     setError(null);
     try {
-      // await authService.forgotPassword({ email })
-      await new Promise((r) => setTimeout(r, 1000));
+      await authService.forgotPassword({ email });
       setStep("success");
     } catch {
       setError("Não foi possível enviar o e-mail. Tente novamente.");

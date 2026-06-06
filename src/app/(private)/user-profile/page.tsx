@@ -12,7 +12,6 @@ const MOCK_USER: UserProfile = {
   id: '1',
   name: 'João Silva',
   email: 'joao.silva@email.com',
-  cpf: '123.456.789-00',
   password: '••••••••'
 };
 

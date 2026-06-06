@@ -8,7 +8,7 @@ import {
   FormControl, OutlinedInput, FormHelperText,
 } from "@mui/material";
 import { ArrowBackIos, MailOutlined } from "@mui/icons-material";
-import { useForgotPassword } from "./useForgotPassword";
+import { useForgotPassword } from "../hooks/useForgotPassword";
 
 // ── Estilos reutilizáveis (mesmos do RegisterForm) ───────
 const labelSx = { fontSize: 12, fontWeight: 600, color: "#1a2744", mb: 0.5 };

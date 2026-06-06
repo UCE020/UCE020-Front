@@ -9,8 +9,8 @@ import {
 } from "@mui/material";
 import { Button } from "@/components/ui/Button";
 import { Visibility, VisibilityOff, ArrowBackIos, CheckCircle, RadioButtonUnchecked } from "@mui/icons-material";
-import { UseRegister } from "./useRegister";
-import { UserProfile } from "../../types/userProfile";
+import { useRegister } from "../hooks/useRegister";
+import { UserRegister } from "../types/userRegister";
 
 // ── Requisitos de senha segura ───────────────────────────
 const SECURITY_RULES = [
@@ -72,49 +72,26 @@ function Field({
 
 // ── ETAPA 1: Formulário ──────────────────────────────────
 function StepForm({ onSubmit, loading, error }: {
-  onSubmit: (data: UserProfile) => void;
+  onSubmit: (data: UserRegister) => void;
   loading: boolean;
   error: string | null;
 }) {
   const router = useRouter();
   const [fields, setFields] = useState({
     nome: "", email: "",
-    senha: "", confirmaSenha: "", cpf: "",
+    senha: "", confirmaSenha: "",
   });
   const [showSenha, setShowSenha]       = useState(false);
   const [showConfirma, setShowConfirma] = useState(false);
   const [touched, setTouched]           = useState<Record<string, boolean>>({});
 
-  const formatCpf = (v: string) => {
-    const digits = v.replace(/\D/g, "").slice(0, 11);
-    return digits
-      .replace(/(\d{3})(\d)/, "$1.$2")
-      .replace(/(\d{3})\.(\d{3})(\d)/, "$1.$2.$3")
-      .replace(/(\d{3})\.(\d{3})\.(\d{3})(\d)/, "$1.$2.$3-$4");
-  };
-
   const set = (k: string) => (v: string) =>
-    setFields((f) => ({ ...f, [k]: k === "cpf" ? formatCpf(v) : v }));
+    setFields((f) => ({ ...f, [k]: v }));
   const blur = (k: string) => () => setTouched((t) => ({ ...t, [k]: true }));
   const err  = (k: string) => touched[k] && fields[k as keyof typeof fields].trim() === "";
 
   const validateEmail = (email: string) =>
     /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/.test(email);
-
-  const validateCpf = (cpf: string) => {
-    cpf = cpf.replace(/[^\d]/g, "");
-    if (cpf.length !== 11 || /^(\d)\1{10}$/.test(cpf)) return false;
-    let sum = 0, remainder;
-    for (let i = 1; i <= 9; i++) sum += parseInt(cpf[i - 1]) * (11 - i);
-    remainder = (sum * 10) % 11;
-    if (remainder === 10 || remainder === 11) remainder = 0;
-    if (remainder !== parseInt(cpf[9])) return false;
-    sum = 0;
-    for (let i = 1; i <= 10; i++) sum += parseInt(cpf[i - 1]) * (12 - i);
-    remainder = (sum * 10) % 11;
-    if (remainder === 10 || remainder === 11) remainder = 0;
-    return remainder === parseInt(cpf[10]);
-  };
 
   const senhasDiferem =
     touched.confirmaSenha &&
@@ -125,18 +102,15 @@ function StepForm({ onSubmit, loading, error }: {
     e.preventDefault();
     setTouched(Object.fromEntries(Object.keys(fields).map((k) => [k, true])));
     const isEmailValid = validateEmail(fields.email);
-    const isCpfValid   = validateCpf(fields.cpf);
     const isSenhaValid = SECURITY_RULES.every((r) => r.test(fields.senha));
-    if (Object.values(fields).some((v) => v.trim() === "") || senhasDiferem || !isEmailValid || !isCpfValid || !isSenhaValid) return;
+    if (Object.values(fields).some((v) => v.trim() === "") || senhasDiferem || !isEmailValid || !isSenhaValid) return;
 
-    const userProfile: UserProfile = {
-      id: "",
+    const userRegister = {
       name: fields.nome,
       email: fields.email,
-      cpf: fields.cpf,
       password: fields.senha,
     };
-    onSubmit(userProfile);
+    onSubmit(userRegister);
   }
 
   const eyeBtn = (show: boolean, toggle: () => void) => (
@@ -205,14 +179,6 @@ function StepForm({ onSubmit, loading, error }: {
              error={err("confirmaSenha") || senhasDiferem}
              helperText={senhasDiferem ? "As senhas não coincidem." : "Obrigatório."}
              endAdornment={eyeBtn(showConfirma, () => setShowConfirma((p) => !p))} />
-
-      {/* CPF */}
-      <Field label="CPF" value={fields.cpf} onChange={set("cpf")}
-             mt={2.5}
-             onBlur={blur("cpf")}
-             error={err("cpf") || (touched.cpf && !validateCpf(fields.cpf))}
-             helperText={err("cpf") ? "O CPF é obrigatório." : "CPF inválido."}
-             placeholder="000.000.000-00" />
 
       <Button
         type="submit"
@@ -348,7 +314,7 @@ function StepSuccess({ onAccess }: { onAccess: () => void }) {
 // ── Componente principal ─────────────────────────────────
 export function RegisterForm() {
   const router = useRouter();
-  const { step, loading, error, code, setCode, submitForm, submitCode, resetForm } = UseRegister();
+  const { step, isLoading, error, code, setCode, submitForm, submitCode, resetForm } = useRegister();
 
   function handleBack() {
     if (step === "form") router.back();
@@ -396,8 +362,8 @@ export function RegisterForm() {
           </Box>
         )}
 
-        {step === "form"    && <StepForm    onSubmit={submitForm} loading={loading} error={error} />}
-        {step === "code"    && <StepCode    code={code} setCode={setCode} onSubmit={submitCode} loading={loading} error={error} />}
+        {step === "form"    && <StepForm    onSubmit={submitForm} loading={isLoading} error={error} />}
+        {step === "code"    && <StepCode    code={code} setCode={setCode} onSubmit={submitCode} loading={isLoading} error={error} />}
         {step === "success" && <StepSuccess onAccess={() => router.push("/home")} />}
       </Box>
     </Box>

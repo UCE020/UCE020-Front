@@ -76,15 +76,6 @@ export function ProfileForm({ user, onSave, isEditing, onEditChange }: ProfileFo
               placeholder="seu@email.com"
             />
           </Box>
-          <Box sx={{ mb: 2.5 }}>
-            <TextInput
-              label="CPF"
-              value={formData.cpf}
-              onChange={(value) => handleInputChange('cpf', value)}
-              disabled={!isEditing}
-              placeholder="000.000.000-00"
-            />
-          </Box>
           <Box>
             <PasswordInput
               label="Senha"

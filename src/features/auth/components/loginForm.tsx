@@ -15,7 +15,7 @@ import { Button } from "@/components/ui/Button";
 import { FormControl } from "@mui/material";
 import { OutlinedInput } from "@mui/material";
 import { Visibility, VisibilityOff, ArrowBackIos } from "@mui/icons-material";
-import { useLogin } from "./useLogin";
+import { useLogin } from "../hooks/useLogin";
 
 export function LoginForm() {
   const router = useRouter();

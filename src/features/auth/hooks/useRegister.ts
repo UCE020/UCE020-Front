@@ -27,7 +27,7 @@ export function useRegister() {
     setIsLoading(true);
     setError(null);
     try {
-      await authService.register(data as any as Record<string, string>); 
+      await authService.register(data); 
       setFormData(data);
       setStep('code');
     } catch (err) {

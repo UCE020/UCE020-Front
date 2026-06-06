@@ -16,7 +16,7 @@ export interface LoginResponse {
 export interface RegisterResponse {
   statusCode: number;
   message?: string;
-  data: {};
+  data?: unknown;
 }
 
 export interface GenericResponse {

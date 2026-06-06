@@ -5,6 +5,14 @@ import { authService } from '@/services/authService';
 import { UserRegister } from '@/features/auth/types/userRegister';
 import { useAuth } from '@/providers/auth-provider';
 
+interface AxiosErrorResponse {
+  response?: {
+    data?: {
+      error?: string;
+    };
+  };
+}
+
 export type RegisterStep = 'form' | 'code' | 'success';
 
 export function useRegister() {
@@ -15,16 +23,16 @@ export function useRegister() {
   const [formData, setFormData] = useState<UserRegister | null>(null);
   const { loginGlobal } = useAuth();
 
-
   async function submitForm(data: UserRegister) {
     setIsLoading(true);
     setError(null);
     try {
-      await authService.register(data as unknown as Record<string, string>);
+      await authService.register(data as any as Record<string, string>); 
       setFormData(data);
       setStep('code');
-    } catch (err: any) {
-      setError(err.response?.data?.error || 'Erro ao cadastrar. Tente novamente.');
+    } catch (err) {
+      const axiosError = err as AxiosErrorResponse;
+      setError(axiosError.response?.data?.error || 'Erro ao cadastrar. Tente novamente.');
     } finally {
       setIsLoading(false);
     }
@@ -56,8 +64,9 @@ export function useRegister() {
       }
       
       setStep('success');
-    } catch (err: any) {
-      setError(err.response?.data?.error || 'Código inválido. Verifique seu e-mail.');
+    } catch (err) {
+      const axiosError = err as AxiosErrorResponse;
+      setError(axiosError.response?.data?.error || 'Código inválido. Verifique seu e-mail.');
     } finally {
       setIsLoading(false);
     }

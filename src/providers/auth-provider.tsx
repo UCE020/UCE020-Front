@@ -42,8 +42,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         .finally(() => {
           setIsLoading(false); 
         });
-    } else {
-      setIsLoading(false);
     }
   }, []);
 

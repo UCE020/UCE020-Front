@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { authService } from "@/services/authService";
 
 export interface RedefinePasswordFormData {
   novaSenha: string;
@@ -66,13 +67,11 @@ export function useRedefinePassword() {
   const [error, setError]     = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
-  // data vai ser mockado
-  async function handleRedefine(data: RedefinePasswordFormData) {
+  async function handleRedefine(data: RedefinePasswordFormData, token: string) {
     setLoading(true);
     setError(null);
     try {
-      // substitua pela sua chamada real
-      // await authService.redefinePassword(data);
+      await authService.resetPassword(token, data.novaSenha);
       await new Promise((r) => setTimeout(r, 1000)); // simula request
       setSuccess(true);
       setTimeout(() => router.push("/login"), 2000);

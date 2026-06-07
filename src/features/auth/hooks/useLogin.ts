@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { authService } from "@/services/authService";
+import { useAuth } from "@/providers/auth-provider";
 
 export interface LoginFormData {
   email: string;
@@ -10,19 +12,27 @@ export interface LoginFormData {
 
 export function useLogin() {
   const router = useRouter();
+  const { loginGlobal } = useAuth();
+  
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // varial data vai ser mockada?
   async function handleLogin(data: LoginFormData) {
     setLoading(true);
     setError(null);
     try {
-      // substitua pela sua chamada real
-      // await authService.login(data);
-      await new Promise((r) => setTimeout(r, 1000)); // simula request
-      router.push("/");
-    } catch {
+      const response = await authService.login(data);
+      
+      const token = response.data?.access_token || null;
+
+      if (token && response.data?.user) {
+        loginGlobal(token, response.data.user);
+        
+        router.push("/home");
+      } else {
+        setError("Resposta inválida do servidor.");
+      }
+    } catch (err) {
       setError("E-mail ou senha inválidos.");
     } finally {
       setLoading(false);

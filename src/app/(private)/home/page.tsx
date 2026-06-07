@@ -6,11 +6,11 @@ import { Box } from '@mui/material';
 import { Event } from '@/types/event';
 import { Searchbar } from '@/components/ui';
 import { GreetingSection, QuickActions, EventList, useHomeEvents } from '@/features/home';
+import { useAuth } from '@/providers/auth-provider';
 
-// Substitua pela fonte real: contexto de auth, session, etc.
-const USER = { name: 'João' };
 
 export default function HomePage() {
+  const { user } = useAuth();
   const router = useRouter();
   const [code, setCode] = useState('');
   const { filteredEvents } = useHomeEvents();
@@ -34,7 +34,7 @@ export default function HomePage() {
           <Searchbar value={code} onChange={setCode} placeholder="cód. do evento" />
         </form>
 
-        <GreetingSection userName={USER.name} />
+        <GreetingSection userName={user?.name?.split(' ')[0] || 'Usuário'} />
         <QuickActions />
         <EventList
           events={filteredEvents}

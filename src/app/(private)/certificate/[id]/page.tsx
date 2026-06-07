@@ -2,22 +2,10 @@
 
 import { use } from 'react';
 import { Box, Container, Typography, IconButton } from '@mui/material';
-import { CalendarToday, AccessTime, ArrowBack } from '@mui/icons-material';
+import { CalendarToday, AccessTime, ArrowBack, Draw } from '@mui/icons-material';
 import { useRouter } from 'next/navigation';
-import { Header } from '@/components/ui/Header';
 import { Button } from '@/components/ui/Button';
 import { MOCK_CERTIFICATES } from '@/mocks/certificates';
-
-const NAV_LINKS = [
-  { label: 'Início', href: '/home' },
-  { label: 'Certificados', href: '/certificados' },
-  { label: 'Inscrições', href: '/inscricoes' },
-  { label: 'Criar evento', href: '/criar-evento' },
-  { label: 'Eventos Criados', href: '/eventos-criados' },
-  { label: 'Monitoria', href: '/monitoria' },
-];
-
-const USER = { name: 'João' };
 
 function formatCardDate(dateString: string) {
   const [year, month, day] = dateString.split('-');
@@ -37,7 +25,6 @@ export default function CertificateViewPage({ params }: { params: Promise<{ id: 
 
   return (
     <Box sx={{ minHeight: '100dvh', bgcolor: 'background.default' }}>
-      <Header navLinks={NAV_LINKS} user={USER} />
 
       <Container maxWidth="sm" sx={{ px: 3, py: 2, pb: 6 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
@@ -119,9 +106,18 @@ export default function CertificateViewPage({ params }: { params: Promise<{ id: 
           </Box>
         </Box>
 
-        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 8 }}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 8 }}>
           <Button
             variant="contained"
+            color="primary"
+            sx={{ px: 6, borderRadius: '50px', fontWeight: 700 }}
+            leftIcon={<Draw />}
+            onClick={() => router.push(`/certificate/${cert.id}/sign`)}
+          >
+            Assinar Certificado
+          </Button>
+          <Button
+            variant="outlined"
             color="secondary"
             sx={{ px: 6, borderRadius: '50px', fontWeight: 700 }}
             onClick={() => console.log('Baixar certificado:', cert.id)}

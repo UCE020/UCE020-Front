@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import { Box, Container, Typography, IconButton } from '@mui/material';
 import { ArrowBack } from '@mui/icons-material';
 
-import { Header } from '@/components/ui/Header';
 import { Button } from '@/components/ui/Button';
 import { CertificateForm } from '@/components/certificate/CertificateForm';
 import type { EditCertificateFormData } from '@/types/certificate';
@@ -19,17 +18,6 @@ const MOCK_CERTIFICATE = {
   imageUrl: '/certificate-preview.png',
   issueDate: '2024-05-16',
 };
-
-const NAV_LINKS = [
-  { label: 'Início', href: '/home' },
-  { label: 'Certificados', href: '/certificados' },
-  { label: 'Inscrições', href: '/inscricoes' },
-  { label: 'Criar evento', href: '/criar-evento' },
-  { label: 'Eventos Criados', href: '/eventos-criados' },
-  { label: 'Monitoria', href: '/monitoria' },
-];
-
-const USER = { name: 'João' };
 
 export default function EditCertificatePage() {
   const router = useRouter();
@@ -76,8 +64,6 @@ export default function EditCertificatePage() {
 
   return (
     <Box sx={{ minHeight: '100dvh', bgcolor: 'background.default' }}>
-      {/* Header com navegação */}
-      <Header user={USER} navLinks={NAV_LINKS} onLogout={() => console.log('logout')} />
 
       {/* Conteúdo Principal */}
       <Container maxWidth="sm" sx={{ py: { xs: 3, sm: 4 } }}>

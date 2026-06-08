@@ -1,43 +1,34 @@
-import type { Metadata } from 'next';
-import { Poppins } from 'next/font/google';
-import '../globals.css';
-import ThemeRegistry from '@/providers/theme-provider';
+'use client';
+
+import { useState } from 'react';
 import Header from '@/components/ui/Header';
+import { Sidebar, type NavLink } from '@/components/ui/Sidebar';
+import { Home, Article, Event, PostAdd, DocumentScanner } from '@mui/icons-material';
 
-const poppins = Poppins({
-  variable: '--font-poppins',
-  subsets: ['latin'],
-  weight: ['400', '500', '600', '700'],
-});
+const NAV_LINKS: NavLink[] = [
+  { icon: <Home />, label: 'Início', href: '/home' },
+  { icon: <Article />, label: 'Certificados', href: '/certificate/list' },
+  { icon: <Event />, label: 'Inscrições', href: '/event/list' },
+  { icon: <PostAdd />, label: 'Criar evento', href: '/event/register' },
+  { icon: <DocumentScanner />, label: 'Monitoria', href: '/monitoria' },
+];
 
-export const metadata: Metadata = {
-  title: 'Assinaê',
-  description: 'Frontend organizado com Next.js, Tailwind e Material UI',
-};
-
-// Substitua pela fonte real: contexto de auth, session, etc.
 const USER = { name: 'João' };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
-  return (
-    <html
-      lang="pt-BR"
-      className={`${poppins.variable} h-full antialiased`}
-      suppressHydrationWarning
-    >
-      <body className="min-h-screen" suppressHydrationWarning>
-        <ThemeRegistry>
-          {/* Header fixo global */}
-          <Header user={USER} />
+export default function PrivateLayout({ children }: { children: React.ReactNode }) {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
-          {/* Conteúdo da página */}
-          <main>{children}</main>
-        </ThemeRegistry>
-      </body>
-    </html>
+  return (
+    <>
+      <Header user={USER} onMenuClick={() => setSidebarOpen(true)} />
+      <Sidebar
+        open={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+        navLinks={NAV_LINKS}
+        user={USER}
+        onLogout={() => console.log('logout')}
+      />
+      <main className="pt-16">{children}</main>
+    </>
   );
 }

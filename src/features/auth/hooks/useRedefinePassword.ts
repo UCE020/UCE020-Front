@@ -16,24 +16,29 @@ export interface RedefinePasswordErrors {
 
 export const SECURITY_RULES = [
   {
+    // Mínimo de 8 caracteres
     test: (v: string) => v.length >= 8,
-    label: "8+ dígitos",
+    label: "Mínimo de 8 caracteres",
   },
   {
-    test: (v: string) =>
-      /[a-zA-Z]/.test(v) &&
-      /[0-9]/.test(v) &&
-      /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(v),
-    label: "Letra, número e caractere especial (!,@,#…)",
+    // Pelo menos uma letra maiúscula
+    test: (v: string) => /[A-Z]/.test(v),
+    label: "Pelo menos uma letra maiúscula",
   },
   {
-    test: (v: string) =>
-      !/(012|123|234|345|456|567|678|789|890)/.test(v),
-    label: "Não use números sequenciais. Ex: 1234",
+    // Pelo menos uma letra minúscula
+    test: (v: string) => /[a-z]/.test(v),
+    label: "Pelo menos uma letra minúscula",
   },
   {
-    test: (v: string) => !/\b(nome|name|cpf)\b/i.test(v),
-    label: "Não use dados pessoais. Ex: Nome, CPF",
+    // Pelo menos um número
+    test: (v: string) => /[0-9]/.test(v),
+    label: "Pelo menos um número",
+  },
+  {
+    // Pelo menos um caractere especial
+    test: (v: string) => /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?~`]/.test(v),
+    label: "Pelo menos um caractere especial",
   },
 ];
 

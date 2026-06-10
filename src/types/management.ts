@@ -1,4 +1,4 @@
-export type StaffRole = 'participant' | 'monitor' | 'organizer';
+export type StaffRole = 'Participante' | 'Monitor' | 'Organizador';
 
 export interface ManagedUser {
   id: string;

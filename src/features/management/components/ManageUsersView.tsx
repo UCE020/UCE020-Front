@@ -8,16 +8,24 @@ import { getRemoveStaffMessage } from '@/features/participants/utils/presenceMes
 import { filterBySearch } from '../utils/filterBySearch';
 import { ManagementListCard } from './ManagementListCard';
 import { StaffListRow } from './StaffListRow';
-import type { ManagedUser } from '@/types/management';
+import { EditUserRoleModal } from './EditUserRoleModal';
+import type { ManagedUser, StaffRole } from '@/types/management';
 
 export function ManageUsersView() {
   const [users, setUsers] = useState<ManagedUser[]>(MOCK_STAFF);
   const [search, setSearch] = useState('');
+
+  // Estado do modal de exclusão
   const [selectedUser, setSelectedUser] = useState<ManagedUser | null>(null);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
 
+  // Estado do modal de edição de papel
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [editingUser, setEditingUser] = useState<ManagedUser | null>(null);
+
   const filteredUsers = filterBySearch(users, search);
 
+  // --- Exclusão ---
   function openDeleteModal(userId: string) {
     const user = users.find((item) => item.id === userId);
     if (!user) return;
@@ -36,10 +44,27 @@ export function ManageUsersView() {
     closeDeleteModal();
   }
 
-  function handleEditUser(userId: string) {
+  // --- Edição de papel ---
+  function openEditModal(userId: string) {
     const user = users.find((item) => item.id === userId);
     if (!user) return;
-    console.log(`Editar usuário: ${user.name}`);
+    setEditingUser(user);
+    setEditModalOpen(true);
+  }
+
+  function closeEditModal() {
+    setEditModalOpen(false);
+    setEditingUser(null);
+  }
+
+  function handleSaveRole(newRole: StaffRole) {
+    if (!editingUser) return;
+    setUsers((current) =>
+      current.map((item) =>
+        item.id === editingUser.id ? { ...item, role: newRole } : item,
+      ),
+    );
+    closeEditModal();
   }
 
   const deleteMessages = selectedUser
@@ -61,12 +86,22 @@ export function ManageUsersView() {
             key={user.id}
             name={user.name}
             role={user.role}
-            onEdit={() => handleEditUser(user.id)}
+            onEdit={() => openEditModal(user.id)}
             onDelete={() => openDeleteModal(user.id)}
           />
         ))}
       </ManagementListCard>
 
+      {/* Modal de edição de tipo */}
+      <EditUserRoleModal
+        open={editModalOpen}
+        userName={editingUser?.name ?? ''}
+        currentRole={(editingUser?.role as StaffRole) ?? 'participant'}
+        onClose={closeEditModal}
+        onConfirm={handleSaveRole}
+      />
+
+      {/* Modal de confirmação de exclusão */}
       <ConfirmModal
         open={deleteModalOpen}
         onClose={closeDeleteModal}

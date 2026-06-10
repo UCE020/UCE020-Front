@@ -49,7 +49,7 @@ export function ManageUsersView() {
   return (
     <AppPageContainer>
       <ManagementListCard
-        title="Gerenciar Usuários"
+        title="Gerenciar Membros do Evento"
         search={search}
         onSearchChange={setSearch}
         searchAriaLabel="Buscar usuário"

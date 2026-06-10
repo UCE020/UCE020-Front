@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import type { StaffRole } from '@/types/management';
 
 // Mapeamento: valor interno → label exibido em PT
@@ -28,10 +28,6 @@ export function EditUserRoleModal({
   onConfirm,
 }: EditUserRoleModalProps) {
   const [selectedRole, setSelectedRole] = useState<StaffRole>(currentRole);
-
-  useEffect(() => {
-    if (open) setSelectedRole(currentRole);
-  }, [open, currentRole]);
 
   if (!open) return null;
 

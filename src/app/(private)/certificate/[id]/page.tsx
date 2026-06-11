@@ -2,11 +2,11 @@
 
 import { use } from 'react';
 import { Box, Container, Typography, IconButton } from '@mui/material';
-import { CalendarToday, AccessTime, ArrowBack } from '@mui/icons-material';
+import { CalendarToday, AccessTime, ArrowBack, Draw } from '@mui/icons-material';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/Button';
 import { MOCK_CERTIFICATES } from '@/mocks/certificates';
-import { mockUser } from '@/mocks/user';
+import { MOCK_USER } from '@/mocks/user';
 
 function formatCardDate(dateString: string) {
   const [year, month, day] = dateString.split('-');
@@ -22,7 +22,7 @@ export default function CertificateViewPage({
   const router = useRouter();
 
   const cert = MOCK_CERTIFICATES.find((c) => c.id === id);
-  const isOrganizer = mockUser.role === 'organizer';
+  const isOrganizer = MOCK_USER.role === 'organizer';
 
   if (!cert) {
     router.push('/certificados');
@@ -125,28 +125,18 @@ export default function CertificateViewPage({
           </Box>
         </Box>
 
-        <Box
-          sx={{
-            display: 'flex',
-            justifyContent: 'center',
-            gap: 2,
-            mt: 8,
-            flexWrap: 'wrap',
-          }}
-        >
-          {isOrganizer && (
-            <Button
-              variant="outlined"
-              color="secondary"
-              sx={{ px: 5, borderRadius: '50px', fontWeight: 700 }}
-              onClick={handleEditCertificate}
-            >
-              Editar
-            </Button>
-          )}
-
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 8 }}>
           <Button
             variant="contained"
+            color="primary"
+            sx={{ px: 6, borderRadius: '50px', fontWeight: 700 }}
+            leftIcon={<Draw />}
+            onClick={() => router.push(`/certificate/${cert.id}/sign`)}
+          >
+            Assinar Certificado
+          </Button>
+          <Button
+            variant="outlined"
             color="secondary"
             sx={{ px: 6, borderRadius: '50px', fontWeight: 700 }}
             onClick={handleDownloadCertificate}

@@ -15,7 +15,6 @@ export function Footer() {
         width: '100%',
         backgroundColor: '#13284D',
         color: '#FFFFFF',
-        mt: 8,
 
         py: {
           xs: 3,

@@ -1,72 +1,51 @@
-import Link from "next/link";
-import { Box, Card, Typography } from "@mui/material";
-import { ChevronRight } from "@mui/icons-material";
+import Link from 'next/link';
+import { Box, Card, CardContent, Typography } from '@mui/material';
 
 interface CertificateCardProps {
   id: string;
   title: string;
   issuedDate: string;
+  imageUrl?: string;
 }
 
-export function CertificateCard({
-  id,
-  title,
-  issuedDate,
-}: CertificateCardProps) {
+export function CertificateCard({ id, title, issuedDate, imageUrl }: CertificateCardProps) {
   return (
     <Card
       component={Link}
       href={`/certificate/${id}`}
+      elevation={1}
       sx={{
-        bgcolor: "#00856F",
-        color: "#FFFFFF",
-        borderRadius: 3,
-        p: 3,
-        mb: 2,
-        cursor: "pointer",
-        textDecoration: "none",
-        display: "flex",
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "space-between",
-        transition: "all 0.3s ease",
-        boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
-        "&:hover": {
-          bgcolor: "#006B58",
-          boxShadow: "0 4px 16px rgba(0, 0, 0, 0.15)",
-          transform: "translateY(-2px)",
-        },
+        width: '100%',
+        display: 'flex',
+        flexWrap: 'wrap',
+        alignItems: 'flex-start',
+        gap: 2,
+        p: 2,
+        borderRadius: 8,
+        bgcolor: '#FFF',
+        cursor: 'pointer',
+        textDecoration: 'none',
+        transition: 'transform .15s, box-shadow .15s',
+        '&:hover': { transform: 'translateY(-2px)', boxShadow: 4 },
       }}
     >
-      <Box sx={{ flex: 1 }}>
-        <Typography
-          variant="h6"
-          sx={{
-            fontWeight: 600,
-            color: "#FFFFFF",
-            mb: 0.5,
-          }}
-        >
+      <Box
+        component="img"
+        src={imageUrl ?? '/images/certificadoVariacao2.png'}
+        alt={title}
+        sx={{ width: 80, height: 80, borderRadius: 10, objectFit: 'cover', flexShrink: 0 }}
+      />
+      <CardContent sx={{ p: '0 !important', flex: 1, minWidth: 0, overflow: 'hidden' }}>
+        <Typography noWrap sx={{ fontWeight: 700, fontSize: 13, mb: 0.5 }}>
           {title}
         </Typography>
-
-        <Typography
-          variant="body2"
-          sx={{
-            color: "rgba(255, 255, 255, 0.8)",
-          }}
-        >
-          {new Date(issuedDate).toLocaleDateString("pt-BR")}
+        <Typography color="text.secondary" sx={{ fontSize: 11, lineHeight: 1.6 }}>
+          <Box component="span" color="text.primary" sx={{ fontWeight: 600 }}>
+            Emitido em:{' '}
+          </Box>
+          {new Date(issuedDate).toLocaleDateString('pt-BR')}
         </Typography>
-      </Box>
-
-      <ChevronRight
-        sx={{
-          color: "#FFFFFF",
-          fontSize: 28,
-          ml: 2,
-        }}
-      />
+      </CardContent>
     </Card>
   );
 }

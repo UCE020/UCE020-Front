@@ -1,16 +1,13 @@
 'use client';
 
-import { Box, Avatar, Typography, IconButton } from '@mui/material';
-import { Menu, Edit } from '@mui/icons-material';
+import { Box, Avatar, Typography } from '@mui/material';
 import type { UserProfile } from '@/types/userProfile';
 
 interface ProfileHeaderProps {
   user: UserProfile;
-  onMenuClick: () => void;
-  onEditClick: () => void;
 }
 
-export function ProfileHeader({ user, onMenuClick, onEditClick }: ProfileHeaderProps) {
+export function ProfileHeader({ user }: ProfileHeaderProps) {
   const initials = user.name
     .split(' ')
     .map((n) => n[0])
@@ -28,22 +25,6 @@ export function ProfileHeader({ user, onMenuClick, onEditClick }: ProfileHeaderP
         overflow: 'hidden',
       }}
     >
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          px: 3,
-          mb: 3,
-        }}
-      >
-        <IconButton onClick={onMenuClick} aria-label="Abrir menu" sx={{ color: '#fff' }}>
-          <Menu />
-        </IconButton>
-        <IconButton onClick={onEditClick} aria-label="Editar perfil" sx={{ color: '#fff' }}>
-          <Edit />
-        </IconButton>
-      </Box>
 
       <Box
         sx={{

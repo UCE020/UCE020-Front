@@ -75,11 +75,11 @@ export function Sidebar({ open, onClose, navLinks, user, onLogout }: SidebarProp
           {/* Logo dentro do sidebar */}
           <Link href="/" onClick={onClose} aria-label="Ir para a página inicial">
             <Image
-                src={"/logo.svg"}
-                alt="Logo"
-                width={32}
-                height={32}
-              />
+              src={"/logo.svg"}
+              alt="Logo"
+              width={32}
+              height={32}
+            />
           </Link>
 
           <button
@@ -126,7 +126,7 @@ export function Sidebar({ open, onClose, navLinks, user, onLogout }: SidebarProp
         {/* Rodapé: info do usuário + sair */}
         <div className="border-t border-white/10 px-4 py-4">
           <Link
-            href="/perfil"
+            href="/user-profile"
             onClick={onClose}
             className="flex items-center gap-3 mb-3 rounded-lg p-2 hover:bg-white/10 transition-colors"
           >

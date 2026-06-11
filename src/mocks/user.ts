@@ -1,5 +1,7 @@
-export const mockUser = {
-  id: "1",
-  name: "João",
-  role: "organizer" as "organizer" | "participant",
+import type { AppUser } from '@/types/user';
+
+export const MOCK_USER: AppUser = {
+  id: '1',
+  name: 'Fulano Sicraninho',
+  role: 'participant',
 };

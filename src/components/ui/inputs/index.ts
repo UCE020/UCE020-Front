@@ -6,3 +6,5 @@ export type { SelectInputProps, SelectOption } from "@/types/inputs";
 
 export { default as PasswordInput } from "./PasswordInput";
 export type { PasswordInputProps } from "@/types/inputs";
+
+export { default as ImageUpload } from "./ImageUpload";

@@ -48,10 +48,13 @@ const sampleEvents: Event[] = [
 ];
 
 export default function EventCreatedPage() {
+
   return (
-    <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
-      <Container maxWidth="lg" sx={{ py: { xs: 2, md: 8 } }}>
-        <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 2 }}>
+    <Box sx={{ minHeight: '100dvh', bgcolor: 'background.default' }}>
+
+      <Container maxWidth="md" sx={{ py: { xs: 3, md: 4 } }}>
+        {/* Header */}
+        <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 2, mb: 2 }}>
           <IconButton
             size="small"
             sx={{
@@ -72,7 +75,7 @@ export default function EventCreatedPage() {
           </Typography>
         </Box>
 
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, alignItems: 'center' }}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, alignItems: 'center', mb: 2 }}>
           {/* Lista de eventos criados - substitua pelo mapeamento real dos seus dados */}
           <Box sx={{ width: '100%', maxWidth: 860 }}>
             <EventsList events={sampleEvents} />

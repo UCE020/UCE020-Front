@@ -13,6 +13,10 @@ const poppins = Poppins({
 export const metadata: Metadata = {
   title: 'Assinaê',
   description: 'Frontend organizado com Next.js, Tailwind e Material UI',
+  icons: {
+    icon: '/images/logos/logo1.png',
+    apple: '/images/logos/logo1.png',
+  },
 };
 
 export default function RootLayout({

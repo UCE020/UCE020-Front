@@ -38,6 +38,24 @@ const inputSx = (hasError = false) => ({
   "& input": { fontSize: 14 },
 });
 
+// ── Logo central grande ──────────────────────────────────
+function BigLogo() {
+  return (
+    <Box sx={{ display: "flex", justifyContent: "center", my: 3 }}>
+      <Box
+        component="img"
+        src="/images/logos/logo1.png"
+        alt="Logo"
+        sx={{ 
+          height: 80, 
+          width: "auto",
+          objectFit: "contain" // Prevents the image from stretching weirdly
+        }}
+      />
+    </Box>
+  );
+}
+
 // ── Subcomponente: campo com label ───────────────────────
 function Field({
   label, value, onChange, type = "text",
@@ -230,14 +248,7 @@ function StepCode({ code, setCode, onSubmit, loading, error }: {
 }) {
   return (
     <Box>
-      <Box sx={{ textAlign: "center", mb: 3 }}>
-        <Box sx={{
-          width: 90, height: 90, borderRadius: "20px",
-          border: "3px solid #3dd6c8",
-          display: "inline-flex", alignItems: "center", justifyContent: "center",
-          fontWeight: 900, fontSize: 48, color: "#3dd6c8",
-        }}>A</Box>
-      </Box>
+      <BigLogo />
 
       <Typography sx={{ textAlign: "center", color: "#1a2744", fontWeight: 600, mb: 2.5, fontSize: 14 }}>
         Para finalizar o seu cadastro, informe o código recebido através do e-mail
@@ -263,11 +274,11 @@ function StepCode({ code, setCode, onSubmit, loading, error }: {
         sx={{
           py: 1.4,
           borderRadius: 50,
-          bgcolor: "#3dd6c8",
+          bgcolor: "#1a2744",
           color: "#ffffff",
           fontWeight: 700,
           fontSize: 15,
-          "&:hover": { bgcolor: "#2bbfb2" },
+          "&:hover": { bgcolor: "#111c33" },
           "&.Mui-disabled": { bgcolor: "#b0b0b0", color: "#ffffff" },
         }}
       >
@@ -281,12 +292,7 @@ function StepCode({ code, setCode, onSubmit, loading, error }: {
 function StepSuccess({ onAccess }: { onAccess: () => void }) {
   return (
     <Box sx={{ textAlign: "center" }}>
-      <Box sx={{
-        width: 90, height: 90, borderRadius: "20px",
-        border: "3px solid #3dd6c8",
-        display: "inline-flex", alignItems: "center", justifyContent: "center",
-        fontWeight: 900, fontSize: 48, color: "#3dd6c8", mb: 3,
-      }}>A</Box>
+      <BigLogo />
 
       <Typography sx={{ color: "#1a2744", fontWeight: 600, mb: 4, fontSize: 15 }}>
         E-mail confirmado com sucesso

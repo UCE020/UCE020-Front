@@ -189,7 +189,7 @@ export function BenefitsSection() {
               },
             }}
           >
-            Controle de presença, emissão automática de certificados e acompanhamento de carga horária em uma única plataforma.
+            Controle de presença, emissão automática de certificados e gestão de carga horária em uma única plataforma.
           </Typography>
         </Box>
 
@@ -284,9 +284,6 @@ export function BenefitsSection() {
                   flexDirection: 'column',
 
                   justifyContent: 'space-between',
-
-                  boxShadow:
-                    '0 10px 30px rgba(0,0,0,0.08)',
 
                   border:
                     '1px solid rgba(255,255,255,0.18)',

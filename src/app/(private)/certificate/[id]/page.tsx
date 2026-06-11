@@ -13,40 +13,28 @@ function formatCardDate(dateString: string) {
   return `${day}/${month}/${year}`;
 }
 
-export default function CertificateViewPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
+export default function CertificateViewPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const router = useRouter();
 
   const cert = MOCK_CERTIFICATES.find((c) => c.id === id);
-  const isOrganizer = MOCK_USER.role === 'organizer';
+ 
 
   if (!cert) {
     router.push('/certificados');
     return null;
   }
 
-  const certificate = cert;
-
-  function handleEditCertificate() {
-    router.push('/certificate/edit');
-  }
-
-  function handleDownloadCertificate() {
-    console.log('Baixar certificado:', certificate.id);
-  }
+  const isOrganizer = MOCK_USER.role === 'organizer';
 
   return (
     <Box sx={{ minHeight: '100dvh', bgcolor: 'background.default' }}>
+
       <Container maxWidth="sm" sx={{ px: 3, py: 2, pb: 6 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
           <IconButton onClick={() => router.back()} size="small">
             <ArrowBack fontSize="small" />
           </IconButton>
-
           <Typography
             sx={{
               fontFamily: "'Poppins', sans-serif",
@@ -61,8 +49,8 @@ export default function CertificateViewPage({
 
         <Box
           component="img"
-          src={certificate.imageUrl}
-          alt={`Certificado - ${certificate.title}`}
+          src={cert.imageUrl}
+          alt={`Certificado - ${cert.title}`}
           sx={{
             width: '100%',
             borderRadius: '14px',
@@ -80,13 +68,12 @@ export default function CertificateViewPage({
             mb: 2,
           }}
         >
-          {certificate.title}
+          {cert.title}
         </Typography>
 
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.8, mb: 4 }}>
           <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
             <CalendarToday sx={{ fontSize: 16, color: '#64748b', mt: '2px' }} />
-
             <Box>
               <Typography
                 sx={{
@@ -95,9 +82,8 @@ export default function CertificateViewPage({
                   color: '#0f172a',
                 }}
               >
-                {formatCardDate(certificate.issuedDate)}
+                {formatCardDate(cert.issuedDate)}
               </Typography>
-
               <Typography
                 sx={{
                   fontFamily: "'Poppins', sans-serif",
@@ -105,14 +91,13 @@ export default function CertificateViewPage({
                   color: '#64748b',
                 }}
               >
-                {certificate.location}
+                {cert.location}
               </Typography>
             </Box>
           </Box>
 
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <AccessTime sx={{ fontSize: 16, color: '#64748b' }} />
-
             <Typography
               sx={{
                 fontFamily: "'Poppins', sans-serif",
@@ -120,26 +105,28 @@ export default function CertificateViewPage({
                 color: '#0f172a',
               }}
             >
-              {certificate.hours} horas de carga horária
+              {cert.hours} horas de carga horária
             </Typography>
           </Box>
         </Box>
 
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 8 }}>
-          <Button
-            variant="contained"
-            color="primary"
-            sx={{ px: 6, borderRadius: '50px', fontWeight: 700 }}
-            leftIcon={<Draw />}
-            onClick={() => router.push(`/certificate/${cert.id}/sign`)}
-          >
-            Assinar Certificado
-          </Button>
+          {isOrganizer && (
+            <Button
+              variant="contained"
+              color="primary"
+              sx={{ px: 6, borderRadius: '50px', fontWeight: 700 }}
+              leftIcon={<Draw />}
+              onClick={() => router.push(`/certificate/${cert.id}/sign`)}
+            >
+              Assinar Certificado
+            </Button>
+            )}
           <Button
             variant="outlined"
             color="secondary"
             sx={{ px: 6, borderRadius: '50px', fontWeight: 700 }}
-            onClick={handleDownloadCertificate}
+            onClick={() => console.log('Baixar certificado:', cert.id)}
           >
             Baixar
           </Button>

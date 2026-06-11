@@ -22,7 +22,7 @@ export default function CertificateViewPage({
   const router = useRouter();
 
   const cert = MOCK_CERTIFICATES.find((c) => c.id === id);
-  const isAdmin = mockUser.role === 'admin';
+  const isOrganizer = mockUser.role === 'organizer';
 
   if (!cert) {
     router.push('/certificados');
@@ -134,7 +134,7 @@ export default function CertificateViewPage({
             flexWrap: 'wrap',
           }}
         >
-          {isAdmin && (
+          {isOrganizer && (
             <Button
               variant="outlined"
               color="secondary"

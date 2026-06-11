@@ -3,7 +3,7 @@
 import { Suspense, useState, useReducer, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Box, Typography, CircularProgress } from "@mui/material";
-import { IEvent } from "@/types/event";
+import { Event } from "@/types/event";
 
 import { Searchbar } from "@/components/ui";
 import { ActivityModal } from "@/components/modals";
@@ -13,12 +13,12 @@ import { eventService } from "@/services/eventService";
 type SearchState =
   | { status: "idle" }
   | { status: "loading" }
-  | { status: "success"; event: IEvent }
+  | { status: "success"; event: Event }
   | { status: "not_found" };
 
 type SearchAction =
   | { type: "FETCH_START" }
-  | { type: "FETCH_SUCCESS"; event: IEvent }
+  | { type: "FETCH_SUCCESS"; event: Event }
   | { type: "FETCH_NOT_FOUND" };
 
 function searchReducer(_: SearchState, action: SearchAction): SearchState {
@@ -67,7 +67,7 @@ function EventSearchContent() {
   const initialCode = searchParams.get("code") ?? "";
 
   const [code, setCode] = useState(initialCode);
-  const [selectedEvent, setSelectedEvent] = useState<IEvent | null>(null);
+  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
 
   const searchState = useEventSearch(initialCode);
 

@@ -1,4 +1,4 @@
-export interface IEvent {
+export interface Event {
   id: number;
   nome: string;
   codigo: string;
@@ -15,6 +15,6 @@ export interface IEvent {
 }
 
 export interface EventCardProps {
-  event: IEvent;
-  onClick?: (event: IEvent) => void;
+  event: Event;
+  onClick?: (event: Event) => void;
 }

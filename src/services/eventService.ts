@@ -1,14 +1,14 @@
 import { api } from './api';
-import { IEvent } from '../types/event';
+import { Event } from '../types/event';
 
 interface EventResponse {
   statusCode: number;
   message: string;
-  data: IEvent;
+  data: Event;
 }
 
 class EventService {
-  async findByCodigo(codigo: string): Promise<IEvent> {
+  async findByCodigo(codigo: string): Promise<Event> {
     const { data } = await api.get<EventResponse>(`/event/codigo/${codigo}`);
     return data.data;
   }

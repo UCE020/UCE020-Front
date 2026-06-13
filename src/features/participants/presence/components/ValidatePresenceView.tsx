@@ -41,16 +41,13 @@ export function ValidatePresenceView() {
   const [state, setState] = useState<ScanState>(INITIAL_STATE);
   const [scanKey, setScanKey] = useState(0);
 
-  if (!context) {
-    return <PresenceContextMissing />;
-  }
-
   // processar QR code scaneado
   const handleScan = useCallback(
     (qrCode: string) => {
-      if (state.modalOpen) return;
+      if (!context || state.modalOpen) return;
 
       const result = validatePresenceScan(qrCode, context);
+
       setState({
         modalOpen: true,
         result,
@@ -86,9 +83,15 @@ export function ValidatePresenceView() {
     }
   }, [state.result, closeModal]);
 
+  if (!context) {
+    return <PresenceContextMissing />;
+  }
+
   const handleBack = () => {
     router.push(buildListParticipantsPath(context.eventId, context.activityId));
   };
+
+  
 
   return (
     <AppPageContainer>

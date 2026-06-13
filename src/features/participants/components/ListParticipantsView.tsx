@@ -1,42 +1,69 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { AppPageContainer } from '@/components/layout/AppPageContainer';
-import { MOCK_ACTIVITY_CONTEXT } from '@/mocks/activity-context';
-import {
-  loadParticipants,
-  updateParticipantStatus,
-} from '@/mocks/participants-storage';
-import { MOCK_USER } from '@/mocks/user';
-import { ParticipantsListCard } from './ParticipantsListCard';
-import { PresenceActionModals } from './PresenceActionModals';
-import { ValidatePresencesButton } from './ValidatePresencesButton';
-import { filterParticipants, togglePresenceFilter } from '../utils/filterParticipants';
+import { useMockUser } from '@/mocks/useMockUser';
+import { unconfirmParticipantForActivity } from '@/mocks/participants-storage';
+import { requirePresenceContext } from '@/features/participants/presence/utils/resolvePresenceContext';
+import { getParticipantsForActivity } from '@/features/participants/presence/utils/getParticipantsForActivity';
+import { buildValidatePresencePath } from '@/features/participants/presence/utils/routes';
+import { PresenceContextMissing } from '@/features/participants/presence/components/PresenceContextMissing';
+import { ParticipantsListCard } from '@/features/participants/components/ParticipantsListCard';
+import { PresenceActionModals } from '@/features/participants/presence/components/PresenceActionModals';
+import { ValidatePresencesButton } from '@/features/participants/components/ValidatePresencesButton';
+import { filterParticipants, togglePresenceFilter } from '@/features/participants/utils/filterParticipants';
 import type { Participant, PresenceFilter } from '@/types/participant';
+import { IconButton } from '@mui/material';
+import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded';
+import { colorTokens } from '@/lib/colors';
 
 export function ListParticipantsView() {
   const router = useRouter();
-  const isMonitor = MOCK_USER.role === 'monitor';
-  const canEditPresence = isMonitor || MOCK_USER.role === 'organizer';
+  const searchParams = useSearchParams();
+  const mockUser = useMockUser();
+  const context = requirePresenceContext(
+    searchParams.get('eventId'),
+    searchParams.get('activityId'),
+  );
 
-  const [participants, setParticipants] = useState<Participant[]>(() => loadParticipants());
+  const [participants, setParticipants] = useState<Participant[]>([]);
   const [search, setSearch] = useState('');
   const [presenceFilter, setPresenceFilter] = useState<PresenceFilter>('all');
   const [selectedParticipant, setSelectedParticipant] = useState<Participant | null>(null);
   const [removeModalOpen, setRemoveModalOpen] = useState(false);
 
+  useEffect(() => {
+    if (!context) {
+      return;
+    }
+
+    const { eventId, activityId } = context;
+
+    function refresh() {
+      setParticipants(getParticipantsForActivity(eventId, activityId));
+    }
+
+    refresh();
+    window.addEventListener('pageshow', refresh);
+    return () => window.removeEventListener('pageshow', refresh);
+  }, [context?.eventId, context?.activityId]);
+
+  if (!context) {
+    return <PresenceContextMissing />;
+  }
+
+  const { eventId, activityId, activityTitle } = context;
+  const isMonitor = mockUser.role === 'monitor';
+  const canEditPresence = isMonitor || mockUser.role === 'organizer';
   const filteredParticipants = filterParticipants(participants, search, presenceFilter);
 
   function handleFilterToggle(filter: Exclude<PresenceFilter, 'all'>) {
     setPresenceFilter((current) => togglePresenceFilter(current, filter));
   }
 
-  function goToValidatePresence(participantId?: string) {
-    const path = participantId
-      ? `${'/list-participants/validate'}?participantId=${participantId}`
-      : '/list-participants/validate';
-    router.push(path);
+  function goToValidatePresence() {
+    router.push(buildValidatePresencePath(eventId, activityId));
   }
 
   function openRemoveModal(participantId: string) {
@@ -53,13 +80,27 @@ export function ListParticipantsView() {
 
   async function handleRemovePresence() {
     if (!selectedParticipant) return;
-    setParticipants(updateParticipantStatus(selectedParticipant.id, 'pending'));
+
+    unconfirmParticipantForActivity(eventId, activityId, selectedParticipant.id);
+    setParticipants(getParticipantsForActivity(eventId, activityId));
     closeRemoveModal();
   }
 
+  const handleBack = () => {
+    router.push(`/event/${eventId}`);
+  };
+  
   return (
     <AppPageContainer>
-      {isMonitor && <ValidatePresencesButton onClick={() => goToValidatePresence()} />}
+      <IconButton
+        onClick={handleBack}
+        aria-label="Voltar"
+        sx={{ alignSelf: 'flex-start', color: colorTokens.text.primary }}
+      >
+        <ArrowBackRoundedIcon />
+      </IconButton>
+      
+      {isMonitor && <ValidatePresencesButton onClick={goToValidatePresence} />}
 
       <ParticipantsListCard
         participants={filteredParticipants}
@@ -75,7 +116,7 @@ export function ListParticipantsView() {
 
       <PresenceActionModals
         participantName={selectedParticipant?.name ?? null}
-        activityTitle={MOCK_ACTIVITY_CONTEXT.activityTitle}
+        activityTitle={activityTitle}
         confirmOpen={false}
         removeOpen={removeModalOpen}
         onCloseConfirm={() => undefined}

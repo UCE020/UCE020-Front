@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { IconButton } from '@mui/material';
+import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded';
 import { AppPageContainer } from '@/components/layout/AppPageContainer';
 import { useMockUser } from '@/mocks/useMockUser';
 import { unconfirmParticipantForActivity } from '@/mocks/participants-storage';
@@ -9,14 +11,13 @@ import { requirePresenceContext } from '@/features/participants/presence/utils/r
 import { getParticipantsForActivity } from '@/features/participants/presence/utils/getParticipantsForActivity';
 import { buildValidatePresencePath } from '@/features/participants/presence/utils/routes';
 import { PresenceContextMissing } from '@/features/participants/presence/components/PresenceContextMissing';
+import { RemovePresenceModal } from '@/features/participants/presence/components/RemovePresenceModal';
 import { ParticipantsListCard } from '@/features/participants/components/ParticipantsListCard';
-import { PresenceActionModals } from '@/features/participants/presence/components/PresenceActionModals';
+import { ParticipantPresenceActions } from '@/features/participants/components/ParticipantPresenceActions';
 import { ValidatePresencesButton } from '@/features/participants/components/ValidatePresencesButton';
 import { filterParticipants, togglePresenceFilter } from '@/features/participants/utils/filterParticipants';
-import type { Participant, PresenceFilter } from '@/types/participant';
-import { IconButton } from '@mui/material';
-import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded';
 import { colorTokens } from '@/lib/colors';
+import type { Participant, PresenceFilter } from '@/types/participant';
 
 export function ListParticipantsView() {
   const router = useRouter();
@@ -31,22 +32,26 @@ export function ListParticipantsView() {
   const [search, setSearch] = useState('');
   const [presenceFilter, setPresenceFilter] = useState<PresenceFilter>('all');
   const [selectedParticipant, setSelectedParticipant] = useState<Participant | null>(null);
-  const [removeModalOpen, setRemoveModalOpen] = useState(false);
 
   useEffect(() => {
-    if (!context) {
-      return;
+    const eventId = context?.eventId;
+    const activityId = context?.activityId;
+
+    if (!eventId || !activityId) return;
+
+    const currentEventId = eventId;
+    const currentActivityId = activityId;
+
+    function refreshParticipants() {
+      setParticipants(getParticipantsForActivity(currentEventId, currentActivityId));
     }
 
-    const { eventId, activityId } = context;
+    refreshParticipants();
+    window.addEventListener('pageshow', refreshParticipants);
 
-    function refresh() {
-      setParticipants(getParticipantsForActivity(eventId, activityId));
-    }
-
-    refresh();
-    window.addEventListener('pageshow', refresh);
-    return () => window.removeEventListener('pageshow', refresh);
+    return () => {
+      window.removeEventListener('pageshow', refreshParticipants);
+    };
   }, [context?.eventId, context?.activityId]);
 
   if (!context) {
@@ -70,15 +75,13 @@ export function ListParticipantsView() {
     const participant = participants.find((item) => item.id === participantId);
     if (!participant || participant.presenceStatus !== 'confirmed') return;
     setSelectedParticipant(participant);
-    setRemoveModalOpen(true);
   }
 
   function closeRemoveModal() {
-    setRemoveModalOpen(false);
     setSelectedParticipant(null);
   }
 
-  async function handleRemovePresence() {
+  function handleRemovePresence() {
     if (!selectedParticipant) return;
 
     unconfirmParticipantForActivity(eventId, activityId, selectedParticipant.id);
@@ -86,10 +89,22 @@ export function ListParticipantsView() {
     closeRemoveModal();
   }
 
-  const handleBack = () => {
+  function renderParticipantActions(participant: Participant) {
+    return (
+      <ParticipantPresenceActions
+        participant={participant}
+        canValidatePresence={isMonitor}
+        canEditPresence={canEditPresence}
+        onValidatePresence={goToValidatePresence}
+        onRemovePresence={openRemoveModal}
+      />
+    );
+  }
+
+  function handleBack() {
     router.push(`/event/${eventId}`);
-  };
-  
+  }
+
   return (
     <AppPageContainer>
       <IconButton
@@ -99,30 +114,24 @@ export function ListParticipantsView() {
       >
         <ArrowBackRoundedIcon />
       </IconButton>
-      
+
       {isMonitor && <ValidatePresencesButton onClick={goToValidatePresence} />}
 
       <ParticipantsListCard
         participants={filteredParticipants}
         search={search}
         presenceFilter={presenceFilter}
-        showQrAction={isMonitor}
-        showEditAction={canEditPresence}
         onSearchChange={setSearch}
         onFilterToggle={handleFilterToggle}
-        onValidateParticipant={isMonitor ? goToValidatePresence : undefined}
-        onEditPresence={canEditPresence ? openRemoveModal : undefined}
+        renderParticipantActions={renderParticipantActions}
       />
 
-      <PresenceActionModals
+      <RemovePresenceModal
+        open={!!selectedParticipant}
         participantName={selectedParticipant?.name ?? null}
         activityTitle={activityTitle}
-        confirmOpen={false}
-        removeOpen={removeModalOpen}
-        onCloseConfirm={() => undefined}
-        onCloseRemove={closeRemoveModal}
-        onConfirmPresence={() => undefined}
-        onRemovePresence={handleRemovePresence}
+        onClose={closeRemoveModal}
+        onConfirm={handleRemovePresence}
       />
     </AppPageContainer>
   );

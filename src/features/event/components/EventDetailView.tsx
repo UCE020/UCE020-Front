@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { IconButton } from '@mui/material';
+import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded';
 import { ActivityModal, ScheduleCard } from '@/components/modals';
 import { ContentCard } from '@/components/layout/ContentCard';
 import { AppPageContainer } from '@/components/layout/AppPageContainer';
@@ -11,12 +13,10 @@ import { useMockUser } from '@/mocks/useMockUser';
 import { registrationService } from '@/services/registrationService';
 import { getActivityModalVariant } from '@/features/event/utils/getActivityModalVariant';
 import { ParticipantQrCodeModal } from '@/features/participants/presence/components/ParticipantQrCodeModal';
+import { colorTokens } from '@/lib/colors';
 import { EventActivitiesSection } from './EventActivitiesSection';
 import { OrganizerEventActions } from './OrganizerEventActions';
 import type { Activity } from '@/types/activity';
-import { IconButton } from '@mui/material';
-import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded';
-import { colorTokens } from '@/lib/colors';
 
 interface EventDetailViewProps {
   eventId: string;
@@ -27,7 +27,7 @@ export function EventDetailView({ eventId }: EventDetailViewProps) {
   const mockUser = useMockUser();
   const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null);
   const [isQrModalOpen, setIsQrModalOpen] = useState(false);
-  const [registrationUpdate, setRegistrationUpdate] = useState(0);
+  const [, setRegistrationUpdate] = useState(0);
   const event = MOCK_EVENTS[eventId as keyof typeof MOCK_EVENTS];
 
   if (!event) {
@@ -79,10 +79,10 @@ export function EventDetailView({ eventId }: EventDetailViewProps) {
     router.push(buildListParticipantsPath(eventId, selectedActivity.id));
   }
 
-  const handleBack = () => {
+  function handleBack() {
     router.push('/home');
-  };
-  
+  }
+
   return (
     <AppPageContainer sx={{ gap: 3 }}>
       <IconButton
@@ -141,11 +141,13 @@ export function EventDetailView({ eventId }: EventDetailViewProps) {
         <ParticipantQrCodeModal
           open={isQrModalOpen}
           onClose={() => setIsQrModalOpen(false)}
-          participantId={mockUser.id}
-          participantName={mockUser.name}
-          activityId={selectedActivity.id}
-          activityTitle={selectedActivity.title}
-          eventId={eventId}
+          payload={{
+            participantId: mockUser.id,
+            participantName: mockUser.name,
+            activityId: selectedActivity.id,
+            activityTitle: selectedActivity.title,
+            eventId,
+          }}
         />
       )}
     </AppPageContainer>

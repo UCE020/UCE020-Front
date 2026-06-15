@@ -2,12 +2,18 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { IconButton } from '@mui/material';
+import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded';
 import { ActivityModal, ScheduleCard } from '@/components/modals';
 import { ContentCard } from '@/components/layout/ContentCard';
 import { AppPageContainer } from '@/components/layout/AppPageContainer';
 import { MOCK_EVENTS } from '@/mocks/event';
-import { MOCK_USER } from '@/mocks/user';
+import { buildListParticipantsPath } from '@/features/participants/presence/utils/routes';
+import { useMockUser } from '@/mocks/useMockUser';
+import { registrationService } from '@/services/registrationService';
 import { getActivityModalVariant } from '@/features/event/utils/getActivityModalVariant';
+import { ParticipantQrCodeModal } from '@/features/participants/presence/components/ParticipantQrCodeModal';
+import { colorTokens } from '@/lib/colors';
 import { EventActivitiesSection } from './EventActivitiesSection';
 import { OrganizerEventActions } from './OrganizerEventActions';
 import type { Activity } from '@/types/activity';
@@ -18,8 +24,10 @@ interface EventDetailViewProps {
 
 export function EventDetailView({ eventId }: EventDetailViewProps) {
   const router = useRouter();
+  const mockUser = useMockUser();
   const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null);
-  const [enrolledActivities, setEnrolledActivities] = useState<string[]>([]);
+  const [isQrModalOpen, setIsQrModalOpen] = useState(false);
+  const [, setRegistrationUpdate] = useState(0);
   const event = MOCK_EVENTS[eventId as keyof typeof MOCK_EVENTS];
 
   if (!event) {
@@ -39,37 +47,52 @@ export function EventDetailView({ eventId }: EventDetailViewProps) {
     );
   }
 
-  const role = MOCK_USER.role;
+  const role = mockUser.role;
   const isOrganizer = role === 'organizer';
   const isActivityEnrolled = selectedActivity
-    ? enrolledActivities.includes(selectedActivity.id)
+    ? registrationService.isRegistered(eventId, selectedActivity.id, mockUser.id)
     : false;
 
   const activityModalVariant = getActivityModalVariant(role, isActivityEnrolled);
 
   function handleSignup() {
     if (!selectedActivity) return;
-    setEnrolledActivities((current) => [...new Set([...current, selectedActivity.id])]);
+    registrationService.register(eventId, selectedActivity.id, mockUser.id);
+    setRegistrationUpdate((prev) => prev + 1);
   }
 
   function handleCancelParticipation() {
     if (!selectedActivity) return;
-    setEnrolledActivities((current) => current.filter((id) => id !== selectedActivity.id));
+    registrationService.unregister(eventId, selectedActivity.id, mockUser.id);
+    setRegistrationUpdate((prev) => prev + 1);
   }
 
   function handleMarkPresence() {
     if (!selectedActivity) return;
-    console.log(`Marcar presença: ${selectedActivity.title}`);
+    setIsQrModalOpen(true);
   }
 
   function goToListParticipants() {
     if (!selectedActivity) return;
     setSelectedActivity(null);
-    router.push('/list-participants');
+    setIsQrModalOpen(false);
+    router.push(buildListParticipantsPath(eventId, selectedActivity.id));
+  }
+
+  function handleBack() {
+    router.push('/home');
   }
 
   return (
     <AppPageContainer sx={{ gap: 3 }}>
+      <IconButton
+        onClick={handleBack}
+        aria-label="Voltar"
+        sx={{ alignSelf: 'flex-start', color: colorTokens.text.primary }}
+      >
+        <ArrowBackRoundedIcon />
+      </IconButton>
+
       <ContentCard sx={{ borderRadius: '28px', gap: 0 }}>
         <ScheduleCard
           title={event.name}
@@ -93,7 +116,10 @@ export function EventDetailView({ eventId }: EventDetailViewProps) {
 
       <ActivityModal
         open={!!selectedActivity}
-        onClose={() => setSelectedActivity(null)}
+        onClose={() => {
+          setSelectedActivity(null);
+          setIsQrModalOpen(false);
+        }}
         title={selectedActivity?.title ?? ''}
         image={event.imageUrl}
         startDate={selectedActivity?.startDate ?? ''}
@@ -110,6 +136,20 @@ export function EventDetailView({ eventId }: EventDetailViewProps) {
         onValidatePresences={goToListParticipants}
         onListParticipants={goToListParticipants}
       />
+
+      {selectedActivity && (
+        <ParticipantQrCodeModal
+          open={isQrModalOpen}
+          onClose={() => setIsQrModalOpen(false)}
+          payload={{
+            participantId: mockUser.id,
+            participantName: mockUser.name,
+            activityId: selectedActivity.id,
+            activityTitle: selectedActivity.title,
+            eventId,
+          }}
+        />
+      )}
     </AppPageContainer>
   );
 }

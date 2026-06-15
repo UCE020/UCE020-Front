@@ -36,7 +36,7 @@ export function ParticipantsSearchBar({
         <InputBase
           placeholder="Buscar"
           value={search}
-          onChange={(e) => onSearchChange(e.target.value)}
+          onChange={(event) => onSearchChange(event.target.value)}
           fullWidth
           inputProps={{ 'aria-label': 'Buscar participante' }}
           sx={{ fontSize: 14 }}

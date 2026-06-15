@@ -1,26 +1,29 @@
-import { useState } from 'react';
-import { MOCK_USERS_AVAILABLE } from './user';
+import { useSyncExternalStore } from 'react';
+import {
+  MOCK_USER,
+  MOCK_USER_CHANGED_EVENT,
+  getCurrentMockUser,
+} from './user';
 import type { AppUser } from '@/types/user';
 
-const DEFAULT_USER = MOCK_USERS_AVAILABLE.participant;
-
-function getDefaultMockUser(): AppUser {
+function subscribeToMockUserChanges(onStoreChange: () => void) {
   if (typeof window === 'undefined') {
-    return DEFAULT_USER;
+    return () => undefined;
   }
 
-  try {
-    const userKey = localStorage.getItem('mock-current-user');
-    if (userKey && MOCK_USERS_AVAILABLE[userKey]) {
-      return MOCK_USERS_AVAILABLE[userKey];
-    }
-  } catch {
-  }
+  window.addEventListener('storage', onStoreChange);
+  window.addEventListener(MOCK_USER_CHANGED_EVENT, onStoreChange);
 
-  return DEFAULT_USER;
+  return () => {
+    window.removeEventListener('storage', onStoreChange);
+    window.removeEventListener(MOCK_USER_CHANGED_EVENT, onStoreChange);
+  };
 }
 
 export function useMockUser(): AppUser {
-  const [user] = useState<AppUser>(getDefaultMockUser);
-  return user;
+  return useSyncExternalStore(
+    subscribeToMockUserChanges,
+    getCurrentMockUser,
+    () => MOCK_USER,
+  );
 }

@@ -1,5 +1,6 @@
 'use client';
 
+import { Typography } from '@mui/material';
 import { AppPageContainer } from '@/components/layout/AppPageContainer';
 
 export function PresenceContextMissing() {
@@ -14,11 +15,13 @@ export function PresenceContextMissing() {
         textAlign: 'center',
       }}
     >
-       <p>Atividade não especificada</p>
-      <p>
-        Acesse o <strong>Evento</strong>, selecione a <strong>Atividade</strong> correspondente<br />
-        e clique em: <strong>Validar presenças</strong> ou <strong>Listar participantes</strong>
-      </p>
+      <Typography sx={{ fontWeight: 700, color: 'text.primary' }}>
+        Atividade não especificada
+      </Typography>
+      <Typography sx={{ color: 'text.secondary', lineHeight: 1.6 }}>
+        Acesse o <strong>Evento</strong>, selecione a <strong>Atividade</strong> correspondente
+        <br />e clique em <strong>Validar presenças</strong> ou <strong>Listar participantes</strong>
+      </Typography>
     </AppPageContainer>
   );
 }

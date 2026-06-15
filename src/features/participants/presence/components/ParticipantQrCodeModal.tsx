@@ -1,36 +1,23 @@
 'use client';
 
 import { Box, Typography } from '@mui/material';
-import { ModalContainer, CloseButton } from '@/components/modals';
 import QRCode from 'react-qr-code';
+import { ModalContainer, CloseButton } from '@/components/modals';
 import { buildPresenceQrPayload } from '@/features/participants/presence/utils/presenceQr';
+import type { PresenceQrPayload } from '@/types/presence';
 
 interface ParticipantQrCodeModalProps {
   open: boolean;
   onClose: () => void;
-  participantId: string;
-  participantName: string;
-  activityId: string;
-  activityTitle: string;
-  eventId: string;
+  payload: PresenceQrPayload;
 }
 
 export function ParticipantQrCodeModal({
   open,
   onClose,
-  participantId,
-  participantName,
-  activityId,
-  activityTitle,
-  eventId,
+  payload,
 }: ParticipantQrCodeModalProps) {
-  const qrPayload = buildPresenceQrPayload({
-    participantId,
-    participantName,
-    activityId,
-    activityTitle,
-    eventId,
-  });
+  const qrPayload = buildPresenceQrPayload(payload);
 
   return (
     <ModalContainer open={open} onClose={onClose}>
@@ -56,7 +43,7 @@ export function ParticipantQrCodeModal({
             textAlign: 'center',
           }}
         >
-          {activityTitle}
+          {payload.activityTitle}
         </Typography>
 
         <Box sx={{ display: 'flex', justifyContent: 'center', mb: 3 }}>

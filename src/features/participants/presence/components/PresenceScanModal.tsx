@@ -114,8 +114,7 @@ export function PresenceScanModal({
                 textAlign: 'center',
                 color: 'text.secondary',
                 mb: 1,
-                fontSize: 'clamp(14px, 4vw, 16px)',
-                lineHeight: 1.5,
+                fontSize: 'clamp(12px, 3vw, 14px)',
               }}
             >
               {confirmMessages.message}
@@ -125,7 +124,7 @@ export function PresenceScanModal({
                 textAlign: 'center',
                 fontWeight: 700,
                 color: 'text.primary',
-                fontSize: 'clamp(16px, 5vw, 18px)',
+                fontSize: 'clamp(12px, 3vw, 14px)',
                 mb: 2,
               }}
             >
@@ -139,8 +138,7 @@ export function PresenceScanModal({
                 textAlign: 'center',
                 color: 'text.secondary',
                 mb: 1,
-                fontSize: 'clamp(14px, 4vw, 16px)',
-                lineHeight: 1.5,
+                fontSize: 'clamp(12px, 3vw, 14px)',
               }}
             >
               {title}
@@ -150,7 +148,7 @@ export function PresenceScanModal({
                 textAlign: 'center',
                 fontWeight: 700,
                 color: visualType === 'error' ? colorTokens.status.error : 'text.primary',
-                fontSize: 'clamp(15px, 4vw, 17px)',
+                fontSize: 'clamp(10px, 3vw, 12px)',
                 mb: 2,
               }}
             >

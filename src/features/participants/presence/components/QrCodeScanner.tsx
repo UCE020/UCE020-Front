@@ -13,6 +13,23 @@ interface QrCodeScannerProps {
   paused?: boolean;
 }
 
+type ScannerStatus = 'loading' | 'ready' | 'error' | 'success';
+
+const SCAN_INTERVAL_MS = 250;
+const SUCCESS_FEEDBACK_MS = 1000;
+const DUPLICATE_SCAN_WINDOW_MS = 2000;
+const CAMERA_CONSTRAINTS: MediaStreamConstraints = {
+  video: {
+    facingMode: 'environment',
+    width: { ideal: 1280 },
+    height: { ideal: 720 },
+  },
+};
+
+function stopCamera(stream: MediaStream | null) {
+  stream?.getTracks().forEach((track) => track.stop());
+}
+
 export function QrCodeScanner({
   onResult,
   scanKey = 0,
@@ -27,6 +44,9 @@ export function QrCodeScanner({
   const onResultRef = useRef(onResult);
   const pausedRef = useRef(paused);
 
+  const [status, setStatus] = useState<ScannerStatus>('loading');
+  const [message, setMessage] = useState('Inicializando câmera...');
+
   useEffect(() => {
     onResultRef.current = onResult;
   }, [onResult]);
@@ -35,9 +55,6 @@ export function QrCodeScanner({
     pausedRef.current = paused;
   }, [paused]);
 
-  const [status, setStatus] = useState<'loading' | 'ready' | 'error' | 'success'>('loading');
-  const [message, setMessage] = useState('Inicializando câmera...');
-
   useEffect(() => {
     lastScannedRef.current = null;
   }, [scanKey]);
@@ -45,55 +62,70 @@ export function QrCodeScanner({
   useEffect(() => {
     let mounted = true;
 
-    const stopCamera = () => {
+    function clearTimers() {
       if (scanTimerRef.current) window.clearTimeout(scanTimerRef.current);
       if (successTimerRef.current) window.clearTimeout(successTimerRef.current);
-      streamRef.current?.getTracks().forEach((track) => track.stop());
-      streamRef.current = null;
-    };
+    }
 
-    const scanFrame = () => {
+    function scheduleNextScan() {
+      scanTimerRef.current = window.setTimeout(scanFrame, SCAN_INTERVAL_MS);
+    }
+
+    function handleDetectedCode(value: string) {
+      const now = Date.now();
+      const lastScan = lastScannedRef.current;
+      const isDuplicate =
+        lastScan?.value === value && now - lastScan.timestamp < DUPLICATE_SCAN_WINDOW_MS;
+
+      if (isDuplicate) return;
+
+      lastScannedRef.current = { value, timestamp: now };
+      setStatus('success');
+      onResultRef.current?.(value);
+
+      if (successTimerRef.current) window.clearTimeout(successTimerRef.current);
+      successTimerRef.current = window.setTimeout(() => {
+        if (mounted) setStatus('ready');
+      }, SUCCESS_FEEDBACK_MS);
+    }
+
+    function scanFrame() {
       if (!mounted) return;
+
+      if (pausedRef.current) {
+        scheduleNextScan();
+        return;
+      }
 
       const video = videoRef.current;
       const canvas = canvasRef.current;
 
       if (!video || !canvas || !video.videoWidth) {
-        scanTimerRef.current = window.setTimeout(scanFrame, 100);
+        scheduleNextScan();
         return;
       }
 
-      const ctx = canvas.getContext('2d', { willReadFrequently: true });
-      if (!ctx) {
-        scanTimerRef.current = window.setTimeout(scanFrame, 100);
+      const context = canvas.getContext('2d', { willReadFrequently: true });
+      if (!context) {
+        scheduleNextScan();
         return;
       }
 
       canvas.width = video.videoWidth;
       canvas.height = video.videoHeight;
-      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
       const code = jsQR(imageData.data, imageData.width, imageData.height);
 
-      if (code?.data && !pausedRef.current) {
-        const now = Date.now();
-        if (!lastScannedRef.current || now - lastScannedRef.current.timestamp > 2000) {
-          lastScannedRef.current = { value: code.data, timestamp: now };
-          setStatus('success');
-          onResultRef.current?.(code.data);
-
-          if (successTimerRef.current) window.clearTimeout(successTimerRef.current);
-          successTimerRef.current = window.setTimeout(() => {
-            if (mounted) setStatus('ready');
-          }, 1500);
-        }
+      if (code?.data) {
+        handleDetectedCode(code.data);
       }
 
-      scanTimerRef.current = window.setTimeout(scanFrame, 100);
-    };
+      scheduleNextScan();
+    }
 
-    const initScanner = async () => {
+    async function initScanner() {
       if (!navigator.mediaDevices?.getUserMedia) {
         setStatus('error');
         setMessage('Seu navegador não suporta câmera');
@@ -101,16 +133,10 @@ export function QrCodeScanner({
       }
 
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: {
-            facingMode: 'environment',
-            width: { ideal: 1280 },
-            height: { ideal: 720 },
-          },
-        });
+        const stream = await navigator.mediaDevices.getUserMedia(CAMERA_CONSTRAINTS);
 
         if (!mounted || !videoRef.current) {
-          stream.getTracks().forEach((track) => track.stop());
+          stopCamera(stream);
           return;
         }
 
@@ -125,13 +151,15 @@ export function QrCodeScanner({
         setStatus('error');
         setMessage('Permita o acesso à câmera e recarregue a página');
       }
-    };
+    }
 
     void initScanner();
 
     return () => {
       mounted = false;
-      stopCamera();
+      clearTimers();
+      stopCamera(streamRef.current);
+      streamRef.current = null;
     };
   }, []);
 

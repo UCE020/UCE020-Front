@@ -3,9 +3,16 @@
 import { useState } from 'react';
 import { Typography, Box } from '@mui/material';
 import WarningAmberRoundedIcon from '@mui/icons-material/WarningAmberRounded';
+import ErrorRoundedIcon from '@mui/icons-material/ErrorRounded';
+import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded';
 import { Button } from '@/components/ui';
 import { ModalContainer, CloseButton, ModalContent, ModalFooter } from '@/components/modals';
+import { colorTokens } from '@/lib/colors';
 import type { ConfirmModalProps } from '@/types/confirmModal';
+
+interface ExtendedConfirmModalProps extends ConfirmModalProps {
+  type?: 'default' | 'error' | 'warning' | 'success';
+}
 
 export default function ConfirmModal({
   open,
@@ -17,7 +24,8 @@ export default function ConfirmModal({
   onConfirm,
   confirmDisabled = false,
   isLoading = false,
-}: ConfirmModalProps) {
+  type = 'default',
+}: ExtendedConfirmModalProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleConfirm = async () => {
@@ -31,13 +39,26 @@ export default function ConfirmModal({
     }
   };
 
+  const getIcon = () => {
+    switch (type) {
+      case 'error':
+        return <ErrorRoundedIcon sx={{ fontSize: 48, color: colorTokens.status.error }} />;
+      case 'warning':
+        return <WarningAmberRoundedIcon sx={{ fontSize: 48, color: colorTokens.status.warning }} />;
+      case 'success':
+        return <CheckCircleRoundedIcon sx={{ fontSize: 48, color: colorTokens.status.success }} />;
+      default:
+        return <WarningAmberRoundedIcon sx={{ fontSize: 32, color: 'text.secondary' }} />;
+    }
+  };
+
   return (
     <ModalContainer open={open} onClose={onClose}>
       <CloseButton onClick={onClose} />
 
       <ModalContent paddingX={3} marginBottom={3.5}>
         <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2.5, mt: 1 }}>
-          <WarningAmberRoundedIcon sx={{ fontSize: 32, color: 'text.secondary' }} />
+          {getIcon()}
         </Box>
 
         <Typography
@@ -56,7 +77,7 @@ export default function ConfirmModal({
           sx={{
             textAlign: 'center',
             fontWeight: 700,
-            color: 'text.primary',
+            color: type === 'error' ? colorTokens.status.error : 'text.primary',
             fontSize: 'clamp(16px, 5vw, 18px)',
             mb: 3,
           }}

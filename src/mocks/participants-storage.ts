@@ -1,29 +1,43 @@
 import { MOCK_PARTICIPANTS } from '@/mocks/participants';
-import type { Participant, PresenceStatus } from '@/types/participant';
 
-const STORAGE_KEY = 'assinae-mock-participants';
+const confirmedByActivity: Record<string, string[]> = {};
 
-export function loadParticipants(): Participant[] {
-  if (typeof window === 'undefined') return MOCK_PARTICIPANTS;
-
-  try {
-    const stored = sessionStorage.getItem(STORAGE_KEY);
-    if (!stored) return MOCK_PARTICIPANTS;
-    return JSON.parse(stored) as Participant[];
-  } catch {
-    return MOCK_PARTICIPANTS;
-  }
+function buildKey(eventId: string, activityId: string) {
+  return `${eventId}:${activityId}`;
 }
 
-export function saveParticipants(participants: Participant[]) {
-  if (typeof window === 'undefined') return;
-  sessionStorage.setItem(STORAGE_KEY, JSON.stringify(participants));
+export function loadParticipants() {
+  return MOCK_PARTICIPANTS;
 }
 
-export function updateParticipantStatus(participantId: string, presenceStatus: PresenceStatus) {
-  const participants = loadParticipants().map((participant) =>
-    participant.id === participantId ? { ...participant, presenceStatus } : participant,
-  );
-  saveParticipants(participants);
-  return participants;
+export function isParticipantConfirmed(
+  eventId: string,
+  activityId: string,
+  participantId: string,
+): boolean {
+  return (confirmedByActivity[buildKey(eventId, activityId)] ?? []).includes(participantId);
+}
+
+export function confirmParticipantForActivity(
+  eventId: string,
+  activityId: string,
+  participantId: string,
+) {
+  const key = buildKey(eventId, activityId);
+  const list = new Set(confirmedByActivity[key] ?? []);
+  list.add(participantId);
+  confirmedByActivity[key] = Array.from(list);
+}
+
+export function unconfirmParticipantForActivity(
+  eventId: string,
+  activityId: string,
+  participantId: string,
+) {
+  const key = buildKey(eventId, activityId);
+  confirmedByActivity[key] = (confirmedByActivity[key] ?? []).filter((id) => id !== participantId);
+}
+
+export function getConfirmedPresencesSnapshot(): Record<string, string[]> {
+  return { ...confirmedByActivity };
 }

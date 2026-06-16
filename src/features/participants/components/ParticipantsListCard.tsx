@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import type { Participant, PresenceFilter } from '@/types/participant';
 import { ManagementListCard } from '@/features/management/components/ManagementListCard';
 import { ParticipantsSearchBar } from './ParticipantsSearchBar';
@@ -7,24 +8,18 @@ interface ParticipantsListCardProps {
   participants: Participant[];
   search: string;
   presenceFilter: PresenceFilter;
-  showQrAction: boolean;
-  showEditAction: boolean;
   onSearchChange: (value: string) => void;
   onFilterToggle: (filter: Exclude<PresenceFilter, 'all'>) => void;
-  onValidateParticipant?: (participantId: string) => void;
-  onEditPresence?: (participantId: string) => void;
+  renderParticipantActions?: (participant: Participant) => ReactNode;
 }
 
 export function ParticipantsListCard({
   participants,
   search,
   presenceFilter,
-  showQrAction,
-  showEditAction,
   onSearchChange,
   onFilterToggle,
-  onValidateParticipant,
-  onEditPresence,
+  renderParticipantActions,
 }: ParticipantsListCardProps) {
   return (
     <ManagementListCard
@@ -44,10 +39,7 @@ export function ParticipantsListCard({
         <ParticipantRow
           key={participant.id}
           participant={participant}
-          showQrAction={showQrAction}
-          showEditAction={showEditAction}
-          onValidateParticipant={onValidateParticipant}
-          onEditPresence={onEditPresence}
+          actions={renderParticipantActions?.(participant)}
         />
       ))}
     </ManagementListCard>

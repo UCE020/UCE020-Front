@@ -1,29 +1,49 @@
-"use client";
+﻿"use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Event } from "@/types/event";
-
-// Mock — substitua pela chamada real em services/api.ts
-const MOCK_EVENTS: Event[] = [
-  {
-    id: "1",
-    name: "NOME DO EVENTO",
-    startDate: "13/01/2026",
-    endDate: "17/01/2026",
-    time: "Das 2h até 15h",
-    imageUrl: "https://placehold.co/60x60/76E3BC/0D1E3B?text=E1",
-  },
-  {
-    id: "2",
-    name: "NOME DO EVENTO",
-    startDate: "13/01/2026",
-    endDate: "17/01/2026",
-    time: "Das 8h até 15h",
-    imageUrl: "https://placehold.co/60x60/0D1E3B/76E3BC?text=E2",
-  },
-];
+import { eventService } from "@/services/eventService";
+import { useAuth } from "@/providers/auth-provider";
 
 export function useHomeEvents() {
-  const filteredEvents = useMemo(() => MOCK_EVENTS, []);
-  return { filteredEvents };
+  const { user, isLoading } = useAuth();
+  const [events, setEvents] = useState<Event[]>([]);
+  const [isFetchingEvents, setIsFetchingEvents] = useState(false);
+
+  useEffect(() => {
+    if (isLoading || !user) return;
+
+    let isMounted = true;
+    Promise.resolve().then(() => {
+      if (isMounted) {
+        setIsFetchingEvents(true);
+      }
+    });
+
+    eventService
+      .findParticipatingEvents()
+      .then((events) => {
+        if (isMounted) {
+          setEvents(events);
+        }
+      })
+      .catch(() => {
+        if (isMounted) {
+          setEvents([]);
+        }
+      })
+      .finally(() => {
+        if (isMounted) {
+          setIsFetchingEvents(false);
+        }
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [user, isLoading]);
+
+  const filteredEvents = useMemo(() => (user ? events : []), [events, user]);
+
+  return { filteredEvents, isFetchingEvents };
 }

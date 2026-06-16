@@ -5,7 +5,7 @@ import { Box } from '@mui/material';
 import { ConfirmModal } from '@/components/modals/confirm-modal';
 import { AppPageContainer } from '@/components/layout/AppPageContainer';
 import { MOCK_GUESTS } from '@/mocks/guests';
-import { getRemoveStaffMessage } from '@/features/participants/utils/presenceMessages';
+import { getRemoveStaffMessage } from '@/features/participants/presence/utils/presenceMessages';
 import { filterBySearch } from '../utils/filterBySearch';
 import { ManagementListCard } from './ManagementListCard';
 import { StaffListRow } from './StaffListRow';

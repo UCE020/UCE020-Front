@@ -89,7 +89,7 @@ export function ActivityModalActions({
           fullWidth
           sx={actionButtonSx}
         >
-          Lista de participantes
+          Participantes
         </Button>
       )}
     </Box>

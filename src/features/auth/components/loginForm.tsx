@@ -173,68 +173,26 @@ export function LoginForm() {
           </IconButton>
         </Box>
 
-        {/* Erro global da API */}
-        {error && (
-          <Alert severity="error" sx={{ mb: 2, borderRadius: 2 }}>
-            {error}
-          </Alert>
-        )}
+        {/* Logo mobile */}
+        <Box sx={{
+          display: { xs: "flex", md: "none" },
+          position: "relative",
+          width: 130,
+          height: 52,
+          mb: 5,
+        }}>
+          <Image src="/images/logo-assinae.png" alt="Assinaê" fill style={{ objectFit: "contain" }} priority />
+        </Box>
 
-        <Box component="form" onSubmit={onSubmit} noValidate>
-
-          {/* E-mail */}
-          <Typography sx={labelSx}>Digite seu e-mail</Typography>
-          <FormControl fullWidth size="small" error={emailError}>
-            <OutlinedInput
-              type="email"
-              placeholder="aluno@email.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              onBlur={() => setTouched((t) => ({ ...t, email: true }))}
-              sx={inputSx(emailError)}
-            />
-            {emailEmpty   && <FormHelperText>O e-mail é obrigatório.</FormHelperText>}
-            {emailInvalid && <FormHelperText>Digite um e-mail válido.</FormHelperText>}
-          </FormControl>
-
-          {/* Senha */}
-          <Typography sx={{ ...labelSx, mt: 2.5 }}>Digite sua senha</Typography>
-          <FormControl fullWidth size="small" error={passwordError}>
-            <OutlinedInput
-              type={showPass ? "text" : "password"}
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              onBlur={() => setTouched((t) => ({ ...t, password: true }))}
-              sx={inputSx(passwordError)}
-              endAdornment={
-                <InputAdornment position="end">
-                  <IconButton onClick={() => setShowPass((p) => !p)} edge="end" size="small" sx={{ color: "#aaa" }}>
-                    {showPass ? <VisibilityOff fontSize="small" /> : <Visibility fontSize="small" />}
-                  </IconButton>
-                </InputAdornment>
-              }
-            />
-            {passwordError && (
-              <FormHelperText>A senha é obrigatória.</FormHelperText>
-            )}
-          </FormControl>
-
-          {/* ── Esqueceu sua senha? ── */}
-          <Box sx={{ textAlign: "right", mt: 1 }}>
-            <Typography
-              component="span"
-              onClick={() => router.push("/forgot-password")}
-              sx={{
-                fontSize: 13,
-                color: "#1a2744",
-                fontWeight: 600,
-                textDecoration: "underline",
-                cursor: "pointer",
-                "&:hover": { color: "#76E3BC" },
-              }}
-            >
-              Esqueceu sua senha?
+        {/* Form container */}
+        <Box sx={{ width: "100%", maxWidth: 380 }}>
+          {/* Cabeçalho */}
+          <Box sx={{ mb: 5 }}>
+            <Typography sx={{ fontWeight: 800, textAlign: "center", fontSize: "1.9rem", color: navy, letterSpacing: "-0.5px", lineHeight: 1.1, mb: 1 }}>
+              Seja Bem-vindo
+            </Typography>
+            <Typography sx={{ color: gray600, fontSize: 14, textAlign: "center" }}>
+              Entre na sua conta para continuar.
             </Typography>
           </Box>
 
@@ -335,7 +293,8 @@ export function LoginForm() {
                 borderRadius: "14px",
                 border: `1.5px solid ${gray200}`,
                 cursor: "pointer",
-                "&:hover": { color: "#76E3BC" },
+                transition: "0.2s ease",
+                "&:hover": { borderColor: teal, bgcolor: gray50 },
               }}
             >
               <Typography sx={{ fontSize: 14, color: navy, fontWeight: 600 }}>

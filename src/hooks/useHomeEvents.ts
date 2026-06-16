@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useMemo, useState } from "react";
 import { Event } from "@/types/event";
@@ -24,7 +24,7 @@ export function useHomeEvents() {
       .findParticipatingEvents()
       .then((events) => {
         if (isMounted) {
-          setEvents(events);
+          setEvents(Array.isArray(events) ? events : []);
         }
       })
       .catch(() => {

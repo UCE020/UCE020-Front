@@ -1,3 +1,5 @@
+// esse modal está sendo usado tanto para editar usuários quanto convidados, por isso tem tipos genéricos e aceita uma lista de papéis como prop
+
 'use client';
 
 import { useEffect, useState } from 'react';

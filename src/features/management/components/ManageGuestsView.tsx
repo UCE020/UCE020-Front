@@ -9,7 +9,7 @@ import { getRemoveStaffMessage } from '@/features/participants/utils/presenceMes
 import { filterBySearch } from '../utils/filterBySearch';
 import { ManagementListCard } from './ManagementListCard';
 import { StaffListRow } from './StaffListRow';
-import { EditUserRoleModal, GUEST_ROLES } from './EditUserRoleModal';
+import { EditUserRoleModal, GUEST_ROLES } from '../../../components/modals/manage-users-modal/EditUserRoleModal';
 import type { ManagedGuest, StaffRole, GuestRole } from '@/types/management';
 
 export function ManageGuestsView() {

@@ -1,62 +1,56 @@
 'use client';
 
-import { useState } from 'react';
-import type { StaffRole } from '@/types/management';
+import { useEffect, useState } from 'react';
+import type { StaffRole, GuestRole } from '@/types/management';
 
-// Mapeamento: valor interno → label exibido em PT
-export const ROLE_LABELS: Record<StaffRole, string> = {
-  'Organizador': 'Organizador',
-  'Monitor': 'Monitor',
-  'Participante': 'Participante',
-};
+import ModalContainer from '@/components/modals/shared/ModalContainer';
+import ModalHeader from '@/components/modals/shared/ModalHeader';
+import ModalContent from '@/components/modals/shared/ModalContent';
+import ModalFooter from '@/components/modals/shared/ModalFooter';
+import { Button } from '@/components/ui/Button';
+import { Box } from '@mui/material';
 
-export const STAFF_ROLES: StaffRole[] = ['Organizador', 'Monitor', 'Participante'];
+export const USER_ROLES: StaffRole[] = ['Organizador', 'Monitor', 'Participante'];
+export const GUEST_ROLES: GuestRole[] = ['Palestrante', 'Ministrante'];
 
-interface EditUserRoleModalProps {
+interface EditUserRoleModalProps<T extends string> {
   open: boolean;
   userName: string;
-  currentRole: StaffRole;
+  currentRole: T;
+  roles: T[];
   onClose: () => void;
-  onConfirm: (newRole: StaffRole) => void;
+  onConfirm: (newRole: T) => void;
 }
 
-export function EditUserRoleModal({
+export function EditUserRoleModal<T extends string>({
   open,
   userName,
   currentRole,
+  roles,
   onClose,
   onConfirm,
-}: EditUserRoleModalProps) {
-  const [selectedRole, setSelectedRole] = useState<StaffRole>(currentRole);
+}: EditUserRoleModalProps<T>) {
+  const [selectedRole, setSelectedRole] = useState<T>(currentRole);
 
-  if (!open) return null;
+  useEffect(() => {
+    if (open) setSelectedRole(currentRole);
+  }, [open, currentRole]);
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
-      onClick={onClose}
-      aria-modal="true"
-      role="dialog"
-      aria-labelledby="edit-role-title"
-    >
-      <div
-        className="relative w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <h2
-          id="edit-role-title"
-          className="mb-1 text-base font-semibold text-gray-900"
-        >
-          Editar tipo de usuário
-        </h2>
+    <ModalContainer open={open} onClose={onClose}>
+      <Box sx={{ pt: 1 }}>
+        <ModalHeader title="Editar tipo de usuário" onClose={onClose} />
+      </Box>
+
+      <ModalContent>
         <p className="mb-5 text-sm text-gray-500">
           Selecione o novo tipo para{' '}
           <span className="font-medium text-gray-700">{userName}</span>.
         </p>
 
-        <fieldset className="mb-6 space-y-2">
+        <fieldset className="space-y-2">
           <legend className="sr-only">Tipo de usuário</legend>
-          {STAFF_ROLES.map((role) => (
+          {roles.map((role) => (
             <label
               key={role}
               className={`flex cursor-pointer items-center gap-3 rounded-xl border px-4 py-3 transition-colors ${
@@ -73,29 +67,35 @@ export function EditUserRoleModal({
                 onChange={() => setSelectedRole(role)}
                 className="accent-indigo-600"
               />
-              <span className="text-sm font-medium">{ROLE_LABELS[role]}</span>
+              <span className="text-sm font-medium">{role}</span>
             </label>
           ))}
         </fieldset>
+      </ModalContent>
 
-        <div className="flex gap-3">
-          <button
-            type="button"
-            onClick={onClose}
-            className="flex-1 rounded-xl border border-gray-200 py-2.5 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-50"
-          >
-            Cancelar
-          </button>
-          <button
-            type="button"
-            onClick={() => onConfirm(selectedRole)}
-            disabled={selectedRole === currentRole}
-            className="flex-1 rounded-xl bg-indigo-600 py-2.5 text-sm font-medium text-white transition-colors hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-40"
-          >
-            Salvar
-          </button>
-        </div>
-      </div>
-    </div>
+      <ModalFooter>
+        <Box sx={{ pb: 2 }}>
+          <div className="flex gap-3">
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={onClose}
+              fullWidth
+            >
+              Cancelar
+            </Button>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => onConfirm(selectedRole)}
+              disabled={selectedRole === currentRole}
+              fullWidth
+            >
+              Salvar
+            </Button>
+          </div>
+        </Box>
+      </ModalFooter>
+    </ModalContainer>
   );
 }

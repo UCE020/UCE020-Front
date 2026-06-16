@@ -1,4 +1,5 @@
 export type StaffRole = 'Participante' | 'Monitor' | 'Organizador';
+export type GuestRole = 'Palestrante' | 'Ministrante';
 
 export interface ManagedUser {
   id: string;
@@ -9,5 +10,5 @@ export interface ManagedUser {
 export interface ManagedGuest {
   id: string;
   name: string;
-  role: string;
+  role: GuestRole;
 }

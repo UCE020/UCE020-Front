@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { Box } from '@mui/material';
 import { ConfirmModal } from '@/components/modals/confirm-modal';
 import { AppPageContainer } from '@/components/layout/AppPageContainer';
 import { MOCK_STAFF } from '@/mocks/staff';
@@ -8,7 +9,7 @@ import { getRemoveStaffMessage } from '@/features/participants/utils/presenceMes
 import { filterBySearch } from '../utils/filterBySearch';
 import { ManagementListCard } from './ManagementListCard';
 import { StaffListRow } from './StaffListRow';
-import { EditUserRoleModal } from './EditUserRoleModal';
+import { EditUserRoleModal, USER_ROLES } from './EditUserRoleModal';
 import type { ManagedUser, StaffRole } from '@/types/management';
 
 export function ManageUsersView() {
@@ -72,31 +73,61 @@ export function ManageUsersView() {
     : { message: '', emphasisEndText: '' };
 
   return (
-    <AppPageContainer>
-      <ManagementListCard
-        title="Gerenciar Usuários"
-        search={search}
-        onSearchChange={setSearch}
-        searchAriaLabel="Buscar usuário"
-        isEmpty={filteredUsers.length === 0}
-        emptyMessage="Nenhum usuário encontrado"
+    // AppPageContainer fornece: minHeight 100dvh, bgcolor, width 100%, minWidth 320
+    // e um inner Box com maxWidth 620, mx auto, p 2.
+    // Sobrescrevemos o bgcolor para o fundo acinzentado no sm+ via sx.
+    <AppPageContainer
+      sx={{
+        bgcolor: { xs: 'background.default', sm: '#e8eaf0' },
+        display: { sm: 'flex' },
+        flexDirection: { sm: 'column' },
+        alignItems: { sm: 'center' },
+        justifyContent: { sm: 'center' },
+        py: { sm: 4 },
+      }}
+    >
+      {/*
+        No mobile: card sem margens, sem sombra, ocupa tela cheia.
+        No sm+: card com borderRadius, sombra e largura máxima controlada
+        pelo inner Box do AppPageContainer (maxWidth 620).
+      */}
+      <Box
+        sx={{
+          minHeight: { xs: '100dvh', sm: 'auto' },
+          bgcolor: 'background.paper',
+          borderRadius: { xs: 0, sm: 4 },
+          mx: { xs: -2, sm: 0 }, // cancela o p:2 do inner Box no mobile
+          px: { xs: 2, sm: 3 },
+          py: { xs: 4, sm: 4 },
+          boxShadow: { xs: 'none', sm: '0 4px 24px rgba(0,0,0,0.08)' },
+        }}
       >
-        {filteredUsers.map((user) => (
-          <StaffListRow
-            key={user.id}
-            name={user.name}
-            role={user.role}
-            onEdit={() => openEditModal(user.id)}
-            onDelete={() => openDeleteModal(user.id)}
-          />
-        ))}
-      </ManagementListCard>
+        <ManagementListCard
+          title="Gerenciar Usuários"
+          search={search}
+          onSearchChange={setSearch}
+          searchAriaLabel="Buscar usuário"
+          isEmpty={filteredUsers.length === 0}
+          emptyMessage="Nenhum usuário encontrado"
+        >
+          {filteredUsers.map((user) => (
+            <StaffListRow
+              key={user.id}
+              name={user.name}
+              role={user.role}
+              onEdit={() => openEditModal(user.id)}
+              onDelete={() => openDeleteModal(user.id)}
+            />
+          ))}
+        </ManagementListCard>
+      </Box>
 
       {/* Modal de edição de tipo */}
       <EditUserRoleModal
         open={editModalOpen}
         userName={editingUser?.name ?? ''}
-        currentRole={(editingUser?.role as StaffRole) ?? 'participant'}
+        currentRole={(editingUser?.role as StaffRole) ?? 'Organizador'}
+        roles={USER_ROLES}
         onClose={closeEditModal}
         onConfirm={handleSaveRole}
       />

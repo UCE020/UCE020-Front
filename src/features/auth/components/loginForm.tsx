@@ -143,7 +143,7 @@ export function LoginForm() {
                 fontWeight: 600,
                 textDecoration: "underline",
                 cursor: "pointer",
-                "&:hover": { color: "#3dd6c8" },
+                "&:hover": { color: "#76E3BC" },
               }}
             >
               Esqueceu sua senha?
@@ -184,7 +184,7 @@ export function LoginForm() {
                 fontWeight: 700,
                 textDecoration: "underline",
                 cursor: "pointer",
-                "&:hover": { color: "#3dd6c8" },
+                "&:hover": { color: "#76E3BC" },
               }}
             >
               Criar conta.

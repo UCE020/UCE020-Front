@@ -7,9 +7,20 @@ interface EventResponse {
   data: Event;
 }
 
+interface EventsResponse {
+  statusCode: number;
+  message: string;
+  data: Event[];
+}
+
 class EventService {
   async findByCodigo(codigo: string): Promise<Event> {
     const { data } = await api.get<EventResponse>(`/event/codigo/${codigo}`);
+    return data.data;
+  }
+
+  async findParticipatingEvents(): Promise<Event[]> {
+    const { data } = await api.get<EventsResponse>('/event/participating');
     return data.data;
   }
 }

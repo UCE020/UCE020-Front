@@ -149,7 +149,7 @@ export function BenefitsSection() {
               mb: 2,
             }}
           >
-            Plataforma para eventos universitários
+            Plataforma para eventos universitários da UEFS
           </Typography>
 
           <Typography

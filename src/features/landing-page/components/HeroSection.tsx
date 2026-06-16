@@ -3,7 +3,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { Box, Container, Typography } from '@mui/material';
-import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded';
 import { Button } from '@/components/ui';
 
 export function HeroSection() {
@@ -161,7 +160,11 @@ export function HeroSection() {
               Assinaê
             </Box>{' '}
             é uma plataforma completa para gestão de carga horária e emissão de certificados
-            para eventos universitários.
+            para eventos universitários da
+            {' '}
+            <Box component="span" sx={{ color: '#6ED7B4', fontWeight: 700 }}>
+              UEFS.
+            </Box>{' '}
           </Typography>
 
           {/* CTA */}

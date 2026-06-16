@@ -1,8 +1,6 @@
-// esse modal está sendo usado tanto para editar usuários quanto convidados, por isso tem tipos genéricos e aceita uma lista de papéis como prop
-
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import type { StaffRole, GuestRole } from '@/types/management';
 
 import ModalContainer from '@/components/modals/shared/ModalContainer';
@@ -32,11 +30,8 @@ export function EditUserRoleModal<T extends string>({
   onClose,
   onConfirm,
 }: EditUserRoleModalProps<T>) {
+  
   const [selectedRole, setSelectedRole] = useState<T>(currentRole);
-
-  useEffect(() => {
-    if (open) setSelectedRole(currentRole);
-  }, [open, currentRole]);
 
   return (
     <ModalContainer open={open} onClose={onClose}>

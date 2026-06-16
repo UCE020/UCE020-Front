@@ -116,9 +116,10 @@ export function ManageGuestsView() {
 
       {/* Modal de edição de papel */}
       <EditUserRoleModal
+        key={editingGuest?.id} // <-- Reseta o estado interno do modal para o convidado atual
         open={editModalOpen}
         userName={editingGuest?.name ?? ''}
-        currentRole={(editingGuest?.role as GuestRole) ?? 'Palestrante'}
+        currentRole={editingGuest?.role as GuestRole ?? 'Palestrante'}
         roles={GUEST_ROLES}
         onClose={closeEditModal}
         onConfirm={handleSaveRole}

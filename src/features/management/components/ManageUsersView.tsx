@@ -124,9 +124,10 @@ export function ManageUsersView() {
 
       {/* Modal de edição de tipo */}
       <EditUserRoleModal
+        key={editingUser?.id} // <-- Reseta o estado interno do modal para o usuário atual
         open={editModalOpen}
         userName={editingUser?.name ?? ''}
-        currentRole={(editingUser?.role as StaffRole) ?? 'Organizador'}
+        currentRole={editingUser?.role as StaffRole ?? 'Organizador'}
         roles={USER_ROLES}
         onClose={closeEditModal}
         onConfirm={handleSaveRole}

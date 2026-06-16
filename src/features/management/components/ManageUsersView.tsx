@@ -73,17 +73,29 @@ export function ManageUsersView() {
     : { message: '', emphasisEndText: '' };
 
   return (
-    <AppPageContainer>
-      <ManagementListCard
-        title="Gerenciar Membros do Evento"
-        search={search}
-        onSearchChange={setSearch}
-        searchAriaLabel="Buscar usuário"
-        isEmpty={filteredUsers.length === 0}
-        emptyMessage="Nenhum usuário encontrado"
+    <AppPageContainer
+      sx={{
+        bgcolor: { xs: 'background.default', sm: '#e8eaf0' },
+        display: { sm: 'flex' },
+        flexDirection: { sm: 'column' },
+        alignItems: { sm: 'center' },
+        justifyContent: { sm: 'center' },
+        py: { sm: 4 },
+      }}
+    >
+      <Box
+        sx={{
+          minHeight: { xs: '100dvh', sm: 'auto' },
+          bgcolor: 'background.paper',
+          borderRadius: { xs: 0, sm: 4 },
+          mx: { xs: -2, sm: 0 },
+          px: { xs: 2, sm: 3 },
+          py: { xs: 4, sm: 4 },
+          boxShadow: { xs: 'none', sm: '0 4px 24px rgba(0,0,0,0.08)' },
+        }}
       >
         <ManagementListCard
-          title="Gerenciar Usuários"
+          title="Gerenciar Membros do Evento"
           search={search}
           onSearchChange={setSearch}
           searchAriaLabel="Buscar usuário"
@@ -102,16 +114,18 @@ export function ManageUsersView() {
         </ManagementListCard>
       </Box>
 
-      {/* Modal de edição de tipo */}
-      <EditUserRoleModal
-        key={editingUser?.id} // <-- Reseta o estado interno do modal para o usuário atual
-        open={editModalOpen}
-        userName={editingUser?.name ?? ''}
-        currentRole={editingUser?.role as StaffRole ?? 'Organizador'}
-        roles={USER_ROLES}
-        onClose={closeEditModal}
-        onConfirm={handleSaveRole}
-      />
+      {/* Modal de edição de tipo aplicando a renderização condicional correta com a key */}
+      {editModalOpen && editingUser && (
+        <EditUserRoleModal
+          key={editingUser.id}
+          open={editModalOpen}
+          userName={editingUser.name}
+          currentRole={editingUser.role as StaffRole}
+          roles={USER_ROLES}
+          onClose={closeEditModal}
+          onConfirm={handleSaveRole}
+        />
+      )}
 
       {/* Modal de confirmação de exclusão */}
       <ConfirmModal

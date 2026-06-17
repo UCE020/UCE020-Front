@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { ConfirmModal } from '@/components/modals/confirm-modal';
 import { AppPageContainer } from '@/components/layout/AppPageContainer';
 import { MOCK_STAFF } from '@/mocks/staff';
-import { getRemoveStaffMessage } from '@/features/participants/utils/presenceMessages';
+import { getRemoveStaffMessage } from '@/features/participants/presence/utils/presenceMessages';
 import { filterBySearch } from '../utils/filterBySearch';
 import { ManagementListCard } from './ManagementListCard';
 import { StaffListRow } from './StaffListRow';
@@ -49,7 +49,7 @@ export function ManageUsersView() {
   return (
     <AppPageContainer>
       <ManagementListCard
-        title="Gerenciar Usuários"
+        title="Gerenciar Membros do Evento"
         search={search}
         onSearchChange={setSearch}
         searchAriaLabel="Buscar usuário"

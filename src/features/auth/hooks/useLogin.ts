@@ -32,7 +32,7 @@ export function useLogin() {
       } else {
         setError("Resposta inválida do servidor.");
       }
-    } catch (err) {
+    } catch {
       setError("E-mail ou senha inválidos.");
     } finally {
       setLoading(false);

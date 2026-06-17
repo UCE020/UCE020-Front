@@ -10,4 +10,5 @@ export interface ConfirmModalProps {
   onConfirm: AsyncVoidHandler;
   confirmDisabled?: boolean;
   isLoading?: boolean;
+  type?: 'default' | 'error' | 'warning' | 'success';
 }

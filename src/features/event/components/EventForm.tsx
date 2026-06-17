@@ -113,7 +113,7 @@ function getErrors(form: FormState, touched: TouchedState) {
         ? 'Informe a carga horária.'
         : '',
     status: '',
-    foto: touched.foto && !form.foto ? 'Adicione a imagem do evento.' : '',
+    foto: '',
   };
 }
 
@@ -184,8 +184,7 @@ export default function EventForm({ mode, eventId }: EventFormProps) {
     form.startTime.length > 0 &&
     form.endTime.length > 0 &&
     form.cargaHoraria.trim().length > 0 &&
-    Number(form.cargaHoraria) >= 0 &&
-    form.foto !== null;
+    Number(form.cargaHoraria) >= 0;
 
   const title = isEdit ? 'Edição de Evento' : 'Cadastrar Evento';
   const subtitle = isEdit
@@ -243,10 +242,12 @@ export default function EventForm({ mode, eventId }: EventFormProps) {
   }
 
   function handleAddActivity() {
+    const newId = crypto.randomUUID();
     setActivities((cur) => [
       ...cur,
-      { id: crypto.randomUUID(), title: `Atividade ${cur.length + 1}` },
+      { id: newId, title: '' },
     ]);
+    setEditingActivityId(newId);
   }
 
   function handleRemoveActivity(id: string) {
@@ -257,11 +258,10 @@ export default function EventForm({ mode, eventId }: EventFormProps) {
     setEditingActivityId(id);
   }
 
-  function handleSaveActivityTitle(id: string, newTitle: string) {
+  function handleUpdateActivityTitle(id: string, newTitle: string) {
     setActivities((cur) =>
       cur.map((a) => (a.id === id ? { ...a, title: newTitle } : a))
     );
-    setEditingActivityId(null);
   }
 
   if (isEdit && loadingEvent) {
@@ -525,10 +525,10 @@ export default function EventForm({ mode, eventId }: EventFormProps) {
                     {editingActivityId === activity.id ? (
                       <TextInput
                         value={activity.title}
-                        onChange={(v) => handleSaveActivityTitle(activity.id, v)}
+                        onChange={(v) => handleUpdateActivityTitle(activity.id, v)}
                         onBlur={() => setEditingActivityId(null)}
                         onKeyDown={(e) => {
-                          if (e.key === 'Enter') handleSaveActivityTitle(activity.id, activity.title);
+                          if (e.key === 'Enter') setEditingActivityId(null);
                         }}
                         size="small"
                         fullWidth

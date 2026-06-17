@@ -1,49 +1,37 @@
-import { Box, Typography } from '@mui/material';
+import { Typography } from '@mui/material';
 import { useState } from 'react';
-import type { ScheduleDescriptionProps } from '@/types/scheduleCard';
 
-export default function ScheduleDescription({ description }: ScheduleDescriptionProps) {
-  const [isExpanded, setIsExpanded] = useState(false);
+interface ScheduleDescriptionProps {
+  description?: string;
+}
 
-  const toggleExpand = () => setIsExpanded(!isExpanded);
+export default function ScheduleDescription({
+  description = '',
+}: ScheduleDescriptionProps) {
+  const [expanded, setExpanded] = useState(false);
+
+  const safeDescription = description ?? '';
+  const shouldTruncate = safeDescription.length > 278;
+  const displayedDescription =
+    expanded || !shouldTruncate
+      ? safeDescription
+      : `${safeDescription.slice(0, 278)}...`;
+
+  function toggleExpand() {
+    setExpanded((prev) => !prev);
+  }
 
   return (
-    <Box sx={{ mt: 4, mb: 4 }}>
-      <Typography
-        onClick={toggleExpand}
-        sx={{
-          color: 'text.primary',
-          fontSize: 'clamp(10px, 3vw, 12px)',
-          textAlign: 'justify',
-          cursor: 'pointer',
-          display: '-webkit-box',
-          WebkitLineClamp: isExpanded ? 'unset' : 5,
-          WebkitBoxOrient: 'vertical',
-          overflow: 'hidden',
-          transition: 'all 0.2s ease-in-out',
-        }}
-      >
-        {description}
+    <>
+      <Typography>
+        {displayedDescription}
       </Typography>
-      {description.length > 278 && (
-        <Typography
-          component="span"
-          onClick={toggleExpand}
-          sx={{
-            display: 'inline-block',
-            mt: 1,
-            fontSize: '8px',
-            color: 'text.secondary',
-            cursor: 'pointer',
-            fontWeight: 500,
-            '&:hover': {
-              opacity: 0.7,
-            },
-          }}
-        >
-          {isExpanded ? 'Ver menos' : 'Ver mais'}
+
+      {shouldTruncate && (
+        <Typography component="span" onClick={toggleExpand}>
+          {expanded ? ' Ver menos' : ' Ver mais'}
         </Typography>
       )}
-    </Box>
+    </>
   );
 }

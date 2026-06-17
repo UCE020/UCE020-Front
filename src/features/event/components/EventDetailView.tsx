@@ -25,46 +25,41 @@ interface EventDetailViewProps {
 export function EventDetailView({ eventId }: EventDetailViewProps) {
   const router = useRouter();
   const mockUser = useMockUser();
+
   const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null);
   const [isQrModalOpen, setIsQrModalOpen] = useState(false);
-  const [, setRegistrationUpdate] = useState(0);
+  const [isActivityEnrolled, setIsActivityEnrolled] = useState(false);
+
   const event = MOCK_EVENTS[eventId as keyof typeof MOCK_EVENTS];
 
   if (!event) {
-    return (
-      <AppPageContainer
-        sx={{
-          borderRadius: '28px',
-          minHeight: '100dvh',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          textAlign: 'center',
-        }}
-      >
-        <p>Evento não encontrado</p>
-      </AppPageContainer>
-    );
+    return <div>Evento não encontrado</div>;
   }
 
   const role = mockUser.role;
   const isOrganizer = role === 'organizer';
-  const isActivityEnrolled = selectedActivity
-    ? registrationService.isRegistered(eventId, selectedActivity.id, mockUser.id)
-    : false;
-
   const activityModalVariant = getActivityModalVariant(role, isActivityEnrolled);
 
-  function handleSignup() {
+  async function handleSignup() {
     if (!selectedActivity) return;
-    registrationService.register(eventId, selectedActivity.id, mockUser.id);
-    setRegistrationUpdate((prev) => prev + 1);
+
+    try {
+      await registrationService.register(eventId, selectedActivity.id, mockUser.id);
+      setIsActivityEnrolled(true);
+    } catch (error) {
+      console.error('Erro ao realizar inscrição:', error);
+    }
   }
 
-  function handleCancelParticipation() {
+  async function handleCancelParticipation() {
     if (!selectedActivity) return;
-    registrationService.unregister(eventId, selectedActivity.id, mockUser.id);
-    setRegistrationUpdate((prev) => prev + 1);
+
+    try {
+      await registrationService.unregister(eventId, selectedActivity.id, mockUser.id);
+      setIsActivityEnrolled(false);
+    } catch (error) {
+      console.error('Erro ao cancelar inscrição:', error);
+    }
   }
 
   function handleMarkPresence() {
@@ -74,26 +69,42 @@ export function EventDetailView({ eventId }: EventDetailViewProps) {
 
   function goToListParticipants() {
     if (!selectedActivity) return;
+
+    const activityId = selectedActivity.id;
+
     setSelectedActivity(null);
     setIsQrModalOpen(false);
-    router.push(buildListParticipantsPath(eventId, selectedActivity.id));
+    router.push(buildListParticipantsPath(eventId, activityId));
   }
 
   function handleBack() {
     router.push('/home');
   }
 
-  return (
-    <AppPageContainer sx={{ gap: 3 }}>
-      <IconButton
-        onClick={handleBack}
-        aria-label="Voltar"
-        sx={{ alignSelf: 'flex-start', color: colorTokens.text.primary }}
-      >
-        <ArrowBackRoundedIcon />
-      </IconButton>
+  function handleSelectActivity(activity: Activity) {
+    setSelectedActivity(activity);
+    setIsQrModalOpen(false);
+    setIsActivityEnrolled(false);
+  }
 
-      <ContentCard sx={{ borderRadius: '28px', gap: 0 }}>
+  return (
+    <AppPageContainer>
+      <ContentCard
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 3,
+          backgroundColor: colorTokens.surface,
+        }}
+      >
+        <IconButton
+          onClick={handleBack}
+          sx={{ alignSelf: 'flex-start' }}
+          aria-label="Voltar"
+        >
+          <ArrowBackRoundedIcon />
+        </IconButton>
+
         <ScheduleCard
           title={event.name}
           image={event.imageUrl}
@@ -106,38 +117,40 @@ export function EventDetailView({ eventId }: EventDetailViewProps) {
           description={event.description}
         />
 
-        {isOrganizer && <OrganizerEventActions />}
+        {isOrganizer && <OrganizerEventActions eventId={eventId} />}
 
         <EventActivitiesSection
           activities={event.activities}
-          onSelectActivity={setSelectedActivity}
+          onSelectActivity={handleSelectActivity}
         />
       </ContentCard>
 
-      <ActivityModal
-        open={!!selectedActivity}
-        onClose={() => {
-          setSelectedActivity(null);
-          setIsQrModalOpen(false);
-        }}
-        title={selectedActivity?.title ?? ''}
-        image={event.imageUrl}
-        startDate={selectedActivity?.startDate ?? ''}
-        endDate={selectedActivity?.endDate ?? ''}
-        location={event.location}
-        hours={event.hours}
-        participantsCount={event.participantsCount}
-        status={selectedActivity?.status ?? ''}
-        description={selectedActivity?.description ?? ''}
-        variant={activityModalVariant}
-        onSignup={handleSignup}
-        onCancelParticipation={handleCancelParticipation}
-        onMarkPresence={handleMarkPresence}
-        onValidatePresences={goToListParticipants}
-        onListParticipants={goToListParticipants}
-      />
+      {selectedActivity ? (
+        <ActivityModal
+          open
+          onClose={() => {
+            setSelectedActivity(null);
+            setIsQrModalOpen(false);
+          }}
+          title={selectedActivity.title ?? ''}
+          image={event.imageUrl}
+          startDate={selectedActivity.startDate ?? ''}
+          endDate={selectedActivity.endDate ?? selectedActivity.startDate ?? ''}
+          location={event.location}
+          hours={event.hours}
+          participantsCount={event.participantsCount}
+          status={selectedActivity.status ?? ''}
+          description={selectedActivity.description ?? ''}
+          variant={activityModalVariant}
+          onSignup={handleSignup}
+          onCancelParticipation={handleCancelParticipation}
+          onMarkPresence={handleMarkPresence}
+          onValidatePresences={goToListParticipants}
+          onListParticipants={goToListParticipants}
+        />
+      ) : null}
 
-      {selectedActivity && (
+      {selectedActivity ? (
         <ParticipantQrCodeModal
           open={isQrModalOpen}
           onClose={() => setIsQrModalOpen(false)}
@@ -145,11 +158,11 @@ export function EventDetailView({ eventId }: EventDetailViewProps) {
             participantId: mockUser.id,
             participantName: mockUser.name,
             activityId: selectedActivity.id,
-            activityTitle: selectedActivity.title,
+            activityTitle: selectedActivity.title ?? '',
             eventId,
           }}
         />
-      )}
+      ) : null}
     </AppPageContainer>
   );
 }

@@ -1,60 +1,55 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { Box } from '@mui/material';
 import { Button } from '@/components/ui';
 
-const actionButtonSx = {
-  height: 36,
-  fontSize: 'clamp(10px, 3vw, 12px)',
-  fontWeight: 700,
-  whiteSpace: 'nowrap',
-  flex: 1
-} as const;
+interface OrganizerEventActionsProps {
+  eventId: string;
+}
 
-export function OrganizerEventActions() {
-  const router = useRouter();
-
-  function onManageMembers() {
-    router.push('/manage-users');
-  }
-
-  function onEditEvent() {
-    router.push('/event/edit');
-  }
-
-  function onFinalizeEvent() {
-    console.log('Finalizar evento');
-  }
-
+export function OrganizerEventActions({
+  eventId,
+}: OrganizerEventActionsProps) {
   return (
-    <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 2, mt: 2 }}>
+    <Box
+      sx={{
+        display: 'flex',
+        gap: 1.5,
+        flexWrap: 'wrap',
+        px: { xs: 2, sm: 3 },
+        py: 2,
+        justifyContent: 'flex-start',
+      }}
+    >
       <Button
-        variant="outlined"
-        color="primary"
-        fullWidth
-        onClick={onManageMembers}
-        sx={{ ...actionButtonSx }}
+        component={Link}
+        href={`/event/${eventId}/activity/create`}
+        variant="contained"
+        color="secondary"
+        sx={{
+          minWidth: 180,
+          textTransform: 'none',
+          borderRadius: '10px',
+          fontWeight: 700,
+        }}
       >
-        Gerenciar Membros
+        Cadastrar atividade
       </Button>
+
       <Button
+        component={Link}
+        href={`/event/${eventId}/edit`}
         variant="outlined"
         color="secondary"
-        fullWidth
-        onClick={onEditEvent}
-        sx={{ ...actionButtonSx }}
+        sx={{
+          minWidth: 160,
+          textTransform: 'none',
+          borderRadius: '10px',
+          fontWeight: 700,
+        }}
       >
-        Editar
-      </Button>
-      <Button
-        variant="contained"
-        color="success"
-        fullWidth
-        onClick={onFinalizeEvent}
-        sx={{ ...actionButtonSx }}
-      >
-        Finalizar
+        Editar evento
       </Button>
     </Box>
   );

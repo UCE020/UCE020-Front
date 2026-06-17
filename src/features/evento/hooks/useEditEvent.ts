@@ -40,8 +40,11 @@ export function useEditEvent(eventId: number | null) {
       await eventService.update(eventId, payload);
       router.push('/home');
     } catch (err: unknown) {
-      const message =
-        err instanceof Error ? err.message : 'Erro ao atualizar evento. Tente novamente.';
+      const axiosErr = err as { response?: { data?: { message?: string | string[] } } };
+      const raw = axiosErr.response?.data?.message;
+      const message = Array.isArray(raw)
+        ? raw.join(', ')
+        : raw ?? (err instanceof Error ? err.message : 'Erro ao atualizar evento. Tente novamente.');
       setError(message);
     } finally {
       setLoading(false);

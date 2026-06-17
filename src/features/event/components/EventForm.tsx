@@ -148,27 +148,30 @@ export default function EventForm({ mode, eventId }: EventFormProps) {
 
   useEffect(() => {
     if (!existingEvent) return;
-    const startDT = existingEvent.dataInicio ? new Date(existingEvent.dataInicio) : null;
-    const endDT = existingEvent.dataFim ? new Date(existingEvent.dataFim) : null;
+    
+    Promise.resolve().then(() => {
+      const startDT = existingEvent.dataInicio ? new Date(existingEvent.dataInicio) : null;
+      const endDT = existingEvent.dataFim ? new Date(existingEvent.dataFim) : null;
 
-    const pad = (n: number) => String(n).padStart(2, '0');
-    const toDate = (dt: Date | null) =>
-      dt ? `${dt.getFullYear()}-${pad(dt.getMonth() + 1)}-${pad(dt.getDate())}` : '';
-    const toTime = (dt: Date | null) =>
-      dt ? `${pad(dt.getHours())}:${pad(dt.getMinutes())}` : '';
+      const pad = (n: number) => String(n).padStart(2, '0');
+      const toDate = (dt: Date | null) =>
+        dt ? `${dt.getFullYear()}-${pad(dt.getMonth() + 1)}-${pad(dt.getDate())}` : '';
+      const toTime = (dt: Date | null) =>
+        dt ? `${pad(dt.getHours())}:${pad(dt.getMinutes())}` : '';
 
-    setForm({
-      nome: existingEvent.nome ?? '',
-      localizacao: existingEvent.localizacao ?? '',
-      responsavel: existingEvent.responsavel ?? '',
-      descricao: existingEvent.descricao ?? '',
-      startDate: toDate(startDT),
-      endDate: toDate(endDT),
-      startTime: toTime(startDT),
-      endTime: toTime(endDT),
-      cargaHoraria: String(existingEvent.cargaHoraria ?? ''),
-      status: (existingEvent.status as FormState['status']) ?? 'pendente',
-      foto: existingEvent.foto ?? null,
+      setForm({
+        nome: existingEvent.nome ?? '',
+        localizacao: existingEvent.localizacao ?? '',
+        responsavel: existingEvent.responsavel ?? '',
+        descricao: existingEvent.descricao ?? '',
+        startDate: toDate(startDT),
+        endDate: toDate(endDT),
+        startTime: toTime(startDT),
+        endTime: toTime(endDT),
+        cargaHoraria: String(existingEvent.cargaHoraria ?? ''),
+        status: (existingEvent.status as FormState['status']) ?? 'pendente',
+        foto: existingEvent.foto ?? null,
+      });
     });
   }, [existingEvent]);
 
@@ -192,7 +195,7 @@ export default function EventForm({ mode, eventId }: EventFormProps) {
     : 'Preencha os dados abaixo para cadastrar um novo evento';
   const actionLabel = isEdit ? 'Salvar' : 'Cadastrar';
 
-  function updateField(field: keyof FormState, value: any) {
+  function updateField<K extends keyof FormState>(field: K, value: FormState[K]) {
     setForm((cur) => ({ ...cur, [field]: value }));
   }
 
@@ -466,7 +469,7 @@ export default function EventForm({ mode, eventId }: EventFormProps) {
                     select
                     label="Status"
                     value={form.status}
-                    onChange={(e) => updateField('status', e.target.value)}
+                    onChange={(e) => updateField('status', e.target.value as FormState['status'])}
                     size="small"
                     fullWidth
                   >

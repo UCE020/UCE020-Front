@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { eventService, UpdateEventPayload } from '@/services/eventService';
 import { Event } from '@/types/event';
@@ -14,23 +14,32 @@ export function useEditEvent(eventId: number | null) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchEvent = useCallback(async () => {
-    if (eventId === null) return;
-    setLoadingEvent(true);
-    setLoadError(null);
-    try {
-      const data = await eventService.findOne(eventId);
-      setEvent(data);
-    } catch {
-      setLoadError('Não foi possível carregar os dados do evento.');
-    } finally {
-      setLoadingEvent(false);
-    }
-  }, [eventId]);
-
   useEffect(() => {
-    fetchEvent();
-  }, [fetchEvent]);
+    if (eventId === null) return;
+    let isMounted = true;
+
+    Promise.resolve().then(() => {
+      if (isMounted) {
+        setLoadingEvent(true);
+        setLoadError(null);
+      }
+    });
+
+    eventService.findOne(eventId)
+      .then(data => {
+        if (isMounted) setEvent(data);
+      })
+      .catch(() => {
+        if (isMounted) setLoadError('Não foi possível carregar os dados do evento.');
+      })
+      .finally(() => {
+        if (isMounted) setLoadingEvent(false);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [eventId]);
 
   async function handleUpdate(payload: UpdateEventPayload) {
     if (eventId === null) return;

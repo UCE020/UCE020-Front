@@ -79,7 +79,7 @@ export function ProfileForm({ user, onSave, isEditing, onEditChange }: ProfileFo
           <Box>
             <PasswordInput
               label="Senha"
-              value={formData.password}
+              value={formData.password || ''}
               onChange={(value) => handleInputChange('password', value)}
               disabled={!isEditing}
               showVisibilityToggle

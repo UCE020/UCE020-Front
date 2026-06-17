@@ -1,5 +1,6 @@
-import EventForm from "@/features/evento/componentes/EventForm";
+import { redirect } from 'next/navigation';
 
 export default function EditarEventoPage() {
-  return <EventForm mode="edit" />;
-}
+  // The edit page requires an event ID. Use /event/editar/[id] instead.
+  redirect('/home');
+}

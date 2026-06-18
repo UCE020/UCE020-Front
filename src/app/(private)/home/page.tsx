@@ -4,9 +4,10 @@ import { useState, useEffect, useReducer, useCallback } from 'react';
 import { Box } from '@mui/material';
 import { Event } from '@/types/event';
 import { Searchbar, Toast } from '@/components/ui';
+import { EventList } from '@/components/event';
 import { ToastSeverity } from '@/types/toast';
 import { ActivityModal } from '@/components/modals';
-import { GreetingSection, QuickActions, EventList, useHomeEvents } from '@/features/home';
+import { GreetingSection, QuickActions, useHomeEvents } from '@/features/home';
 import { useAuth } from '@/providers/auth-provider';
 import { eventService } from '@/services/eventService';
 

@@ -1,8 +1,12 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { Box, CircularProgress, Container, Typography } from '@mui/material';
+
+import { useEffect, useState } from 'react';
 import { Box, Container } from '@mui/material';
 import { EventList } from '@/components/event/EventList';
+import { useAuth } from '@/providers/auth-provider';
 import { eventService } from '@/services/eventService';
 import type { Event } from '@/types/event';
 

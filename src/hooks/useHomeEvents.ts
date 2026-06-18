@@ -21,7 +21,7 @@ export function useHomeEvents() {
     });
 
     eventService
-      .findParticipatingEvents()
+      .findParticipatingEvents('participante')
       .then((events) => {
         if (isMounted) {
           setEvents(Array.isArray(events) ? events : []);

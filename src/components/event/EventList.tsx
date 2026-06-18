@@ -5,7 +5,7 @@ import { useMemo, useState } from 'react';
 import { Event } from '@/types/event';
 import { EventCard } from '@/components/event/EventCard';
 import { Searchbar } from '@/components/ui/Searchbar';
-import { ArrowBack, Check } from "@mui/icons-material";
+import { ArrowBack } from "@mui/icons-material";
 import { useRouter } from "next/navigation";
 
 const statusOptions = [
@@ -44,6 +44,14 @@ export function EventList({
       && (normalizedStatus === 'todos' || event.status.toLowerCase() === normalizedStatus)
     );
   }, [events, searchTerm, statusFilter]);
+  const handleEventClick = (event: Event) => {
+    if (onEventClick) {
+      onEventClick(event);
+      return;
+    }
+
+    router.push(`/event/${event.id}`);
+  };
 
   if(home) {
      return (
@@ -81,7 +89,7 @@ export function EventList({
           >
             {events.map((event) => (
               <Box key={event.id}>
-                <EventCard event={event} onClick={onEventClick} />
+                <EventCard event={event} onClick={handleEventClick} />
               </Box>
             ))}
           </Box>
@@ -263,7 +271,7 @@ export function EventList({
           >
             {filteredEvents.map((event) => (
               <Box key={event.id}>
-                <EventCard event={event} onClick={onEventClick} />
+                <EventCard event={event} onClick={handleEventClick} />
               </Box>
             ))}
           </Box>

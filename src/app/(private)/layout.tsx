@@ -7,10 +7,10 @@ import { Home, Article, Event, PostAdd, DocumentScanner } from '@mui/icons-mater
 
 const NAV_LINKS: NavLink[] = [
   { icon: <Home />, label: 'Início', href: '/home' },
-  { icon: <Article />, label: 'Certificados', href: '/certificate/list' },
-  { icon: <Event />, label: 'Inscrições', href: '/event/list' },
   { icon: <PostAdd />, label: 'Criar evento', href: '/event/register' },
+  { icon: <Event />, label: 'Eventos Criados', href: '/event/list' },
   { icon: <DocumentScanner />, label: 'Monitoria', href: '/monitoria' },
+  { icon: <Article />, label: 'Certificados', href: '/certificate/list' },
 ];
 
 const USER = { name: 'João' };

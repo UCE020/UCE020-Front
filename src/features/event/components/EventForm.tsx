@@ -307,16 +307,16 @@ export default function EventForm({ mode, eventId }: EventFormProps) {
   return (
     <Box sx={{ minHeight: '100dvh', background: colorTokens.surface.background, overflowX: 'hidden' }}>
 
-      <Box sx={{ px: 2, py: 3, display: 'flex', justifyContent: 'center' }}>
+      <Box sx={{ px: { xs: 2, md: 4 }, py: { xs: 3, md: 5 }, display: 'flex', justifyContent: 'center' }}>
         <Box
           sx={{
             width: '100%',
-            maxWidth: 520,
+            maxWidth: { xs: 520, md: 980 },
             background: colorTokens.neutral.white,
-            borderRadius: '28px',
+            borderRadius: { xs: '28px', md: '24px' },
             boxShadow: '0 18px 40px rgba(25, 44, 72, 0.12)',
-            px: { xs: 2, sm: 3 },
-            py: { xs: 2.5, sm: 3 },
+            px: { xs: 2, sm: 3, md: 4 },
+            py: { xs: 2.5, sm: 3, md: 3.5 },
             boxSizing: 'border-box',
             overflow: 'hidden',
           }}
@@ -326,25 +326,25 @@ export default function EventForm({ mode, eventId }: EventFormProps) {
               <ArrowBackIosNewRoundedIcon sx={{ fontSize: 16 }} />
             </IconButton>
 
-            <Typography sx={{ fontSize: 'clamp(18px, 5vw, 26px)', lineHeight: 1.1, fontWeight: 800, color: colorTokens.text.primary }}>
+            <Typography sx={{ fontSize: { xs: 'clamp(18px, 5vw, 26px)', md: 30 }, lineHeight: 1.1, fontWeight: 800, color: colorTokens.text.primary }}>
               {title}
             </Typography>
 
             <Box sx={{ flex: 1, height: 1, background: colorTokens.neutral.gray300, ml: 1 }} />
           </Box>
 
-          <Typography sx={{ fontSize: 11, color: colorTokens.neutral.gray500, mb: 2.5 }}>{subtitle}</Typography>
+          <Typography sx={{ fontSize: { xs: 11, md: 13 }, color: colorTokens.neutral.gray500, mb: { xs: 2.5, md: 3 } }}>{subtitle}</Typography>
 
-          <Box sx={{ display: 'grid', gap: 1.75 }}>
+          <Box sx={{ display: 'grid', gap: { xs: 1.75, md: 2.25 } }}>
             <Box>
-              <Typography sx={{ fontSize: 12, fontWeight: 500, color: colorTokens.text.primary, mb: 0.75 }}>
+              <Typography sx={{ fontSize: { xs: 12, md: 13 }, fontWeight: 600, color: colorTokens.text.primary, mb: 0.75 }}>
                 Dados do Evento
               </Typography>
               <Divider sx={{ borderColor: colorTokens.neutral.gray300, mb: 1.5 }} />
             </Box>
 
-            <Box sx={{ display: 'grid', gap: 1.5 }}>
-              <Box sx={{ minWidth: 0 }}>
+            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(2, minmax(0, 1fr))' }, gap: { xs: 1.5, md: 2 } }}>
+              <Box sx={{ minWidth: 0, gridColumn: { xs: 'auto', md: 'span 2' } }}>
                 <TextInput label="Nome" value={form.nome} onChange={(v) => updateField('nome', v)} onBlur={() => markTouched('nome')} error={Boolean(errors.nome)} size="small" fullWidth />
                 {errors.nome ? <Typography sx={{ mt: 0.4, fontSize: 11, color: 'error.main' }}>{errors.nome}</Typography> : null}
               </Box>
@@ -393,7 +393,7 @@ export default function EventForm({ mode, eventId }: EventFormProps) {
                 {errors.responsavel ? <Typography sx={{ mt: 0.4, fontSize: 11, color: 'error.main' }}>{errors.responsavel}</Typography> : null}
               </Box>
 
-              <Box sx={{ minWidth: 0 }}>
+              <Box sx={{ minWidth: 0, gridColumn: { xs: 'auto', md: 'span 2' } }}>
                 <TextInput
                   label="Descrição do evento"
                   value={form.descricao}
@@ -417,16 +417,18 @@ export default function EventForm({ mode, eventId }: EventFormProps) {
                 {errors.descricao ? <Typography sx={{ mt: 0.4, fontSize: 11, color: 'error.main' }}>{errors.descricao}</Typography> : null}
               </Box>
 
-              <ImageUpload
-                label="Imagem do Evento"
-                value={form.foto}
-                onChange={(value) => updateField('foto', value)}
-                onBlur={() => markTouched('foto')}
-                error={Boolean(errors.foto)}
-                helperText={errors.foto}
-              />
+              <Box sx={{ minWidth: 0, gridColumn: { xs: 'auto', md: 'span 2' } }}>
+                <ImageUpload
+                  label="Imagem do Evento"
+                  value={form.foto}
+                  onChange={(value) => updateField('foto', value)}
+                  onBlur={() => markTouched('foto')}
+                  error={Boolean(errors.foto)}
+                  helperText={errors.foto}
+                />
+              </Box>
 
-              <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 1.5 }}>
+              <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', md: 'repeat(4, minmax(0, 1fr))' }, gap: { xs: 1.5, md: 2 }, gridColumn: { xs: 'auto', md: 'span 2' } }}>
                 <Box sx={{ minWidth: 0 }}>
                   <TextInput label="Data de Início" value={form.startDate} onChange={(v) => updateField('startDate', v)} onBlur={() => markTouched('startDate')} error={Boolean(errors.startDate)} size="small" fullWidth type="date" slotProps={{ inputLabel: { shrink: true }, input: { endAdornment: <InputAdornment position="end" /> } }} />
                   {errors.startDate ? <Typography sx={{ mt: 0.4, fontSize: 11, color: 'error.main' }}>{errors.startDate}</Typography> : null}
@@ -448,7 +450,7 @@ export default function EventForm({ mode, eventId }: EventFormProps) {
                 </Box>
               </Box>
 
-              <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 1.5 }}>
+              <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: { xs: 1.5, md: 2 }, gridColumn: { xs: 'auto', md: 'span 2' } }}>
                 <Box sx={{ minWidth: 0 }}>
                   <TextInput
                     label="Carga Horária (h)"
@@ -483,9 +485,9 @@ export default function EventForm({ mode, eventId }: EventFormProps) {
               </Box>
             </Box>
 
-            <Box sx={{ pt: 1 }}>
+            <Box sx={{ pt: { xs: 1, md: 1.5 } }}>
               <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1, mb: 1.5 }}>
-                <Typography sx={{ fontSize: 12, fontWeight: 500, color: colorTokens.text.primary }}>
+                <Typography sx={{ fontSize: { xs: 12, md: 13 }, fontWeight: 600, color: colorTokens.text.primary }}>
                   Atividades Cadastradas
                 </Typography>
 
@@ -498,7 +500,7 @@ export default function EventForm({ mode, eventId }: EventFormProps) {
                     minWidth: 0,
                     px: 0,
                     py: 0,
-                    fontSize: 11,
+                    fontSize: { xs: 11, md: 12 },
                     fontWeight: 600,
                     color: colorTokens.navigation.default,
                     textTransform: 'none',
@@ -562,15 +564,15 @@ export default function EventForm({ mode, eventId }: EventFormProps) {
               </Typography>
             )}
 
-            <Box sx={{ pt: 1.25, display: 'flex', justifyContent: 'center' }}>
+            <Box sx={{ pt: 1.25, display: 'flex', justifyContent: { xs: 'center', md: 'flex-end' } }}>
               <Button
                 variant="contained"
                 color="secondary"
                 onClick={handleSubmit}
                 disabled={!canSubmit || isSubmitting}
                 sx={{
-                  minWidth: 118,
-                  height: 34,
+                  minWidth: { xs: 118, md: 148 },
+                  height: { xs: 34, md: 40 },
                   borderRadius: '6px',
                   fontSize: 14,
                   fontWeight: 700,

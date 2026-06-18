@@ -1,22 +1,23 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { IconButton } from '@mui/material';
+import { CircularProgress, IconButton, Typography } from '@mui/material';
 import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded';
 import { ActivityModal, ScheduleCard } from '@/components/modals';
 import { ContentCard } from '@/components/layout/ContentCard';
 import { AppPageContainer } from '@/components/layout/AppPageContainer';
-import { MOCK_EVENTS } from '@/mocks/event';
 import { buildListParticipantsPath } from '@/features/participants/presence/utils/routes';
 import { useMockUser } from '@/mocks/useMockUser';
 import { registrationService } from '@/services/registrationService';
+import { eventService } from '@/services/eventService';
 import { getActivityModalVariant } from '@/features/event/utils/getActivityModalVariant';
 import { ParticipantQrCodeModal } from '@/features/participants/presence/components/ParticipantQrCodeModal';
 import { colorTokens } from '@/lib/colors';
 import { EventActivitiesSection } from './EventActivitiesSection';
 import { OrganizerEventActions } from './OrganizerEventActions';
 import type { Activity } from '@/types/activity';
+import type { Event } from '@/types/event';
 
 interface EventDetailViewProps {
   eventId: string;
@@ -25,27 +26,62 @@ interface EventDetailViewProps {
 export function EventDetailView({ eventId }: EventDetailViewProps) {
   const router = useRouter();
   const mockUser = useMockUser();
+  const [event, setEvent] = useState<Event | null>(null);
+  const [isLoadingEvent, setIsLoadingEvent] = useState(true);
+  const [loadError, setLoadError] = useState('');
   const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null);
   const [isQrModalOpen, setIsQrModalOpen] = useState(false);
   const [, setRegistrationUpdate] = useState(0);
-  const event = MOCK_EVENTS[eventId as keyof typeof MOCK_EVENTS];
 
-  if (!event) {
-    return (
-      <AppPageContainer
-        sx={{
-          borderRadius: '28px',
-          minHeight: '100dvh',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          textAlign: 'center',
-        }}
-      >
-        <p>Evento não encontrado</p>
-      </AppPageContainer>
-    );
-  }
+  useEffect(() => {
+    const numericEventId = Number(eventId);
+    let isMounted = true;
+
+    if (!Number.isFinite(numericEventId)) {
+      Promise.resolve().then(() => {
+        if (isMounted) {
+          setSelectedActivity(null);
+          setIsQrModalOpen(false);
+          setEvent(null);
+          setLoadError('Evento nao encontrado.');
+          setIsLoadingEvent(false);
+        }
+      });
+      return;
+    }
+
+    Promise.resolve().then(() => {
+      if (isMounted) {
+        setSelectedActivity(null);
+        setIsQrModalOpen(false);
+        setIsLoadingEvent(true);
+        setLoadError('');
+      }
+    });
+
+    eventService
+      .findOne(numericEventId)
+      .then((apiEvent) => {
+        if (isMounted) {
+          setEvent(apiEvent);
+        }
+      })
+      .catch(() => {
+        if (isMounted) {
+          setEvent(null);
+          setLoadError('Nao foi possivel carregar os dados do evento.');
+        }
+      })
+      .finally(() => {
+        if (isMounted) {
+          setIsLoadingEvent(false);
+        }
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [eventId]);
 
   const role = mockUser.role;
   const isOrganizer = role === 'organizer';
@@ -54,6 +90,7 @@ export function EventDetailView({ eventId }: EventDetailViewProps) {
     : false;
 
   const activityModalVariant = getActivityModalVariant(role, isActivityEnrolled);
+  const activities: Activity[] = [];
 
   function handleSignup() {
     if (!selectedActivity) return;
@@ -83,6 +120,41 @@ export function EventDetailView({ eventId }: EventDetailViewProps) {
     router.push('/home');
   }
 
+  if (isLoadingEvent) {
+    return (
+      <AppPageContainer
+        sx={{
+          borderRadius: '28px',
+          minHeight: '100dvh',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <CircularProgress />
+      </AppPageContainer>
+    );
+  }
+
+  if (!event) {
+    return (
+      <AppPageContainer
+        sx={{
+          borderRadius: '28px',
+          minHeight: '100dvh',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          textAlign: 'center',
+        }}
+      >
+        <Typography sx={{ color: colorTokens.text.primary, fontWeight: 600 }}>
+          {loadError || 'Evento nao encontrado.'}
+        </Typography>
+      </AppPageContainer>
+    );
+  }
+
   return (
     <AppPageContainer sx={{ gap: 3 }}>
       <IconButton
@@ -95,21 +167,21 @@ export function EventDetailView({ eventId }: EventDetailViewProps) {
 
       <ContentCard sx={{ borderRadius: '28px', gap: 0 }}>
         <ScheduleCard
-          title={event.name}
-          image={event.imageUrl}
-          startDate={event.startDate}
-          endDate={event.endDate}
-          location={event.location}
-          hours={event.hours}
-          participantsCount={event.participantsCount}
+          title={event.nome}
+          image={event.foto ?? undefined}
+          startDate={event.dataInicio}
+          endDate={event.dataFim}
+          location={event.localizacao}
+          hours={event.cargaHoraria}
+          participantsCount={0}
           status={event.status}
-          description={event.description}
+          description={event.descricao}
         />
 
         {isOrganizer && <OrganizerEventActions />}
 
         <EventActivitiesSection
-          activities={event.activities}
+          activities={activities}
           onSelectActivity={setSelectedActivity}
         />
       </ContentCard>
@@ -121,12 +193,12 @@ export function EventDetailView({ eventId }: EventDetailViewProps) {
           setIsQrModalOpen(false);
         }}
         title={selectedActivity?.title ?? ''}
-        image={event.imageUrl}
+        image={event.foto ?? undefined}
         startDate={selectedActivity?.startDate ?? ''}
         endDate={selectedActivity?.endDate ?? ''}
-        location={event.location}
-        hours={event.hours}
-        participantsCount={event.participantsCount}
+        location={event.localizacao}
+        hours={event.cargaHoraria}
+        participantsCount={0}
         status={selectedActivity?.status ?? ''}
         description={selectedActivity?.description ?? ''}
         variant={activityModalVariant}

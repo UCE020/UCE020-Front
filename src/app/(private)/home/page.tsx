@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useReducer, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import { Box } from '@mui/material';
 import { Event } from '@/types/event';
 import { Searchbar, Toast } from '@/components/ui';
@@ -33,6 +34,7 @@ function searchReducer(_: SearchState, action: SearchAction): SearchState {
 }
 
 export default function HomePage() {
+  const router = useRouter();
   const { user } = useAuth();
   const { filteredEvents } = useHomeEvents();
   const [code, setCode] = useState('');
@@ -75,8 +77,9 @@ export default function HomePage() {
     if (trimmed) setSearchCode(trimmed);
   }, [code]);
 
-  function handleEventClick() {
+  function handleEventClick(event: Event) {
     setModalOpen(false);
+    router.push(`/event/${event.id}`);
   }
 
   return (

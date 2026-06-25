@@ -39,7 +39,7 @@ export default function CertificatesPage() {
     <Box sx={{ minHeight: "100dvh", bgcolor: "background.default" }}>
 
       <Container maxWidth="md" sx={{ py: { xs: 3, md: 4 } }}>
-        {/* Header */}
+
         <Box sx={{ display: "flex", flexDirection: "row", alignItems: "center", gap: 2, mb: 3.5 }}>
           <IconButton
             onClick={() => router.back()}

@@ -15,6 +15,7 @@ export interface CreateEventPayload {
 }
 
 export type UpdateEventPayload = Partial<CreateEventPayload>;
+export type TipoParticipante = 'participante' | 'monitor' | 'organizador';
 
 interface EventResponse {
   message: string;
@@ -47,10 +48,17 @@ class EventService {
     return data.data;
   }
 
-  async findParticipatingEvents(): Promise<Event[]> {
-    const { data } = await api.get<EventsResponse>('/event/participating');
+  async findParticipatingEvents(tipo?: TipoParticipante): Promise<Event[]> {
+    const { data } = await api.get<EventsResponse>('/event/participating', {
+      params: tipo ? { tipo } : undefined,
+    });
     return data.data;
   }
+
+ // async findOrganizerEvents(): Promise<Event[]> {
+ //   const { data } = await api.get<EventsResponse>('/event/organized');
+ //   return data.data;
+ // }
 
   async update(id: number, payload: UpdateEventPayload): Promise<Event> {
     const { data } = await api.patch<EventResponse>(`/event/${id}`, payload);

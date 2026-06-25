@@ -8,7 +8,7 @@ const QUICK_ACTIONS = [
   { line1: 'Criar novo', line2: 'evento', variant: 'navy', href: '/event/register' },
   { line1: 'Meus', line2: 'certificados', variant: 'teal', href: '/certificate/list' },
   { line1: 'Eventos', line2: 'criados', variant: 'teal', href: '/event/list' },
-  { line1: 'Monitoria', line2: 'de eventos', variant: 'navy', href: '/monitoria' },
+  { line1: 'Monitoria', line2: 'de eventos', variant: 'navy', href: '/monitoring/list' },
 ] as const;
 
 const COLORS = {

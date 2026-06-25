@@ -48,7 +48,7 @@ export function ProfileForm({ user, onSave, isEditing, onEditChange }: ProfileFo
           variant="h6"
           sx={{
             fontWeight: 700,
-            color: '#1a2744',
+            color: '#0D1E3B',
             mb: 2.5,
             fontSize: '1.1rem',
           }}
@@ -74,15 +74,6 @@ export function ProfileForm({ user, onSave, isEditing, onEditChange }: ProfileFo
               onChange={(value) => handleInputChange('email', value)}
               disabled={!isEditing}
               placeholder="seu@email.com"
-            />
-          </Box>
-          <Box>
-            <PasswordInput
-              label="Senha"
-              value={formData.password}
-              onChange={(value) => handleInputChange('password', value)}
-              disabled={!isEditing}
-              showVisibilityToggle
             />
           </Box>
         </Box>

@@ -1,22 +1,23 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { IconButton } from '@mui/material';
+import { CircularProgress, IconButton, Typography } from '@mui/material';
 import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded';
 import { ActivityModal, ScheduleCard } from '@/components/modals';
 import { ContentCard } from '@/components/layout/ContentCard';
 import { AppPageContainer } from '@/components/layout/AppPageContainer';
-import { MOCK_EVENTS } from '@/mocks/event';
 import { buildListParticipantsPath } from '@/features/participants/presence/utils/routes';
 import { useMockUser } from '@/mocks/useMockUser';
 import { registrationService } from '@/services/registrationService';
+import { eventService } from '@/services/eventService';
 import { getActivityModalVariant } from '@/features/event/utils/getActivityModalVariant';
 import { ParticipantQrCodeModal } from '@/features/participants/presence/components/ParticipantQrCodeModal';
 import { colorTokens } from '@/lib/colors';
 import { EventActivitiesSection } from './EventActivitiesSection';
 import { OrganizerEventActions } from './OrganizerEventActions';
 import type { Activity } from '@/types/activity';
+import type { Event } from '@/types/event';
 
 interface EventDetailViewProps {
   eventId: string;
@@ -39,6 +40,7 @@ export function EventDetailView({ eventId }: EventDetailViewProps) {
   const role = mockUser.role;
   const isOrganizer = role === 'organizer';
   const activityModalVariant = getActivityModalVariant(role, isActivityEnrolled);
+  const activities: Activity[] = [];
 
   async function handleSignup() {
     if (!selectedActivity) return;
@@ -87,6 +89,12 @@ export function EventDetailView({ eventId }: EventDetailViewProps) {
     setIsActivityEnrolled(false);
   }
 
+  function handleSelectActivity(activity: Activity) {
+    setSelectedActivity(activity);
+    setIsQrModalOpen(false);
+    setIsActivityEnrolled(false);
+  }
+
   return (
     <AppPageContainer>
       <ContentCard
@@ -106,10 +114,37 @@ export function EventDetailView({ eventId }: EventDetailViewProps) {
         </IconButton>
 
         <ScheduleCard
-          title={event.name}
+          title={event.nome}
+          image={event.foto ?? undefined}
+          startDate={event.dataInicio}
+          endDate={event.dataFim}
+          location={event.localizacao}
+          hours={event.cargaHoraria}
+          participantsCount={0}
+          status={event.status}
+          description={event.descricao}
+        />
+
+        {isOrganizer && <OrganizerEventActions eventId={eventId} />}
+
+        <EventActivitiesSection
+<<<<<<< HEAD
+          activities={event.activities}
+          onSelectActivity={handleSelectActivity}
+        />
+      </ContentCard>
+
+      {selectedActivity ? (
+        <ActivityModal
+          open
+          onClose={() => {
+            setSelectedActivity(null);
+            setIsQrModalOpen(false);
+          }}
+          title={selectedActivity.title ?? ''}
           image={event.imageUrl}
-          startDate={event.startDate}
-          endDate={event.endDate}
+          startDate={selectedActivity.startDate ?? ''}
+          endDate={selectedActivity.endDate ?? selectedActivity.startDate ?? ''}
           location={event.location}
           hours={event.hours}
           participantsCount={event.participantsCount}
@@ -117,7 +152,7 @@ export function EventDetailView({ eventId }: EventDetailViewProps) {
           description={event.description}
         />
 
-        {isOrganizer && <OrganizerEventActions eventId={eventId} />}
+        {isOrganizer && <OrganizerEventActions />}
 
         <EventActivitiesSection
           activities={event.activities}

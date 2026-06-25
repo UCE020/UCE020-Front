@@ -21,10 +21,7 @@ const AuthContext = createContext<AuthContextType | null>(null);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(() => {
-    if (typeof window !== "undefined") {
-      return !!localStorage.getItem("token");
-    }
-    return true;
+    return typeof window !== "undefined" && !!localStorage.getItem("token");
   });
 
   useEffect(() => {
@@ -48,11 +45,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const loginGlobal = (token: string, userData: User) => {
     localStorage.setItem("token", token);
     setUser(userData);
+    setIsLoading(false);
   };
 
   const logout = () => {
     localStorage.removeItem("token");
     setUser(null);
+    setIsLoading(false);
   };
 
   return (

@@ -1,4 +1,4 @@
 export { ActivityList } from './ActivityList';
 export { default as ActivityDetail } from './ActivityDetail';
-export { EventsList } from './EventsList';
+export { EventList } from './EventList';
 export { EventCard } from './EventCard';

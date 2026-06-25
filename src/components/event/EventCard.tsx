@@ -1,57 +1,54 @@
-import { Box, Card, CardContent, Typography } from "@mui/material";
-import { EventCardProps } from "@/types/event";
+/* eslint-disable @next/next/no-img-element */
+import type { EventCardProps } from "@/types/event";
+
+function formatDateRange(start: string, end: string): string {
+  const fmt = (date: string) =>
+    new Date(date).toLocaleDateString("pt-BR", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    });
+
+  return `${fmt(start)} a ${fmt(end)}`;
+}
 
 export function EventCard({ event, onClick }: EventCardProps) {
-  const dataInicio = new Date(event.dataInicio).toLocaleDateString("pt-BR");
-  const dataFim = new Date(event.dataFim).toLocaleDateString("pt-BR");
+  const imageSrc = event.foto || "/images/certificadoVariacao2.png";
 
   return (
-    <Card
-      onClick={onClick ? () => onClick(event) : undefined}
-      elevation={1}
-      sx={{
-        width: "100%",
-        display: "flex",
-        flexWrap: "wrap",
-        alignItems: "flex-start",
-        gap: 2,
-        p: 2,
-        borderRadius: 8,
-        bgcolor: "#FFF",
-        cursor: "pointer",
-        transition: "transform .15s, box-shadow .15s",
-        "&:hover": { transform: "translateY(-2px)", boxShadow: 4 },
-      }}
+    <button
+      type="button"
+      onClick={() => onClick?.(event)}
+      className="group w-full text-left flex items-center gap-4 bg-white rounded-[20px] px-5 py-4 hover:shadow-md transition-shadow duration-200"
     >
-      <Box
-        component="img"
-        src={event.foto ?? "https://placehold.co/80x80/4ecdc4/1a2744?text=E"}
-        alt={event.nome}
-        sx={{ width: 80, height: 80, borderRadius: 10, objectFit: "cover", flexShrink: 0 }}
-      />
-      <CardContent sx={{ p: "0 !important", flex: 1, minWidth: 0, overflow: "hidden" }}>
-        <Typography noWrap sx={{ fontWeight: 700, fontSize: 13, mb: 0.5 }}>
+      <div className="relative w-[90px] h-[85px] flex-shrink-0 rounded-[40px] overflow-hidden bg-[#f0faf7]">
+        <img
+          src={imageSrc}
+          alt={event.nome}
+          className="h-full w-full object-cover"
+        />
+      </div>
+
+      <div className="flex-1 min-w-0">
+        <h3 className="font-bold text-[#0F1D35] text-[15px] leading-snug group-hover:text-[#2EC4A0] transition-colors line-clamp-1 mb-1.5">
           {event.nome}
-        </Typography>
-        <Typography color="text.secondary" sx={{ fontSize: 11, lineHeight: 1.6 }}>
-          <Box component="span" color="text.primary" sx={{ fontWeight: 600 }}>
-            Data:{" "}
-          </Box>
-          {dataInicio} a {dataFim}
-        </Typography>
-        <Typography color="text.secondary" sx={{ fontSize: 11, lineHeight: 1.6 }}>
-          <Box component="span" color="text.primary" sx={{ fontWeight: 600 }}>
-            Local:{" "}
-          </Box>
-          {event.localizacao}
-        </Typography>
-        <Typography color="text.secondary" sx={{ fontSize: 11, lineHeight: 1.6 }}>
-          <Box component="span" color="text.primary" sx={{ fontWeight: 600 }}>
-            Carga horária:{" "}
-          </Box>
-          {event.cargaHoraria}h
-        </Typography>
-      </CardContent>
-    </Card>
+        </h3>
+
+        <div className="flex flex-col gap-0.5">
+          <p className="text-[13px] text-gray-600">
+            <span className="font-semibold text-gray-800">Data:</span>{" "}
+            {formatDateRange(event.dataInicio, event.dataFim)}
+          </p>
+          <p className="text-[13px] text-gray-600">
+            <span className="font-semibold text-gray-800">Local:</span>{" "}
+            {event.localizacao || "A definir"}
+          </p>
+          <p className="text-[13px] text-gray-600">
+            <span className="font-semibold text-gray-800">Carga horária:</span>{" "}
+            {event.cargaHoraria}h
+          </p>
+        </div>
+      </div>
+    </button>
   );
 }

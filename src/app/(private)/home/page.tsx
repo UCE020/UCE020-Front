@@ -84,9 +84,19 @@ export default function HomePage() {
 
   return (
     <Box sx={{ minHeight: '100dvh', bgcolor: 'background.default' }}>
-      <Box sx={{ maxWidth: 1200, mx: 'auto', px: 3, py: 3 }}>
+      <Box
+        sx={{
+          maxWidth: 1200,
+          mx: 'auto',
+          px: { xs: 2.5, sm: 3 },
+          py: { xs: 2.5, sm: 3 },
+          display: 'flex',
+          flexDirection: 'column',
+          gap: { xs: 2.5, sm: 3 },
+        }}
+      >
         <form onSubmit={handleSubmit}>
-          <Searchbar value={code} onChange={setCode} placeholder="cód. do evento" />
+          <Searchbar value={code} onChange={setCode} placeholder="Pesquise o código do seu evento" />
         </form>
 
         <GreetingSection userName={user?.name?.split(' ')[0] || 'Usuário'} />

@@ -56,18 +56,19 @@ export function EventList({
   if(home) {
      return (
       <Box sx={{ width: '100%' }}>
-        <Typography
-          sx={{
-            mb: 2,
-            mt: 6,
-            fontSize: 14,
-            color: '#0F1D35',
-            fontWeight: 600,
-            letterSpacing: '0.02em',
-          }}
-        >
-          {title}
-        </Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2, mt: 3 }}>
+          <Box sx={{ width: 4, height: 16, borderRadius: 4, bgcolor: '#2EC4A0' }} />
+          <Typography
+            sx={{
+              fontSize: 14,
+              color: '#0F1D35',
+              fontWeight: 700,
+              letterSpacing: '0.04em',
+            }}
+          >
+            {title}
+          </Typography>
+        </Box>
 
         {events.length === 0 ? (
           <Typography sx={{ fontSize: 14, color: 'text.secondary', py: 4, textAlign: 'center' }}>
@@ -122,15 +123,18 @@ export function EventList({
             >
               <ArrowBack />
             </IconButton>
-            <Typography
-              variant="h5"
-              sx={{
-                fontWeight: 600,
-                color: "text.primary",
-              }}
-            >
-              {title}
-            </Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25 }}>
+              <Box sx={{ width: 4, height: 22, borderRadius: 4, bgcolor: '#2EC4A0' }} />
+              <Typography
+                variant="h5"
+                sx={{
+                  fontWeight: 600,
+                  color: "text.primary",
+                }}
+              >
+                {title}
+              </Typography>
+            </Box>
           </Box>
 
           <Box

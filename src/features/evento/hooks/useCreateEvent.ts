@@ -13,8 +13,8 @@ export function useCreateEvent() {
     setLoading(true);
     setError(null);
     try {
-      await eventService.create(payload);
-      router.push('/home');
+      const createdEvent = await eventService.create(payload);
+      router.push(`/event/${createdEvent.id}`);
     } catch (err: unknown) {
       const axiosErr = err as { response?: { data?: { message?: string | string[] } } };
       const raw = axiosErr.response?.data?.message;

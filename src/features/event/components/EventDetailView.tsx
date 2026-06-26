@@ -2,9 +2,15 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { CircularProgress, IconButton, Typography } from '@mui/material';
+import { Box, CircularProgress, IconButton, Typography } from '@mui/material';
 import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded';
-import { ActivityModal, ScheduleCard } from '@/components/modals';
+import AccessTimeRoundedIcon from '@mui/icons-material/AccessTimeRounded';
+import CalendarTodayRoundedIcon from '@mui/icons-material/CalendarTodayRounded';
+import ContentCopyRoundedIcon from '@mui/icons-material/ContentCopyRounded';
+import EventAvailableRoundedIcon from '@mui/icons-material/EventAvailableRounded';
+import PlaceRoundedIcon from '@mui/icons-material/PlaceRounded';
+import PersonRoundedIcon from '@mui/icons-material/PersonRounded';
+import { ActivityModal } from '@/components/modals';
 import { ContentCard } from '@/components/layout/ContentCard';
 import { AppPageContainer } from '@/components/layout/AppPageContainer';
 import { buildListParticipantsPath } from '@/features/participants/presence/utils/routes';
@@ -14,6 +20,7 @@ import { eventService } from '@/services/eventService';
 import { getActivityModalVariant } from '@/features/event/utils/getActivityModalVariant';
 import { ParticipantQrCodeModal } from '@/features/participants/presence/components/ParticipantQrCodeModal';
 import { colorTokens } from '@/lib/colors';
+import { formatActivityDate } from '@/utils/format';
 import { EventActivitiesSection } from './EventActivitiesSection';
 import { OrganizerEventActions } from './OrganizerEventActions';
 import type { Activity } from '@/types/activity';
@@ -21,6 +28,81 @@ import type { Event } from '@/types/event';
 
 interface EventDetailViewProps {
   eventId: string;
+}
+
+const STATUS_STYLES: Record<string, { bg: string; color: string; label: string }> = {
+  pendente: { bg: '#F1F2F6', color: '#667085', label: 'Pendente' },
+  iniciada: { bg: '#E6F7F0', color: '#2EC4A0', label: 'Iniciada' },
+  andamento: { bg: '#E8EDFB', color: '#253B68', label: 'Andamento' },
+  finalizada: { bg: '#EAF7EE', color: '#35A384', label: 'Finalizada' },
+};
+
+function DetailTile({
+  icon,
+  label,
+  value,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+}) {
+  return (
+    <Box
+      sx={{
+        minWidth: 0,
+        p: { xs: 1.25, sm: 2 },
+        borderRadius: 2,
+        bgcolor: '#F8FAFC',
+        border: '1px solid rgba(15, 29, 53, 0.06)',
+        display: 'flex',
+        alignItems: 'center',
+        gap: { xs: 1, sm: 1.5 },
+      }}
+    >
+      <Box
+        sx={{
+          width: { xs: 30, sm: 36 },
+          height: { xs: 30, sm: 36 },
+          borderRadius: 2,
+          display: 'grid',
+          placeItems: 'center',
+          color: '#2EC4A0',
+          bgcolor: '#E6F7F0',
+          flexShrink: 0,
+        }}
+      >
+        {icon}
+      </Box>
+      <Box sx={{ minWidth: 0 }}>
+        <Typography
+          sx={{
+            color: '#667085',
+            fontSize: { xs: 9.5, sm: 11 },
+            fontWeight: 700,
+            textTransform: 'uppercase',
+            lineHeight: 1.2,
+          }}
+        >
+          {label}
+        </Typography>
+        <Typography
+          sx={{
+            color: '#0F1D35',
+            fontSize: { xs: 12.25, sm: 13.5 },
+            fontWeight: 700,
+            lineHeight: 1.25,
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            display: '-webkit-box',
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: 'vertical',
+          }}
+        >
+          {value}
+        </Typography>
+      </Box>
+    </Box>
+  );
 }
 
 export function EventDetailView({ eventId }: EventDetailViewProps) {
@@ -31,6 +113,8 @@ export function EventDetailView({ eventId }: EventDetailViewProps) {
   const [loadError, setLoadError] = useState('');
   const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null);
   const [isQrModalOpen, setIsQrModalOpen] = useState(false);
+  const [isCodeCopied, setIsCodeCopied] = useState(false);
+  const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
   const [, setRegistrationUpdate] = useState(0);
 
   useEffect(() => {
@@ -42,8 +126,9 @@ export function EventDetailView({ eventId }: EventDetailViewProps) {
         if (isMounted) {
           setSelectedActivity(null);
           setIsQrModalOpen(false);
+          setIsDescriptionExpanded(false);
           setEvent(null);
-          setLoadError('Evento nao encontrado.');
+          setLoadError('Evento não encontrado.');
           setIsLoadingEvent(false);
         }
       });
@@ -54,6 +139,7 @@ export function EventDetailView({ eventId }: EventDetailViewProps) {
       if (isMounted) {
         setSelectedActivity(null);
         setIsQrModalOpen(false);
+        setIsDescriptionExpanded(false);
         setIsLoadingEvent(true);
         setLoadError('');
       }
@@ -69,7 +155,7 @@ export function EventDetailView({ eventId }: EventDetailViewProps) {
       .catch(() => {
         if (isMounted) {
           setEvent(null);
-          setLoadError('Nao foi possivel carregar os dados do evento.');
+          setLoadError('Não foi possível carregar os dados do evento.');
         }
       })
       .finally(() => {
@@ -91,6 +177,7 @@ export function EventDetailView({ eventId }: EventDetailViewProps) {
 
   const activityModalVariant = getActivityModalVariant(role, isActivityEnrolled);
   const activities: Activity[] = [];
+  const shouldClampDescription = !!event?.descricao && event.descricao.length > 180;
 
   function handleSignup() {
     if (!selectedActivity) return;
@@ -118,6 +205,18 @@ export function EventDetailView({ eventId }: EventDetailViewProps) {
 
   function handleBack() {
     router.push('/home');
+  }
+
+  async function handleCopyEventCode() {
+    if (!event?.codigo) return;
+
+    try {
+      await navigator.clipboard.writeText(event.codigo);
+      setIsCodeCopied(true);
+      window.setTimeout(() => setIsCodeCopied(false), 1600);
+    } catch {
+      setIsCodeCopied(false);
+    }
   }
 
   if (isLoadingEvent) {
@@ -149,34 +248,244 @@ export function EventDetailView({ eventId }: EventDetailViewProps) {
         }}
       >
         <Typography sx={{ color: colorTokens.text.primary, fontWeight: 600 }}>
-          {loadError || 'Evento nao encontrado.'}
+          {loadError || 'Evento não encontrado.'}
         </Typography>
       </AppPageContainer>
     );
   }
 
   return (
-    <AppPageContainer sx={{ gap: 3 }}>
-      <IconButton
-        onClick={handleBack}
-        aria-label="Voltar"
-        sx={{ alignSelf: 'flex-start', color: colorTokens.text.primary }}
+    <AppPageContainer
+      sx={{
+        gap: 3,
+        '& > .MuiBox-root': {
+          maxWidth: 1120,
+          p: { xs: 2, md: 3 },
+        },
+      }}
+    >
+      <ContentCard
+        sx={{
+          borderRadius: { xs: '22px', md: '28px' },
+          gap: { xs: 2.5, md: 3 },
+          p: { xs: 2, md: 3 },
+          border: '1px solid rgba(15, 29, 53, 0.06)',
+          boxShadow: '0 18px 45px rgba(15, 29, 53, 0.08)',
+        }}
       >
-        <ArrowBackRoundedIcon />
-      </IconButton>
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <IconButton
+            onClick={handleBack}
+            aria-label="Voltar"
+            sx={{
+              color: colorTokens.text.primary,
+              bgcolor: '#F8FAFC',
+              border: '1px solid rgba(15, 29, 53, 0.06)',
+              '&:hover': { bgcolor: '#EEF2F6' },
+            }}
+          >
+            <ArrowBackRoundedIcon />
+          </IconButton>
+        </Box>
 
-      <ContentCard sx={{ borderRadius: '28px', gap: 0 }}>
-        <ScheduleCard
-          title={event.nome}
-          image={event.foto ?? undefined}
-          startDate={event.dataInicio}
-          endDate={event.dataFim}
-          location={event.localizacao}
-          hours={event.cargaHoraria}
-          participantsCount={0}
-          status={event.status}
-          description={event.descricao}
-        />
+        <Box
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: { xs: '1fr', md: 'minmax(320px, 0.9fr) minmax(0, 1.1fr)' },
+            gap: { xs: 2.5, md: 3 },
+            alignItems: 'stretch',
+          }}
+        >
+          <Box
+            sx={{
+              minHeight: { xs: 220, md: 360 },
+              borderRadius: { xs: '18px', md: '22px' },
+              overflow: 'hidden',
+              position: 'relative',
+              bgcolor: '#F0FAF7',
+            }}
+          >
+            {event.foto ? (
+              <Box
+                component="img"
+                src={event.foto}
+                alt={event.nome}
+                sx={{
+                  position: 'absolute',
+                  inset: 0,
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover',
+                  display: 'block',
+                }}
+              />
+            ) : (
+              <Box
+                sx={{
+                  height: '100%',
+                  minHeight: 'inherit',
+                  display: 'grid',
+                  placeItems: 'center',
+                  color: '#2EC4A0',
+                  bgcolor: '#E6F7F0',
+                }}
+              >
+                <EventAvailableRoundedIcon sx={{ fontSize: 76 }} />
+              </Box>
+            )}
+          </Box>
+
+          <Box sx={{ minWidth: 0, display: 'flex', flexDirection: 'column', gap: 2.25 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25, flexWrap: 'wrap' }}>
+              <Box
+                component="span"
+                sx={{
+                  px: 1.5,
+                  py: 0.6,
+                  borderRadius: 99,
+                  bgcolor: STATUS_STYLES[event.status.toLowerCase()]?.bg ?? '#F1F2F6',
+                  color: STATUS_STYLES[event.status.toLowerCase()]?.color ?? '#667085',
+                  fontSize: 12,
+                  fontWeight: 800,
+                }}
+              >
+                {STATUS_STYLES[event.status.toLowerCase()]?.label ?? event.status}
+              </Box>
+            </Box>
+
+            <Typography
+              component="h1"
+              sx={{
+                color: '#0F1D35',
+                fontSize: { xs: 26, md: 36 },
+                lineHeight: 1.08,
+                fontWeight: 800,
+                maxWidth: 620,
+              }}
+            >
+              {event.nome}
+            </Typography>
+
+            <Typography
+              sx={{
+                color: '#475467',
+                fontSize: { xs: 14, md: 15 },
+                lineHeight: 1.65,
+                maxWidth: 660,
+                display: '-webkit-box',
+                WebkitLineClamp: shouldClampDescription && !isDescriptionExpanded ? 4 : 'unset',
+                WebkitBoxOrient: 'vertical',
+                overflow: 'hidden',
+              }}
+            >
+              {event.descricao}
+            </Typography>
+            {shouldClampDescription ? (
+              <Typography
+                component="button"
+                type="button"
+                onClick={() => setIsDescriptionExpanded((prev) => !prev)}
+                sx={{
+                  alignSelf: 'flex-start',
+                  p: 0,
+                  border: 0,
+                  bgcolor: 'transparent',
+                  color: '#2EC4A0',
+                  fontSize: 13,
+                  fontWeight: 800,
+                  cursor: 'pointer',
+                  '&:hover': { textDecoration: 'underline' },
+                }}
+              >
+                {isDescriptionExpanded ? 'Ler menos' : 'Leia mais'}
+              </Typography>
+            ) : null}
+
+            <Box
+              sx={{
+                mt: { xs: 0.5, md: 'auto' },
+                p: { xs: 2, md: 2.25 },
+                borderRadius: 2,
+                bgcolor: '#0F1D35',
+                color: '#FFF',
+                display: 'flex',
+                alignItems: { xs: 'flex-start', sm: 'center' },
+                justifyContent: 'space-between',
+                gap: 2,
+              }}
+            >
+              <Box sx={{ minWidth: 0 }}>
+                <Typography sx={{ color: 'rgba(255,255,255,0.68)', fontSize: 12, fontWeight: 700 }}>
+                  Código do Evento
+                </Typography>
+                <Typography
+                  sx={{
+                    fontSize: { xs: 25, md: 30 },
+                    lineHeight: 1.1,
+                    fontWeight: 900,
+                    letterSpacing: '0.08em',
+                    overflowWrap: 'anywhere',
+                  }}
+                >
+                  {event.codigo || 'Sem código'}
+                </Typography>
+              </Box>
+              <IconButton
+                onClick={handleCopyEventCode}
+                disabled={!event.codigo}
+                aria-label="Copiar código do evento"
+                sx={{
+                  flexShrink: 0,
+                  color: '#FFF',
+                  bgcolor: 'rgba(255,255,255,0.12)',
+                  '&:hover': { bgcolor: 'rgba(255,255,255,0.2)' },
+                  '&.Mui-disabled': { color: 'rgba(255,255,255,0.36)' },
+                }}
+              >
+                <ContentCopyRoundedIcon />
+              </IconButton>
+            </Box>
+
+            {isCodeCopied ? (
+              <Typography sx={{ color: '#2EC4A0', fontSize: 12, fontWeight: 700 }}>
+                Código copiado.
+              </Typography>
+            ) : null}
+          </Box>
+        </Box>
+
+        <Box
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: {
+              xs: 'repeat(2, minmax(0, 1fr))',
+              sm: 'repeat(2, minmax(0, 1fr))',
+              lg: 'repeat(4, minmax(0, 1fr))',
+            },
+            gap: { xs: 1, sm: 1.5 },
+          }}
+        >
+          <DetailTile
+            icon={<CalendarTodayRoundedIcon sx={{ fontSize: 20 }} />}
+            label="Data"
+            value={formatActivityDate(event.dataInicio, event.dataFim)}
+          />
+          <DetailTile
+            icon={<PlaceRoundedIcon sx={{ fontSize: 21 }} />}
+            label="Local"
+            value={event.localizacao || 'A definir'}
+          />
+          <DetailTile
+            icon={<AccessTimeRoundedIcon sx={{ fontSize: 21 }} />}
+            label="Carga horária"
+            value={`${event.cargaHoraria} horas`}
+          />
+          <DetailTile
+            icon={<PersonRoundedIcon sx={{ fontSize: 21 }} />}
+            label="Inscritos"
+            value="0 inscritos"
+          />
+        </Box>
 
         {isOrganizer && <OrganizerEventActions />}
 

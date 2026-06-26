@@ -43,7 +43,7 @@ export default function PrivateLayout({ children }: { children: React.ReactNode 
 
   return (
     <>
-      <Header user={user} onMenuClick={() => setSidebarOpen(true)} onLogout={handleLogout} />
+      <Header user={user} onMenuClick={() => setSidebarOpen(true)} />
       <Sidebar
         open={sidebarOpen}
         onClose={() => setSidebarOpen(false)}

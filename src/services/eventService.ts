@@ -43,23 +43,6 @@ class EventService {
     return data.data;
   }
 
-  async findByCodigo(codigo: string): Promise<Event> {
-    const { data } = await api.get<EventResponse>(`/event/codigo/${codigo}`);
-    return data.data;
-  }
-
-  async findParticipatingEvents(tipo?: TipoParticipante): Promise<Event[]> {
-    const { data } = await api.get<EventsResponse>('/event/participating', {
-      params: tipo ? { tipo } : undefined,
-    });
-    return data.data;
-  }
-
- // async findOrganizerEvents(): Promise<Event[]> {
- //   const { data } = await api.get<EventsResponse>('/event/organized');
- //   return data.data;
- // }
-
   async update(id: number, payload: UpdateEventPayload): Promise<Event> {
     const { data } = await api.patch<EventResponse>(`/event/${id}`, payload);
     return data.data;
@@ -69,6 +52,22 @@ class EventService {
     const { data } = await api.delete<EventResponse>(`/event/${id}`);
     return data.data;
   }
+
+  async findByCodigo(codigo: string): Promise<Event> {
+    const { data } = await api.get<EventResponse>(`/event/codigo/${codigo}`);
+    return data.data;
+  }
+
+  //Traz todos os eventos pelo tipo de participante dele (participante, monitor ou organizador)
+  //Ex: tipo = 'participante' => traz todos os eventos que o usuário participa
+  async findParticipatingEvents(tipo?: TipoParticipante): Promise<Event[]> {
+    const { data } = await api.get<EventsResponse>('/event/participating', {
+      params: tipo ? { tipo } : undefined,
+    });
+    return data.data;
+  }
+
+
 }
 
 export const eventService = new EventService();

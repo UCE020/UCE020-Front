@@ -18,7 +18,7 @@ export function ProfileHeader({ user }: ProfileHeaderProps) {
   return (
     <Box
       sx={{
-        background: 'linear-gradient(135deg, #1a2744 0%, #2a3f5f 100%)',
+        background: '#0F1D35',
         position: 'relative',
         pb: 8,
         pt: 2,

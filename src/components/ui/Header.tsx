@@ -41,7 +41,7 @@ export function Header({ user = null, onMenuClick }: HeaderProps) {
 
   if (isLoggedIn) {
     return (
-      <header className="fixed top-0 left-0 right-0 z-30 w-full bg-[#0F1D35] px-4 sm:px-6">
+      <header className="fixed top-0 left-0 right-0 z-30 w-full bg-[#101828] px-4 sm:px-6">
         <div className="mx-auto max-w-7xl flex items-center h-16 relative">
           <button
             onClick={onMenuClick}

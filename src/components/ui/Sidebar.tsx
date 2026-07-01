@@ -65,7 +65,7 @@ export function Sidebar({ open, onClose, navLinks, user, onLogout }: SidebarProp
         aria-hidden={!open}
         className={`
           fixed top-0 left-0 z-50 h-full w-64
-          bg-[#0F1D35] flex flex-col
+          bg-[#101828] flex flex-col
           transition-transform duration-300 ease-in-out
           ${open ? "translate-x-0" : "-translate-x-full"}
         `}

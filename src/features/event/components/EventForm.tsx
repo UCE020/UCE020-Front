@@ -104,8 +104,16 @@ function getErrors(form: FormState, touched: TouchedState) {
       touched.descricao && form.descricao.trim().length < 10
         ? 'Descreva melhor o evento.'
         : '',
-    startDate: touched.startDate && !form.startDate ? 'Selecione a data de início.' : '',
-    endDate: touched.endDate && !form.endDate ? 'Selecione a data de término.' : '',
+    startDate: (() => {
+      if (touched.startDate && !form.startDate) return 'Selecione a data de início.';
+      if (touched.startDate && form.startDate && form.startDate < getTodayString()) return 'A data de início não pode ser no passado.';
+      return '';
+    })(),
+    endDate: (() => {
+      if (touched.endDate && !form.endDate) return 'Selecione a data de término.';
+      if (touched.endDate && form.endDate && form.endDate < getTodayString()) return 'A data de término não pode ser no passado.';
+      return '';
+    })(),
     startTime: touched.startTime && !form.startTime ? 'Selecione o horário de início.' : '',
     endTime: touched.endTime && !form.endTime ? 'Selecione o horário de término.' : '',
     cargaHoraria:
@@ -119,6 +127,12 @@ function getErrors(form: FormState, touched: TouchedState) {
 
 function toISODateTime(date: string, time: string): string {
   return `${date}T${time}:00`;
+}
+
+function getTodayString(): string {
+  const now = new Date();
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
 }
 
 interface EventFormProps {
@@ -148,7 +162,7 @@ export default function EventForm({ mode, eventId }: EventFormProps) {
 
   useEffect(() => {
     if (!existingEvent) return;
-    
+
     Promise.resolve().then(() => {
       const startDT = existingEvent.dataInicio ? new Date(existingEvent.dataInicio) : null;
       const endDT = existingEvent.dataFim ? new Date(existingEvent.dataFim) : null;
@@ -184,6 +198,7 @@ export default function EventForm({ mode, eventId }: EventFormProps) {
     form.descricao.trim().length >= 10 &&
     form.startDate.length > 0 &&
     form.endDate.length > 0 &&
+    form.endDate >= form.startDate &&
     form.startTime.length > 0 &&
     form.endTime.length > 0 &&
     form.cargaHoraria.trim().length > 0 &&
@@ -196,7 +211,14 @@ export default function EventForm({ mode, eventId }: EventFormProps) {
   const actionLabel = isEdit ? 'Salvar' : 'Cadastrar';
 
   function updateField<K extends keyof FormState>(field: K, value: FormState[K]) {
-    setForm((cur) => ({ ...cur, [field]: value }));
+    setForm((cur) => {
+      const next = { ...cur, [field]: value };
+      if (!isEdit && field === 'startDate' && typeof value === 'string') {
+        const today = getTodayString();
+        next.status = value === today ? 'iniciada' : 'pendente';
+      }
+      return next;
+    });
   }
 
   function markTouched(field: keyof FormState) {
@@ -209,6 +231,7 @@ export default function EventForm({ mode, eventId }: EventFormProps) {
     ) as TouchedState;
     setTouched(allTouched);
 
+    const today = getTodayString();
     const currentErrors = getErrors(form, allTouched);
     const isValid =
       Object.values(currentErrors).every((e) => e === '') &&
@@ -217,7 +240,9 @@ export default function EventForm({ mode, eventId }: EventFormProps) {
       form.responsavel.trim().length >= 3 &&
       form.descricao.trim().length >= 10 &&
       form.startDate.length > 0 &&
+      form.startDate >= today &&
       form.endDate.length > 0 &&
+      form.endDate >= form.startDate &&
       form.startTime.length > 0 &&
       form.endTime.length > 0 &&
       form.cargaHoraria.trim().length > 0 &&
@@ -430,12 +455,12 @@ export default function EventForm({ mode, eventId }: EventFormProps) {
 
               <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', md: 'repeat(4, minmax(0, 1fr))' }, gap: { xs: 1.5, md: 2 }, gridColumn: { xs: 'auto', md: 'span 2' } }}>
                 <Box sx={{ minWidth: 0 }}>
-                  <TextInput label="Data de Início" value={form.startDate} onChange={(v) => updateField('startDate', v)} onBlur={() => markTouched('startDate')} error={Boolean(errors.startDate)} size="small" fullWidth type="date" slotProps={{ inputLabel: { shrink: true }, input: { endAdornment: <InputAdornment position="end" /> } }} />
+                  <TextInput label="Data de Início" value={form.startDate} onChange={(v) => updateField('startDate', v)} onBlur={() => markTouched('startDate')} error={Boolean(errors.startDate)} size="small" fullWidth type="date" slotProps={{ inputLabel: { shrink: true }, input: { inputProps: { min: getTodayString() }, endAdornment: <InputAdornment position="end" /> } }} />
                   {errors.startDate ? <Typography sx={{ mt: 0.4, fontSize: 11, color: 'error.main' }}>{errors.startDate}</Typography> : null}
                 </Box>
 
                 <Box sx={{ minWidth: 0 }}>
-                  <TextInput label="Data de Término" value={form.endDate} onChange={(v) => updateField('endDate', v)} onBlur={() => markTouched('endDate')} error={Boolean(errors.endDate)} size="small" fullWidth type="date" slotProps={{ inputLabel: { shrink: true }, input: { endAdornment: <InputAdornment position="end" /> } }} />
+                  <TextInput label="Data de Término" value={form.endDate} onChange={(v) => updateField('endDate', v)} onBlur={() => markTouched('endDate')} error={Boolean(errors.endDate)} size="small" fullWidth type="date" slotProps={{ inputLabel: { shrink: true }, input: { inputProps: { min: form.startDate || getTodayString() }, endAdornment: <InputAdornment position="end" /> } }} />
                   {errors.endDate ? <Typography sx={{ mt: 0.4, fontSize: 11, color: 'error.main' }}>{errors.endDate}</Typography> : null}
                 </Box>
 
@@ -474,6 +499,8 @@ export default function EventForm({ mode, eventId }: EventFormProps) {
                     onChange={(e) => updateField('status', e.target.value as FormState['status'])}
                     size="small"
                     fullWidth
+                    disabled={!isEdit}
+                    helperText={!isEdit ? 'Definido automaticamente pela data de início' : undefined}
                   >
                     {STATUS_OPTIONS.map((opt) => (
                       <MenuItem key={opt.value} value={opt.value}>

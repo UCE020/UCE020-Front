@@ -14,8 +14,8 @@ import { ActivityModal } from '@/components/modals';
 import { ContentCard } from '@/components/layout/ContentCard';
 import { AppPageContainer } from '@/components/layout/AppPageContainer';
 import { buildListParticipantsPath } from '@/features/participants/presence/utils/routes';
-import { useMockUser } from '@/mocks/useMockUser';
-import { registrationService } from '@/services/registrationService';
+import { useAuth } from '@/providers/auth-provider';
+import { registrationService, TipoParticipante } from '@/services/registrationService';
 import { eventService } from '@/services/eventService';
 import { getActivityModalVariant } from '@/features/event/utils/getActivityModalVariant';
 import { ParticipantQrCodeModal } from '@/features/participants/presence/components/ParticipantQrCodeModal';
@@ -35,6 +35,15 @@ const STATUS_STYLES: Record<string, { bg: string; color: string; label: string }
   iniciada: { bg: '#E6F7F0', color: '#2EC4A0', label: 'Iniciada' },
   andamento: { bg: '#E8EDFB', color: '#253B68', label: 'Andamento' },
   finalizada: { bg: '#EAF7EE', color: '#35A384', label: 'Finalizada' },
+};
+
+// Mapeia o tipo retornado pela API (pt-BR) para o "role" usado nos componentes de UI.
+// ATENÇÃO: ajuste os valores da direita ('organizer' | 'monitor' | 'participant') se
+// getActivityModalVariant / OrganizerEventActions esperarem outros literais.
+const TIPO_TO_ROLE: Record<TipoParticipante, 'organizer' | 'monitor' | 'participant'> = {
+  organizador: 'organizer',
+  monitor: 'monitor',
+  participante: 'participant',
 };
 
 function DetailTile({
@@ -107,16 +116,22 @@ function DetailTile({
 
 export function EventDetailView({ eventId }: EventDetailViewProps) {
   const router = useRouter();
-  const mockUser = useMockUser();
+  const { user } = useAuth();
+
   const [event, setEvent] = useState<Event | null>(null);
   const [isLoadingEvent, setIsLoadingEvent] = useState(true);
   const [loadError, setLoadError] = useState('');
+
+  const [participantType, setParticipantType] = useState<TipoParticipante | null>(null);
+  const [isLoadingParticipation, setIsLoadingParticipation] = useState(true);
+
   const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null);
   const [isQrModalOpen, setIsQrModalOpen] = useState(false);
   const [isCodeCopied, setIsCodeCopied] = useState(false);
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
   const [, setRegistrationUpdate] = useState(0);
 
+  // Busca os dados do evento
   useEffect(() => {
     const numericEventId = Number(eventId);
     let isMounted = true;
@@ -169,10 +184,28 @@ export function EventDetailView({ eventId }: EventDetailViewProps) {
     };
   }, [eventId]);
 
-  const role = mockUser.role;
+  // Busca o tipo de participação do usuário logado naquele evento
+  useEffect(() => {
+  const numericEventId = Number(eventId);
+  registrationService
+    .getTipoParticipante(numericEventId)
+    .then((tipo: TipoParticipante) => {
+      console.log('[participação] tipo recebido:', tipo); // debug
+      setParticipantType(tipo);
+    })
+    .catch((err) => {
+      console.error('[participação] erro ao buscar tipo:', err); // debug
+      setParticipantType(null);
+    })
+    .finally(() => {
+      setIsLoadingParticipation(false);
+    });
+}, [eventId, user?.id]);
+
+  const role = participantType ? TIPO_TO_ROLE[participantType] : 'participant';
   const isOrganizer = role === 'organizer';
   const isActivityEnrolled = selectedActivity
-    ? registrationService.isRegistered(eventId, selectedActivity.id, mockUser.id)
+    ? registrationService.isRegistered(eventId, selectedActivity.id, String(user?.id ?? ''))
     : false;
 
   const activityModalVariant = getActivityModalVariant(role, isActivityEnrolled);
@@ -180,14 +213,14 @@ export function EventDetailView({ eventId }: EventDetailViewProps) {
   const shouldClampDescription = !!event?.descricao && event.descricao.length > 180;
 
   function handleSignup() {
-    if (!selectedActivity) return;
-    registrationService.register(eventId, selectedActivity.id, mockUser.id);
+    if (!selectedActivity || !user?.id) return;
+    registrationService.register(eventId, selectedActivity.id, String(user.id));
     setRegistrationUpdate((prev) => prev + 1);
   }
 
   function handleCancelParticipation() {
-    if (!selectedActivity) return;
-    registrationService.unregister(eventId, selectedActivity.id, mockUser.id);
+    if (!selectedActivity || !user?.id) return;
+    registrationService.unregister(eventId, selectedActivity.id, String(user.id));
     setRegistrationUpdate((prev) => prev + 1);
   }
 
@@ -219,7 +252,9 @@ export function EventDetailView({ eventId }: EventDetailViewProps) {
     }
   }
 
-  if (isLoadingEvent) {
+  const isLoading = isLoadingEvent || isLoadingParticipation;
+
+  if (isLoading) {
     return (
       <AppPageContainer
         sx={{
@@ -518,13 +553,13 @@ export function EventDetailView({ eventId }: EventDetailViewProps) {
         onListParticipants={goToListParticipants}
       />
 
-      {selectedActivity && (
+      {selectedActivity && user && (
         <ParticipantQrCodeModal
           open={isQrModalOpen}
           onClose={() => setIsQrModalOpen(false)}
           payload={{
-            participantId: mockUser.id,
-            participantName: mockUser.name,
+            participantId: String(user?.id ?? ''),
+            participantName: user.name,
             activityId: selectedActivity.id,
             activityTitle: selectedActivity.title,
             eventId,

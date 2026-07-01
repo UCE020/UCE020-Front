@@ -1,4 +1,15 @@
 import { MOCK_REGISTRATIONS, registerParticipant as registerParticipantInMock, unregisterParticipant as unregisterParticipantInMock } from '@/mocks/registrations';
+import { api } from './api';
+
+export type TipoParticipante = 'participante' | 'monitor' | 'organizador';
+interface SubscriptionTypeResponse {
+  data: {
+    tipo: TipoParticipante;
+  };
+  message: string;
+  //eventoId: number;
+  //userId: number;
+}
 
 // TODO: integrar com o back
 class RegistrationService {
@@ -39,6 +50,18 @@ class RegistrationService {
   canUnregister(eventId: string, activityId: string, participantId: string): boolean {
     // permite qnd ta inscrito
     return this.isRegistered(eventId, activityId, participantId);
+  }
+
+  //Traz o tipo de participação do usuário autenticado naquele evento
+  //Ex: 'participante', 'monitor' ou 'organizador'
+  async getTipoParticipante(eventoId: number): Promise<TipoParticipante> {
+    const { data } = await api.get<SubscriptionTypeResponse>(
+      `/event/${eventoId}/subscription`,
+    );
+    //console.log('[debug] data:', data);
+    //console.log('[debug] tipo, message,:', data.message, data.tipo);
+
+    return data.data.tipo;
   }
 }
 

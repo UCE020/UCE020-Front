@@ -2,6 +2,7 @@
 
 import { Box, Typography } from '@mui/material';
 import { useState } from 'react';
+import PersonOutlineRoundedIcon from '@mui/icons-material/PersonOutlineRounded';
 import TextInput from '@/components/ui/inputs/TextInput';
 import PasswordInput from '@/components/ui/inputs/PasswordInput';
 import { Button } from '@/components/ui/Button';
@@ -37,26 +38,43 @@ export function ProfileForm({ user, onSave, isEditing, onEditChange }: ProfileFo
   return (
     <Box
       sx={{
-        bgcolor: '#FAFAFA',
-        borderRadius: '16px',
+        bgcolor: '#fff',
+        borderRadius: '20px',
         overflow: 'hidden',
-        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+        border: '1px solid rgba(15, 29, 53, 0.04)',
+        boxShadow: '0 10px 30px rgba(15, 29, 53, 0.08)',
       }}
     >
       <Box sx={{ p: 3 }}>
-        <Typography
-          variant="h6"
-          sx={{
-            fontWeight: 700,
-            color: '#1a2744',
-            mb: 2.5,
-            fontSize: '1.1rem',
-          }}
-        >
-          Informações Pessoais
-        </Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 3 }}>
+          <Box
+            sx={{
+              width: 38,
+              height: 38,
+              borderRadius: '12px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              background: 'linear-gradient(135deg, #101828 0%, #1A2744 100%)',
+              boxShadow: '0 6px 14px rgba(16, 24, 40, 0.25)',
+            }}
+          >
+            <PersonOutlineRoundedIcon sx={{ color: '#fff', fontSize: 20 }} />
+          </Box>
 
-        <Box sx={{ mb: 3 }}>
+          <Typography
+            variant="h6"
+            sx={{
+              fontWeight: 700,
+              color: '#0D1E3B',
+              fontSize: '1.05rem',
+            }}
+          >
+            Informações Pessoais
+          </Typography>
+        </Box>
+
+        <Box sx={{ mb: 1 }}>
           <Box sx={{ mb: 2.5 }}>
             <TextInput
               label="Nome Completo"
@@ -96,7 +114,7 @@ export function ProfileForm({ user, onSave, isEditing, onEditChange }: ProfileFo
             justifyContent: 'flex-end',
             p: 3,
             bgcolor: 'rgba(26, 39, 68, 0.02)',
-            borderTop: '1px solid rgba(26, 39, 68, 0.1)',
+            borderTop: '1px solid rgba(26, 39, 68, 0.08)',
           }}
         >
           <Button variant="outlined" onClick={handleCancel} color="secondary">

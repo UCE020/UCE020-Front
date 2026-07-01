@@ -27,7 +27,7 @@ export default function EventCreatedPage() {
     });
 
     eventService
-      .findParticipatingEvents('organizador')
+      .findParticipatingEvents('monitor')
       .then((events) => {
         if (isMounted) {
           setEvents(Array.isArray(events) ? events : []);
@@ -36,7 +36,7 @@ export default function EventCreatedPage() {
       .catch(() => {
         if (isMounted) {
           setEvents([]);
-          //setLoadError('Nao foi possivel carregar os eventos criados.');
+          //setLoadError('Nao foi possivel carregar os eventos monitorados.');
         }
       })
       .finally(() => {
@@ -68,7 +68,7 @@ export default function EventCreatedPage() {
 
               <EventList
                 events={events}
-                title="Eventos Criados"
+                title="Monitoria de Eventos"
                 home={false}
                 noEventsMessage="Nenhum evento encontrado."
               />

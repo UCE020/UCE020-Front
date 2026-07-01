@@ -5,15 +5,47 @@ interface GreetingSectionProps {
 }
 
 export function GreetingSection({ userName }: GreetingSectionProps) {
+  const initial = userName?.charAt(0)?.toUpperCase() || "U";
+
   return (
-    <Typography
-      variant="h5"
-      sx={{ py: 3, fontWeight: 700, lineHeight: 1.5, textAlign: "center" }}
+    <Box
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        gap: 2,
+        py: 2,
+      }}
     >
-      Olá, {userName}! O que temos para{" "}
-      <Box component="span" sx={{ color: "#35A384" }}>
-        hoje?
+      
+
+      <Box>
+        <Typography
+          sx={{
+            fontSize: 13,
+            fontWeight: 600,
+            color: "#667085",
+            letterSpacing: "0.02em",
+            mb: 0.25,
+          }}
+        >
+          Olá, {userName}
+        </Typography>
+
+        <Typography
+          variant="h5"
+          sx={{
+            fontWeight: 800,
+            color: "#0F1D35",
+            lineHeight: 1.25,
+            fontSize: { xs: 20, sm: 23 },
+          }}
+        >
+          O que vamos fazer{" "}
+          <Box component="span" sx={{ color: "#2EC4A0" }}>
+            hoje?
+          </Box>
+        </Typography>
       </Box>
-    </Typography>
+    </Box>
   );
 }

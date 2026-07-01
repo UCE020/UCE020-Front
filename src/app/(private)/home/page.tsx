@@ -1,12 +1,14 @@
 'use client';
 
 import { useState, useEffect, useReducer, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import { Box } from '@mui/material';
 import { Event } from '@/types/event';
 import { Searchbar, Toast } from '@/components/ui';
+import { EventList } from '@/components/event';
 import { ToastSeverity } from '@/types/toast';
 import { ActivityModal } from '@/components/modals';
-import { GreetingSection, QuickActions, EventList, useHomeEvents } from '@/features/home';
+import { GreetingSection, QuickActions, useHomeEvents } from '@/features/home';
 import { useAuth } from '@/providers/auth-provider';
 import { eventService } from '@/services/eventService';
 
@@ -32,6 +34,7 @@ function searchReducer(_: SearchState, action: SearchAction): SearchState {
 }
 
 export default function HomePage() {
+  const router = useRouter();
   const { user } = useAuth();
   const { filteredEvents } = useHomeEvents();
   const [code, setCode] = useState('');
@@ -74,15 +77,26 @@ export default function HomePage() {
     if (trimmed) setSearchCode(trimmed);
   }, [code]);
 
-  function handleEventClick() {
+  function handleEventClick(event: Event) {
     setModalOpen(false);
+    router.push(`/event/${event.id}`);
   }
 
   return (
     <Box sx={{ minHeight: '100dvh', bgcolor: 'background.default' }}>
-      <Box sx={{ maxWidth: 1200, mx: 'auto', px: 3, py: 3 }}>
+      <Box
+        sx={{
+          maxWidth: 1200,
+          mx: 'auto',
+          px: { xs: 2.5, sm: 3 },
+          py: { xs: 2.5, sm: 3 },
+          display: 'flex',
+          flexDirection: 'column',
+          gap: { xs: 2.5, sm: 3 },
+        }}
+      >
         <form onSubmit={handleSubmit}>
-          <Searchbar value={code} onChange={setCode} placeholder="cód. do evento" />
+          <Searchbar value={code} onChange={setCode} placeholder="Pesquise o código do seu evento" />
         </form>
 
         <GreetingSection userName={user?.name?.split(' ')[0] || 'Usuário'} />

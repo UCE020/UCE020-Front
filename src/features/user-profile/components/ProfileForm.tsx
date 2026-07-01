@@ -4,7 +4,6 @@ import { Box, Typography } from '@mui/material';
 import { useState } from 'react';
 import PersonOutlineRoundedIcon from '@mui/icons-material/PersonOutlineRounded';
 import TextInput from '@/components/ui/inputs/TextInput';
-import PasswordInput from '@/components/ui/inputs/PasswordInput';
 import { Button } from '@/components/ui/Button';
 import type { UserProfile } from '@/types/userProfile';
 

@@ -1,12 +1,13 @@
 'use client';
 
-import { Box, Typography } from '@mui/material';
+import { Box, IconButton, Typography } from '@mui/material';
 import { useState } from 'react';
 import PersonOutlineRoundedIcon from '@mui/icons-material/PersonOutlineRounded';
 import TextInput from '@/components/ui/inputs/TextInput';
 import PasswordInput from '@/components/ui/inputs/PasswordInput';
 import { Button } from '@/components/ui/Button';
 import type { UserProfile } from '@/types/userProfile';
+import EditRoundedIcon from '@mui/icons-material/EditRounded';
 
 interface ProfileFormProps {
   user: UserProfile;
@@ -64,14 +65,24 @@ export function ProfileForm({ user, onSave, isEditing, onEditChange }: ProfileFo
 
           <Typography
             variant="h6"
-            sx={{
-              fontWeight: 700,
-              color: '#0D1E3B',
-              fontSize: '1.05rem',
-            }}
+            sx={{ fontWeight: 700, color: '#0D1E3B', fontSize: '1.05rem', flex: 1 }}
           >
             Informações Pessoais
           </Typography>
+
+          {!isEditing && (
+            <IconButton
+              onClick={() => onEditChange(true)}
+              aria-label="Editar perfil"
+              size="small"
+              sx={{
+                color: '#0D1E3B',
+                '&:hover': { bgcolor: 'rgba(13, 30, 59, 0.06)' },
+              }}
+            >
+              <EditRoundedIcon fontSize="small" />
+            </IconButton>
+          )}
         </Box>
 
         <Box sx={{ mb: 1 }}>

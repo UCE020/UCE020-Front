@@ -4,7 +4,7 @@ import { UserProfile, UserProfileResponse, UpdateProfilePayload } from '../types
 // Formato bruto retornado pelo backend (em português)
 type BackendUserProfile = {
   id: number;
-  nome: string;
+  name: string;
   email: string;
   createdAt: string;
   updatedAt: string;
@@ -18,7 +18,7 @@ type BackendUserProfileResponse = {
 function toUserProfile(raw: BackendUserProfile): UserProfile {
   return {
     id: raw.id,
-    name: raw.nome,
+    name: raw.name,
     email: raw.email,
     createdAt: raw.createdAt,
     updatedAt: raw.updatedAt,
@@ -41,12 +41,7 @@ class UserProfileService {
    * Atualiza nome e/ou email do usuário autenticado
    */
   async updateProfile(payload: UpdateProfilePayload): Promise<UserProfileResponse> {
-    const backendPayload = {
-      ...(payload.name !== undefined && { nome: payload.name }),
-      ...(payload.email !== undefined && { email: payload.email }),
-    };
-
-    const { data } = await api.patch<BackendUserProfileResponse>('/user/me', backendPayload);
+    const { data } = await api.patch<BackendUserProfileResponse>('/user/me', payload);
     return {
       data: toUserProfile(data.data),
       statusCode: data.statusCode,

@@ -4,7 +4,6 @@ import { Box, IconButton, Typography } from '@mui/material';
 import { useState } from 'react';
 import PersonOutlineRoundedIcon from '@mui/icons-material/PersonOutlineRounded';
 import TextInput from '@/components/ui/inputs/TextInput';
-import PasswordInput from '@/components/ui/inputs/PasswordInput';
 import { Button } from '@/components/ui/Button';
 import type { UserProfile } from '@/types/userProfile';
 import EditRoundedIcon from '@mui/icons-material/EditRounded';
@@ -105,7 +104,7 @@ export function ProfileForm({ user, onSave, isEditing, onEditChange }: ProfileFo
               placeholder="seu@email.com"
             />
           </Box>
-          <Box>
+          {/* <Box>
             <PasswordInput
               label="Senha"
               value={formData.password || ''}
@@ -113,7 +112,7 @@ export function ProfileForm({ user, onSave, isEditing, onEditChange }: ProfileFo
               disabled={!isEditing}
               showVisibilityToggle
             />
-          </Box>
+          </Box> */}
         </Box>
       </Box>
 

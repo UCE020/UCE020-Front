@@ -15,8 +15,8 @@ import { ContentCard } from '@/components/layout/ContentCard';
 import { AppPageContainer } from '@/components/layout/AppPageContainer';
 import { buildListParticipantsPath } from '@/features/participants/presence/utils/routes';
 import { useAuth } from '@/providers/auth-provider';
-import { registrationService, TipoParticipante } from '@/services/registrationService';
-import { eventService } from '@/services/eventService';
+import { registrationService } from '@/services/registrationService';
+import { eventService, TipoParticipante } from '@/services/eventService';
 import { getActivityModalVariant } from '@/features/event/utils/getActivityModalVariant';
 import { ParticipantQrCodeModal } from '@/features/participants/presence/components/ParticipantQrCodeModal';
 import { colorTokens } from '@/lib/colors';
@@ -278,8 +278,7 @@ export function EventDetailView({ eventId }: EventDetailViewProps) {
   // Busca o tipo de participação do usuário logado naquele evento
   useEffect(() => {
   const numericEventId = Number(eventId);
-  registrationService
-    .getTipoParticipante(numericEventId)
+  participationService.getTipoParticipante(numericEventId)
     .then((tipo: TipoParticipante) => {
       console.log('[participação] tipo recebido:', tipo); // debug
       setParticipantType(tipo);

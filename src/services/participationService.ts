@@ -1,7 +1,11 @@
 import { api } from './api';
 
+export type TipoParticipante = 'participante' | 'monitor' | 'organizador';
 interface ParticipationResponse {
   message: string;
+  data: {
+    tipo: TipoParticipante;
+  };
 }
 
 class ParticipationService {
@@ -17,6 +21,18 @@ class ParticipationService {
       `/event/${eventoId}/subscription`,
     );
     return data;
+  }
+
+  //Traz o tipo de participação do usuário autenticado naquele evento
+  //Ex: 'participante', 'monitor' ou 'organizador'
+  async getTipoParticipante(eventoId: number): Promise<TipoParticipante> {
+    const { data } = await api.get<ParticipationResponse>(
+      `/event/${eventoId}/subscription`,
+    );
+    //console.log('[debug] data:', data);
+    //console.log('[debug] tipo, message,:', data.message, data.tipo);
+
+    return data.data.tipo;
   }
 }
 

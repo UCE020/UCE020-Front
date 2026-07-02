@@ -8,12 +8,12 @@ export default function ScheduleDescription({ description }: ScheduleDescription
   const toggleExpand = () => setIsExpanded(!isExpanded);
 
   return (
-    <Box sx={{ mt: 4, mb: 4 }}>
+    <Box sx={{ mt: { xs: 2.5, sm: 4 }, mb: { xs: 3, sm: 4 } }}>
       <Typography
         onClick={toggleExpand}
         sx={{
           color: 'text.primary',
-          fontSize: 'clamp(10px, 3vw, 12px)',
+          fontSize: { xs: 12, sm: 12 },
           textAlign: 'justify',
           cursor: 'pointer',
           display: '-webkit-box',

@@ -1,28 +1,34 @@
 'use client';
 
-import { Dialog, SxProps, Theme } from '@mui/material'; // <-- 1. Importe SxProps e Theme
+import { Dialog, SxProps, Theme } from '@mui/material';
 import type { ReactNode } from 'react';
 
 interface ModalContainerProps {
   open: boolean;
   onClose: () => void;
   children: ReactNode;
-  sx?: SxProps<Theme>; // <-- 2. Adicione a propriedade opcional aqui
+  sx?: SxProps<Theme>;
+  paperSx?: SxProps<Theme>;
 }
 
-export default function ModalContainer({ open, onClose, children, sx }: ModalContainerProps) { // <-- 3. Receba o sx aqui
+export default function ModalContainer({
+  open,
+  onClose,
+  children,
+  sx,
+  paperSx,
+}: ModalContainerProps) {
   return (
     <Dialog
       open={open}
       onClose={onClose}
-      sx={sx} // <-- 4. Repasse o sx para a raiz do Dialog
+      sx={sx}
       slotProps={{
         paper: {
-          sx: {
-            // ── Dimensões ──
-            width: '100%',
-            // ... todo o resto do seu código de estilização continua igual aqui
-          },
+          sx: [
+            { width: '100%' },
+            ...(Array.isArray(paperSx) ? paperSx : paperSx ? [paperSx] : []),
+          ],
         },
       }}
     >

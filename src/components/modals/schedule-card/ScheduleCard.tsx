@@ -27,9 +27,9 @@ export default function ScheduleCard({
           fontSize: 'clamp(16px, 5vw, 20px)',
           color: 'primary.contrastText',
           textAlign: 'center',
-          mt: 2,
-          mb: 3,
-          px: 4,
+          mt: { xs: 1, sm: 2 },
+          mb: { xs: 2, sm: 3 },
+          px: { xs: 4, sm: 5 },
           display: '-webkit-box',
           WebkitLineClamp: 2,
           WebkitBoxOrient: 'vertical',
@@ -42,10 +42,11 @@ export default function ScheduleCard({
       <Box
         sx={{
           display: 'flex',
-          flexDirection: 'row',
+          flexDirection: { xs: 'column', sm: 'row' },
           width: '100%',
-          height: '100%',
+          height: 'auto',
           alignItems: 'flex-start',
+          gap: { xs: 2, sm: 0 },
         }}
       >
         <ScheduleImage title={title} image={image} />

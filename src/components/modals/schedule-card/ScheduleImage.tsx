@@ -9,11 +9,12 @@ export default function ScheduleImage({ title, image }: ScheduleImageProps) {
   return (
     <Box
       sx={{
-        width: '50%',
-        aspectRatio: '1/1',
+        width: { xs: '100%', sm: '50%' },
+        aspectRatio: { xs: '16/9', sm: '1/1' },
         position: 'relative',
         overflow: 'hidden',
         flexShrink: 0,
+        borderRadius: { xs: 1, sm: 0 },
       }}
     >
       {image && !hasError ? (

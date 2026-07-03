@@ -28,7 +28,8 @@ export default function ProfilePage() {
     userProfileService
       .getProfile()
       .then(({ data }) => setUser(data))
-      .catch(() => {
+      .catch((err) => {
+        console.error('Falha ao carregar perfil:', err);
         setToast({
           open: true,
           message: 'Não foi possível carregar o perfil',
@@ -72,10 +73,23 @@ export default function ProfilePage() {
     await userProfileService.changePassword({ currentPassword, newPassword });
   };
 
-  if (isLoading || !user) {
+  if (isLoading) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', pt: 8 }}>
         <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (!user) {
+    return (
+      <Box sx={{ minHeight: '100dvh', bgcolor: 'background.default' }}>
+        <Toast
+          open={toast.open}
+          message={toast.message}
+          severity={toast.severity}
+          onClose={() => setToast((prev) => ({ ...prev, open: false }))}
+        />
       </Box>
     );
   }

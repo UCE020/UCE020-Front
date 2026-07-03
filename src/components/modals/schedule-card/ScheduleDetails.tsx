@@ -8,7 +8,7 @@ import type { ScheduleDetailsProps } from '@/types/scheduleCard';
 import { LabelChip } from '@/components';
 
 const labelSx = {
-  fontSize: 'clamp(8px, 3vw, 11px)',
+  fontSize: { xs: 12, sm: 11 },
   color: 'text.primary',
   display: '-webkit-box',
   WebkitLineClamp: 2,
@@ -25,6 +25,7 @@ const detailRowSx = {
   display: 'flex',
   alignItems: 'center',
   gap: 1,
+  minWidth: 0,
 };
 
 export default function ScheduleDetails({
@@ -36,7 +37,14 @@ export default function ScheduleDetails({
   status,
 }: ScheduleDetailsProps) {
   return (
-    <Box sx={{ width: '50%', aspectRatio: '1/1', position: 'relative', flexShrink: 0 }}>
+    <Box
+      sx={{
+        width: { xs: '100%', sm: '50%' },
+        aspectRatio: { xs: 'auto', sm: '1/1' },
+        position: 'relative',
+        flexShrink: 0,
+      }}
+    >
       <Box
         sx={{
           display: 'flex',
@@ -44,10 +52,11 @@ export default function ScheduleDetails({
           justifyContent: 'space-between',
           height: '100%',
           minWidth: 0,
-          px: 1,
+          px: { xs: 0, sm: 1 },
+          gap: { xs: 2, sm: 0 },
         }}
       >
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5, mt: 1 }}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5, mt: { xs: 0, sm: 1 } }}>
           <Box sx={detailRowSx}>
             <CalendarTodayRoundedIcon sx={iconSx} />
             <Typography sx={labelSx}>{formatActivityDate(startDate, endDate)}</Typography>

@@ -10,7 +10,6 @@ import CancelRoundedIcon from '@mui/icons-material/CancelRounded';
 import TextInput from '@/components/ui/inputs/TextInput';
 import { Button } from '@/components/ui/Button';
 import type { UserProfile } from '@/types/userProfile';
-import EditRoundedIcon from '@mui/icons-material/EditRounded';
 
 interface ProfileFormProps {
   user: UserProfile;

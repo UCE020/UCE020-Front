@@ -10,6 +10,7 @@ import CancelRoundedIcon from '@mui/icons-material/CancelRounded';
 import TextInput from '@/components/ui/inputs/TextInput';
 import { Button } from '@/components/ui/Button';
 import type { UserProfile } from '@/types/userProfile';
+import EditRoundedIcon from '@mui/icons-material/EditRounded';
 
 interface ProfileFormProps {
   user: UserProfile;
@@ -173,6 +174,15 @@ export function ProfileForm({ user, onSave, isEditing, onEditChange, onChangePas
               placeholder="seu@email.com"
             />
           </Box>
+          {/* <Box>
+            <PasswordInput
+              label="Senha"
+              value={formData.password || ''}
+              onChange={(value) => handleInputChange('password', value)}
+              disabled={!isEditing}
+              showVisibilityToggle
+            />
+          </Box> */}
         </Box>
       </Box>
 

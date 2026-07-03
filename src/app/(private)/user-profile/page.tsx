@@ -6,16 +6,35 @@ import { Box, CircularProgress } from '@mui/material';
 import { ProfileHeader, ProfileForm } from '@/features/user-profile';
 import type { UserProfile } from '@/types/userProfile';
 import { userProfileService } from '@/services/userProfileService';
+import { Toast } from '@/components/ui/Toast';
+import { ToastSeverity } from '@/types/toast';
+import { isAxiosError } from 'axios';
 
 export default function ProfilePage() {
   const [isEditing, setIsEditing] = useState(false);
   const [user, setUser] = useState<UserProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [toast, setToast] = useState<{
+    open: boolean;
+    message: string;
+    severity: ToastSeverity;
+  }>({
+    open: false,
+    message: '',
+    severity: ToastSeverity.Error,
+  });
 
   useEffect(() => {
     userProfileService
       .getProfile()
       .then(({ data }) => setUser(data))
+      .catch(() => {
+        setToast({
+          open: true,
+          message: 'Não foi possível carregar o perfil',
+          severity: ToastSeverity.Error,
+        });
+      })
       .finally(() => setIsLoading(false));
   }, []);
 
@@ -74,6 +93,13 @@ export default function ProfilePage() {
           onChangePassword={handleChangePassword}
         />
       </Box>
+
+      <Toast
+        open={toast.open}
+        message={toast.message}
+        severity={toast.severity}
+        onClose={() => setToast((prev) => ({ ...prev, open: false }))}
+      />
     </Box>
   );
 }

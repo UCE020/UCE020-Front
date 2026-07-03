@@ -263,7 +263,7 @@ export function EventDetailView({ eventId }: EventDetailViewProps) {
       .unsubscribe(numericEventId)
       .then(() => {
         setIsSubscribed(false);
-        setToast({ open: true, message: 'Inscrição cancelada', severity: ToastSeverity.Success });
+        router.push('/home');
       })
       .catch((error) => {
         setToast({

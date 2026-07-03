@@ -99,11 +99,7 @@ export default function HomePage() {
       dispatch({ type: 'RESET' });
       setSearchCode('');
       setCode('');
-      setFeedback({
-        open: true,
-        message: 'Inscrição realizada com sucesso',
-        severity: ToastSeverity.Success,
-      });
+      router.push(`/event/${eventId}`);
     } catch (error) {
       const message =
         isAxiosError(error) && typeof error.response?.data?.message === 'string'

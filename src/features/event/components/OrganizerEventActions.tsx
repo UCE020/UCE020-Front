@@ -66,15 +66,17 @@ export function OrganizerEventActions({ eventId, isFinalized = false, onFinalize
       >
         Gerenciar Membros
       </Button>
-      <Button
-        variant="outlined"
-        color="secondary"
-        fullWidth
-        onClick={onEditEvent}
-        sx={{ ...actionButtonSx }}
-      >
-        Editar
-      </Button>
+      {!isFinalized && (
+        <Button
+          variant="outlined"
+          color="secondary"
+          fullWidth
+          onClick={onEditEvent}
+          sx={{ ...actionButtonSx }}
+        >
+          Editar
+        </Button>
+      )}
       {!isFinalized && (
         <Button
           variant="contained"

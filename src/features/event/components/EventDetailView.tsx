@@ -330,6 +330,15 @@ export function EventDetailView({ eventId }: EventDetailViewProps) {
     router.push('/home');
   }
 
+  function handleEventFinalized() {
+    setEvent((prev) => (prev ? { ...prev, status: 'finalizada' } : prev));
+    setToast({ open: true, message: 'Evento finalizado com sucesso', severity: ToastSeverity.Success });
+  }
+
+  function handleFinalizeError(message: string) {
+    setToast({ open: true, message, severity: ToastSeverity.Error });
+  }
+
   async function handleCopyEventCode() {
     if (!event?.codigo) return;
 
@@ -621,7 +630,14 @@ export function EventDetailView({ eventId }: EventDetailViewProps) {
           />
         )}
 
-        {isOrganizer && <OrganizerEventActions />}
+        {isOrganizer && (
+          <OrganizerEventActions
+            eventId={event.id}
+            isFinalized={event.status.toLowerCase() === 'finalizada'}
+            onFinalized={handleEventFinalized}
+            onFinalizeError={handleFinalizeError}
+          />
+        )}
 
         <EventActivitiesSection
           activities={activities}

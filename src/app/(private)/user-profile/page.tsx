@@ -39,24 +39,37 @@ export default function ProfilePage() {
   }, []);
 
   const handleSaveProfile = async (userData: UserProfile) => {
+    const previousUser = user;
+
+    setUser(userData);
+
     try {
-      const { data: updated } = await userProfileService.updateProfile({
+      const { data } = await userProfileService.updateProfile({
         name: userData.name,
         email: userData.email,
       });
-      setUser(updated);
-      setToast({
-        open: true,
-        message: 'Perfil atualizado com sucesso',
-        severity: ToastSeverity.Success,
-      });
-    } catch (error) {
-      const message =
-        isAxiosError(error) && typeof error.response?.data?.message === 'string'
-          ? error.response.data.message
-          : 'Não foi possível salvar as alterações';
-      setToast({ open: true, message, severity: ToastSeverity.Error });
+      setUser(data);
+    } catch (err) {
+      // Em caso de erro, reverte para os dados anteriores
+      console.error('Falha ao salvar perfil:', err);
+      setUser(previousUser);
     }
+  };
+
+  const handleAvatarChange = async (file: File) => {
+    if (!user) return;
+
+    try {
+      const { data } = await userProfileService.uploadAvatar(file);
+      // Atualiza a URL do avatar retornada pelo backend
+      setUser((prev) => (prev ? { ...prev, avatarUrl: data.avatarUrl } : prev));
+    } catch (err) {
+      console.error('Falha ao enviar foto de perfil:', err);
+    }
+  };
+
+  const handleChangePassword = async (currentPassword: string, newPassword: string) => {
+    await userProfileService.changePassword({ currentPassword, newPassword });
   };
 
   if (isLoading || !user) {
@@ -69,14 +82,15 @@ export default function ProfilePage() {
 
   return (
     <Box sx={{ minHeight: '100dvh', bgcolor: 'background.default' }}>
-      <ProfileHeader user={user} />
+      <ProfileHeader user={user} onAvatarChange={handleAvatarChange} />
 
-      <Box sx={{ maxWidth: 600, mx: 'auto', px: 3, pb: 4 }}>
+      <Box sx={{ maxWidth: 600, mx: 'auto', px: 3, pt: 4, pb: 4 }}>
         <ProfileForm
           user={user}
           onSave={handleSaveProfile}
           isEditing={isEditing}
           onEditChange={setIsEditing}
+          onChangePassword={handleChangePassword}
         />
       </Box>
 

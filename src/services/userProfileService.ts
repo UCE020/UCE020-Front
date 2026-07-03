@@ -47,6 +47,26 @@ class UserProfileService {
       statusCode: data.statusCode,
     };
   }
+
+  async uploadAvatar(file: File): Promise<{ data: { avatarUrl: string }; statusCode: number }> {
+    const formData = new FormData();
+    formData.append('avatar', file);
+
+    const { data } = await api.post<{ data: { avatarUrl: string }; statusCode: number }>(
+      '/user/me/avatar',
+      formData,
+      { headers: { 'Content-Type': 'multipart/form-data' } }
+    );
+
+    return data;
+  }
+
+  async changePassword(payload: { currentPassword: string; newPassword: string }): Promise<void> {
+    await api.patch('/user/me/password', {
+      senhaAtual: payload.currentPassword,
+      novaSenha: payload.newPassword,
+    });
+  }
 }
 
 export const userProfileService = new UserProfileService();

@@ -1,13 +1,12 @@
-//import { MOCK_EVENTS } from '@/mocks/event';
 import type { PresenceValidationContext } from '@/types/presence';
 
-//OBS de Sara: Foi comentado pq acabei excluindo MOCK_EVENTS
-//Para testar, modificar para pegar eventos reais no banco
+// TODO: MOCK_EVENTS foi removido. As funções abaixo estão
+// como stub temporário até existir uma fonte real de eventos (API/DB).
+// Quando isso estiver pronto, substituir os retornos abaixo pela busca real.
 
-//export function resolveEventName(eventId: string): string  {
-//const event = MOCK_EVENTS[eventId as keyof typeof MOCK_EVENTS];
-//return event?.name ?? eventId;
-//}
+export function resolveEventName(eventId: string): string {
+  return eventId;
+}
 
 // null se n tiver eventId/activityId ou invalidos
 export function requirePresenceContext(
@@ -16,17 +15,12 @@ export function requirePresenceContext(
 ): PresenceValidationContext | null {
   if (!eventId || !activityId) return null;
 
-  //const event = MOCK_EVENTS[eventId as keyof typeof MOCK_EVENTS];
-  if (!event) return null;
-
-  //const activity = event.activities.find((item) => item.id === activityId);
-  //if (!activity) return null;
-
-  //return {
-  // eventId,
-  // activityId,
-  //activityTitle: activity.title,
-  //eventName: event.name,
-  //};
-  return null;
+  // TODO: stub temporário — troque por dados reais assim que houver uma
+  // fonte de eventos/atividades (API/DB) para substituir o MOCK_EVENTS.
+  return {
+    eventId,
+    activityId,
+    activityTitle: activityId,
+    eventName: resolveEventName(eventId),
+  };
 }

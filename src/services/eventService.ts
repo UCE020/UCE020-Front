@@ -53,6 +53,11 @@ class EventService {
     return data.data;
   }
 
+  async finalize(id: number): Promise<Event> {
+    const { data } = await api.patch<EventResponse>(`/event/${id}/finalizar`);
+    return data.data;
+  }
+
   async findByCodigo(codigo: string): Promise<Event> {
     const { data } = await api.get<EventResponse>(`/event/codigo/${codigo}`);
     return data.data;

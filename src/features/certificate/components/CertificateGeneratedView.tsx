@@ -81,31 +81,23 @@ export function CertificatesGeneratedView({eventoId}: CertificatesGeneratedViewP
 
   return (
     <>
+      {/* Header */}
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <Box>
           <Typography
             sx={{ fontWeight: 700, fontSize: { xs: '1.3rem', sm: '1.5rem' }, color: '#0F1D35' }}
           >
             Certificados{' '}
-            <Box component="span" sx={{ color: '#2EC4A0' }}>
-              Gerados
-            </Box>
+            <Box component="span" sx={{ color: '#2EC4A0' }}>Gerados</Box>
           </Typography>
-          <Typography
-            sx={{ fontSize: 12, color: '#64748B', mt: 0.5, maxWidth: 280, lineHeight: 1.5 }}
-          >
+          <Typography sx={{ fontSize: 12, color: '#64748B', mt: 0.5, maxWidth: 280, lineHeight: 1.5 }}>
             Visualize e gerencie os certificados gerados para o seu evento.
           </Typography>
         </Box>
         <Box
           sx={{
-            width: 90,
-            height: 90,
-            bgcolor: '#E8F5F2',
-            borderRadius: '12px',
-            display: { xs: 'none', sm: 'flex' },
-            alignItems: 'center',
-            justifyContent: 'center',
+            width: 90, height: 90, bgcolor: '#E8F5F2', borderRadius: '12px',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
             border: '1.5px dashed #2EC4A0',
           }}
         >
@@ -115,11 +107,10 @@ export function CertificatesGeneratedView({eventoId}: CertificatesGeneratedViewP
 
       <CertificateStatsRow stats={roleStats} />
       <CertificateSummaryCard totalIssued={totalIssued} statusTotals={statusTotals} />
+
       <CertificateBatchActions onSignBatch={handleSignBatch} onSendBatch={handleSendBatch} />
       <CertificateFilterTabs activeTab={roleTab} onChange={setRoleTab} />
-
       <Searchbar value={search} onChange={setSearch} placeholder="Buscar participante" />
-
       <CertificateFilters
         activityDraft={activityDraft}
         statusDraft={statusDraft}
@@ -129,7 +120,6 @@ export function CertificatesGeneratedView({eventoId}: CertificatesGeneratedViewP
         onStatusChange={setStatusDraft}
         onApply={applyFilters}
       />
-
       <CertificateListHeader
         count={filteredCertificates.length}
         sortOrder={sortOrder}
@@ -138,23 +128,12 @@ export function CertificatesGeneratedView({eventoId}: CertificatesGeneratedViewP
 
       <ContentCard sx={{ px: 2, py: filteredCertificates.length === 0 ? 4 : 0 }}>
         {filteredCertificates.length === 0 ? (
-          <Box
-            sx={{
-              display:        'flex',
-              flexDirection:  'column',
-              alignItems:     'center',
-              justifyContent: 'center',
-              py:             6,
-              gap:            1.5,
-            }}
-          >
+          <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', py: 6, gap: 1.5 }}>
             <ArticleOutlinedIcon sx={{ fontSize: 48, color: '#CBD5E1' }} />
             <Typography sx={{ fontWeight: 600, fontSize: 15, color: '#0F1D35' }}>
               Nenhum certificado gerado ainda
             </Typography>
-            <Typography
-              sx={{ fontSize: 13, color: '#64748B', textAlign: 'center', maxWidth: 280 }}
-            >
+            <Typography sx={{ fontSize: 13, color: '#64748B', textAlign: 'center', maxWidth: 280 }}>
               Os certificados aparecerão aqui após serem gerados para os participantes do evento.
             </Typography>
           </Box>
@@ -183,8 +162,7 @@ export function CertificatesGeneratedView({eventoId}: CertificatesGeneratedViewP
           leftIcon={<RefreshIcon sx={{ fontSize: 18 }} />}
           onClick={loadMore}
           sx={{
-            borderColor: '#E2E8F0',
-            color: '#2EC4A0',
+            borderColor: '#E2E8F0', color: '#2EC4A0',
             '&:hover': { borderColor: '#2EC4A0', bgcolor: 'transparent' },
           }}
         >

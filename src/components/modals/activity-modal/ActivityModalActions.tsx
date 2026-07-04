@@ -29,7 +29,7 @@ export function ActivityModalActions({
     <Box
       sx={{
         display: 'flex',
-        flexDirection: 'row',
+        flexDirection: { xs: 'column', sm: 'row' },
         justifyContent: 'center',
         gap: 1,
         width: '100%',
@@ -42,7 +42,7 @@ export function ActivityModalActions({
           color="secondary"
           onClick={onSignup}
           fullWidth
-          sx={{ ...actionButtonSx, maxWidth: 160 }}
+          sx={{ ...actionButtonSx, maxWidth: { xs: '100%', sm: 160 }, alignSelf: 'center' }}
         >
           Inscrever-se
         </Button>

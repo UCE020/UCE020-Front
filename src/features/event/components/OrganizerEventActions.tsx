@@ -48,6 +48,7 @@ export function OrganizerEventActions({ eventId, isFinalized = false, onFinalize
     try {
       await eventService.finalize(eventId);
       onFinalized?.();
+      router.push(`/certificate/generated/${eventId}`);
     } catch (error) {
       onFinalizeError?.(extractErrorMessage(error, 'Não foi possível finalizar o evento'));
     } finally {

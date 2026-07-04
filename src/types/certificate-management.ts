@@ -12,3 +12,10 @@ export interface CertificateManagementItem {
   issueDate: string;
   imageUrl?: string;
 }
+
+export interface CertificatePageResponse {
+  items: CertificateManagementItem[];
+  total: number;
+  page:  number;
+  limit: number;
+}

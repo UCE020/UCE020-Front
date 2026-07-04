@@ -17,7 +17,11 @@ import { CertificateFilterTabs } from './CertificateFilterTabs';
 import { CertificateFilters } from './CertificateFilters';
 import { CertificateListHeader } from './CertificateListHeader';
 
-export function CertificatesGeneratedView() {
+interface CertificatesGeneratedViewProps {
+  eventoId: number;
+}
+
+export function CertificatesGeneratedView({eventoId}: CertificatesGeneratedViewProps) {
   const router = useRouter();
   const {
     filteredCertificates,
@@ -37,7 +41,11 @@ export function CertificatesGeneratedView() {
     statusOptions,
     sortOrder,
     toggleSortOrder,
-  } = useCertificatesGenerated();
+    isLoading,
+    isError,
+    loadMore,
+    hasMore,
+  } = useCertificatesGenerated(eventoId);
 
   const handleView = (certificate: CertificateManagementItem) =>
     router.push(`/certificate/${certificate.id}`);
@@ -49,7 +57,27 @@ export function CertificatesGeneratedView() {
     console.log('TODO: excluir certificado', certificate.id);
   const handleSignBatch = () => console.log('TODO: assinar em lote');
   const handleSendBatch = () => console.log('TODO: encaminhar certificados');
-  const handleLoadMore = () => console.log('TODO: carregar mais');
+  const handleLoadMore = () => loadMore();
+
+  if (isLoading) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', mt: 8 }}>
+        <Typography sx={{ color: '#64748B', fontSize: 14 }}>
+          Carregando certificados...
+        </Typography>
+      </Box>
+    );
+  }
+
+  if (isError) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', mt: 8 }}>
+        <Typography sx={{ color: '#EF4444', fontSize: 14 }}>
+          Não foi possível carregar os certificados. Tente novamente.
+        </Typography>
+      </Box>
+    );
+  }
 
   return (
     <>
@@ -110,9 +138,26 @@ export function CertificatesGeneratedView() {
 
       <ContentCard sx={{ px: 2, py: filteredCertificates.length === 0 ? 4 : 0 }}>
         {filteredCertificates.length === 0 ? (
-          <Typography sx={{ fontSize: 13, color: '#94A3B8', textAlign: 'center' }}>
-            Nenhum certificado encontrado.
-          </Typography>
+          <Box
+            sx={{
+              display:        'flex',
+              flexDirection:  'column',
+              alignItems:     'center',
+              justifyContent: 'center',
+              py:             6,
+              gap:            1.5,
+            }}
+          >
+            <ArticleOutlinedIcon sx={{ fontSize: 48, color: '#CBD5E1' }} />
+            <Typography sx={{ fontWeight: 600, fontSize: 15, color: '#0F1D35' }}>
+              Nenhum certificado gerado ainda
+            </Typography>
+            <Typography
+              sx={{ fontSize: 13, color: '#64748B', textAlign: 'center', maxWidth: 280 }}
+            >
+              Os certificados aparecerão aqui após serem gerados para os participantes do evento.
+            </Typography>
+          </Box>
         ) : (
           filteredCertificates.map((certificate, index) => (
             <Box key={certificate.id}>
@@ -131,19 +176,21 @@ export function CertificatesGeneratedView() {
         )}
       </ContentCard>
 
-      <Button
-        variant="outlined"
-        fullWidth
-        leftIcon={<RefreshIcon sx={{ fontSize: 18 }} />}
-        onClick={handleLoadMore}
-        sx={{
-          borderColor: '#E2E8F0',
-          color: '#2EC4A0',
-          '&:hover': { borderColor: '#2EC4A0', bgcolor: 'transparent' },
-        }}
-      >
-        Carregar mais
-      </Button>
+      {hasMore && (
+        <Button
+          variant="outlined"
+          fullWidth
+          leftIcon={<RefreshIcon sx={{ fontSize: 18 }} />}
+          onClick={loadMore}
+          sx={{
+            borderColor: '#E2E8F0',
+            color: '#2EC4A0',
+            '&:hover': { borderColor: '#2EC4A0', bgcolor: 'transparent' },
+          }}
+        >
+          Carregar mais
+        </Button>
+      )}
     </>
   );
 }

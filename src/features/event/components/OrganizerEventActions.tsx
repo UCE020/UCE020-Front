@@ -16,7 +16,7 @@ export function OrganizerEventActions({ eventId }: { eventId: number }) {
   const router = useRouter();
 
   function onManageMembers() {
-    router.push('/manage-users');
+    router.push(`/event/${eventId}/manage-users`);
   }
 
   function onEditEvent() {

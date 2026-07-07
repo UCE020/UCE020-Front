@@ -29,7 +29,7 @@ import { participationService } from '@/services/participationService';
 import { EventSubscriptionAction } from './EventSubscriptionAction';
 import { ToastSeverity } from '@/types/toast';
 import { Toast } from '@/components/ui/Toast';
-import { isAxiosError } from 'axios';
+import { extractApiErrorMessage } from '@/utils/apiError';
 
 interface EventDetailViewProps {
   eventId: string;
@@ -230,13 +230,6 @@ export function EventDetailView({ eventId }: EventDetailViewProps) {
     };
   }, [eventId]);
 
-  function extractErrorMessage(error: unknown, fallback: string): string {
-    if (isAxiosError(error) && typeof error.response?.data?.message === 'string') {
-      return error.response.data.message;
-    }
-    return fallback;
-  }
-
   function handleSubscribe() {
     const numericEventId = Number(eventId);
     setIsSubscriptionLoading(true);
@@ -249,7 +242,7 @@ export function EventDetailView({ eventId }: EventDetailViewProps) {
       .catch((error) => {
         setToast({
           open: true,
-          message: extractErrorMessage(error, 'Não foi possível concluir a inscrição'),
+          message: extractApiErrorMessage(error, 'Não foi possível concluir a inscrição'),
           severity: ToastSeverity.Error,
         });
       })
@@ -268,7 +261,7 @@ export function EventDetailView({ eventId }: EventDetailViewProps) {
       .catch((error) => {
         setToast({
           open: true,
-          message: extractErrorMessage(error, 'Não foi possível cancelar a inscrição'),
+          message: extractApiErrorMessage(error, 'Não foi possível cancelar a inscrição'),
           severity: ToastSeverity.Error,
         });
       })

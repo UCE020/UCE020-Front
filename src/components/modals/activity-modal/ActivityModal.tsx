@@ -25,7 +25,20 @@ export default function ActivityModal({
   onListParticipants,
 }: ActivityModalProps) {
   return (
-    <ModalContainer open={open} onClose={onClose}>
+    <ModalContainer
+      open={open}
+      onClose={onClose}
+      paperSx={{
+        width: { xs: 'calc(100vw - 24px)', sm: 520 },
+        maxWidth: 'calc(100vw - 24px)',
+        maxHeight: 'calc(100dvh - 24px)',
+        borderRadius: { xs: '20px', sm: '24px' },
+        border: '1px solid',
+        borderColor: 'warning.main',
+        p: { xs: 2, sm: 3 },
+        overflowY: 'auto',
+      }}
+    >
       <CloseButton onClick={onClose} />
 
       <ScheduleCard

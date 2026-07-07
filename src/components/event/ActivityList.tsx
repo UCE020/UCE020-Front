@@ -88,7 +88,7 @@ export function ActivityList({
                   }}
                 >
                   <ListItemText
-                    primary={activity.title}
+                    primary={activity.name}
                     slotProps={{
                       primary: {
                         sx: {

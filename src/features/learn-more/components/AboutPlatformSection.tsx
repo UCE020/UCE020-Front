@@ -1,6 +1,5 @@
 'use client';
 
-import Image from 'next/image';
 import { Box, Typography, Container, IconButton } from '@mui/material';
 import { ArrowBack } from '@mui/icons-material';
 import SchoolRoundedIcon from '@mui/icons-material/SchoolRounded';

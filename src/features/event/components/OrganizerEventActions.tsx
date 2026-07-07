@@ -12,15 +12,15 @@ const actionButtonSx = {
   flex: 1
 } as const;
 
-export function OrganizerEventActions() {
+export function OrganizerEventActions({ eventId }: { eventId: number }) {
   const router = useRouter();
 
   function onManageMembers() {
-    router.push('/manage-users');
+    router.push(`/event/${eventId}/manage-users`);
   }
 
   function onEditEvent() {
-    router.push('/event/edit');
+    router.push(`/event/${eventId}/edit`);
   }
 
   function onFinalizeEvent() {

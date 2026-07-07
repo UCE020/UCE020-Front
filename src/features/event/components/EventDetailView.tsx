@@ -299,7 +299,7 @@ export function EventDetailView({ eventId }: EventDetailViewProps) {
     : false;
 
   const activityModalVariant = getActivityModalVariant(role, isActivityEnrolled);
-  const activities: Activity[] = [];
+  const activities = event?.atividades ?? [];
   const shouldClampDescription = !!event?.descricao && event.descricao.length > 180;
 
   function handleSignup() {
@@ -621,7 +621,7 @@ export function EventDetailView({ eventId }: EventDetailViewProps) {
           />
         )}
 
-        {isOrganizer && <OrganizerEventActions eventId={eventId} />}
+        {isOrganizer && <OrganizerEventActions eventId={Number(event.id)} />}
 
         <EventActivitiesSection
           activities={activities}
@@ -635,12 +635,12 @@ export function EventDetailView({ eventId }: EventDetailViewProps) {
           setSelectedActivity(null);
           setIsQrModalOpen(false);
         }}
-        title={selectedActivity?.title ?? ''}
+        title={selectedActivity?.name ?? ''}
         image={event.foto ?? undefined}
         startDate={selectedActivity?.startDate ?? ''}
         endDate={selectedActivity?.endDate ?? ''}
-        location={event.localizacao}
-        hours={event.cargaHoraria}
+        location={selectedActivity?.location ?? event.localizacao ?? ''}
+        hours={Number(selectedActivity?.workload) ?? event.cargaHoraria ?? 0}
         participantsCount={0}
         status={selectedActivity?.status ?? ''}
         description={selectedActivity?.description ?? ''}
@@ -660,7 +660,7 @@ export function EventDetailView({ eventId }: EventDetailViewProps) {
             participantId: String(user?.id ?? ''),
             participantName: user.name,
             activityId: selectedActivity.id,
-            activityTitle: selectedActivity.title,
+            activityTitle: selectedActivity.name,
             eventId,
           }}
         />

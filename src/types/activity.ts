@@ -29,11 +29,25 @@ export interface ActivityDetailProps {
   date: DateLike;
 }
 
-export interface Activity {
+export type Activity = {
   id: string;
-  title: string;
-  description?: string;
-  startDate?: string;
-  endDate?: string;
-  status?: string;
+  name: string;
+  category: string;
+  location: string;
+  workload: string;
+  description: string;
+  startDate: string;
+  endDate: string;
+  startTime: string;
+  endTime: string;
+  status: string;
+  guests?: ActivityGuest[];
+  createdAt?: string;
+  updatedAt?: string;
 }
+
+export type ActivityGuest = {
+  name: string;
+  email: string;
+  role: string;
+};

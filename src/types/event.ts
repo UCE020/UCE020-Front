@@ -1,3 +1,5 @@
+import type { Activity } from '@/types/activity';
+
 export interface Event {
   id: number;
   nome: string;
@@ -10,6 +12,7 @@ export interface Event {
   dataFim: string;
   status: string;
   foto: string | null;
+  atividades?: Activity[];
   createdAt: string;
   updatedAt: string;
   totalInscritos?: number;

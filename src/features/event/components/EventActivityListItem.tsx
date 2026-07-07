@@ -63,7 +63,7 @@ export function EventActivityListItem({ activity, onSelect }: EventActivityListI
           textOverflow: 'ellipsis',
         }}
       >
-        {activity.title}
+        {activity.name}
       </Typography>
       <ArrowForwardIosRoundedIcon sx={{ width: 22, height: 22, color: colorTokens.text.primary }} />
     </Box>

@@ -5,7 +5,7 @@ export { ParticipantQrCodeModal } from './components/ParticipantQrCodeModal';
 export { PresenceContextMissing } from './components/PresenceContextMissing';
 export { RemovePresenceModal } from './components/RemovePresenceModal';
 export { buildListParticipantsPath, buildValidatePresencePath } from './utils/routes';
-export { requirePresenceContext, resolveEventName } from './utils/resolvePresenceContext';
+export { requirePresenceContext } from './utils/resolvePresenceContext';
 export { validatePresenceScan } from './utils/validatePresenceScan';
 export { getParticipantsForActivity } from './utils/getParticipantsForActivity';
 export { getConfirmPresenceMessage, getRemovePresenceMessage, getRemoveStaffMessage } from './utils/presenceMessages';

@@ -1,14 +1,18 @@
 'use client';
 
-import { useState, useEffect, useReducer, useCallback } from 'react';
+import { useState, useEffect, useReducer, useCallback, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import { Box } from '@mui/material';
 import { Event } from '@/types/event';
 import { Searchbar, Toast } from '@/components/ui';
+import { EventList } from '@/components/event';
 import { ToastSeverity } from '@/types/toast';
 import { ActivityModal } from '@/components/modals';
-import { GreetingSection, QuickActions, EventList, useHomeEvents } from '@/features/home';
+import { GreetingSection, QuickActions, useHomeEvents } from '@/features/home';
 import { useAuth } from '@/providers/auth-provider';
 import { eventService } from '@/services/eventService';
+import { participationService } from '@/services/participationService';
+import { isAxiosError } from 'axios';
 
 type SearchState =
   | { status: 'idle' }
@@ -32,12 +36,19 @@ function searchReducer(_: SearchState, action: SearchAction): SearchState {
 }
 
 export default function HomePage() {
+  const router = useRouter();
   const { user } = useAuth();
   const { filteredEvents } = useHomeEvents();
   const [code, setCode] = useState('');
   const [searchCode, setSearchCode] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
   const [toastOpen, setToastOpen] = useState(false);
+  const isSubscribingRef = useRef(false);
+  const [feedback, setFeedback] = useState<{ open: boolean; message: string; severity: ToastSeverity }>({
+    open: false,
+    message: '',
+    severity: ToastSeverity.Success,
+  });
   const [searchState, dispatch] = useReducer(searchReducer, { status: 'idle' });
 
   useEffect(() => {
@@ -74,15 +85,47 @@ export default function HomePage() {
     if (trimmed) setSearchCode(trimmed);
   }, [code]);
 
-  function handleEventClick() {
+  function handleEventClick(event: Event) {
     setModalOpen(false);
+    router.push(`/event/${event.id}`);
+  }
+
+  async function handleSignup(eventId: number) {
+    if (isSubscribingRef.current) return;
+    isSubscribingRef.current = true;
+    try {
+      await participationService.subscribe(eventId);
+      setModalOpen(false);
+      dispatch({ type: 'RESET' });
+      setSearchCode('');
+      setCode('');
+      router.push(`/event/${eventId}`);
+    } catch (error) {
+      const message =
+        isAxiosError(error) && typeof error.response?.data?.message === 'string'
+          ? error.response.data.message
+          : 'Não foi possível concluir a inscrição';
+      setFeedback({ open: true, message, severity: ToastSeverity.Error });
+    } finally {
+      isSubscribingRef.current = false;
+    }
   }
 
   return (
     <Box sx={{ minHeight: '100dvh', bgcolor: 'background.default' }}>
-      <Box sx={{ maxWidth: 1200, mx: 'auto', px: 3, py: 3 }}>
+      <Box
+        sx={{
+          maxWidth: 1200,
+          mx: 'auto',
+          px: { xs: 2.5, sm: 3 },
+          py: { xs: 2.5, sm: 3 },
+          display: 'flex',
+          flexDirection: 'column',
+          gap: { xs: 2.5, sm: 3 },
+        }}
+      >
         <form onSubmit={handleSubmit}>
-          <Searchbar value={code} onChange={setCode} placeholder="cód. do evento" />
+          <Searchbar value={code} onChange={setCode} placeholder="Pesquise o código do seu evento" />
         </form>
 
         <GreetingSection userName={user?.name?.split(' ')[0] || 'Usuário'} />
@@ -114,9 +157,16 @@ export default function HomePage() {
           status={searchState.event.status}
           description={searchState.event.descricao}
           variant="signup"
-          onSignup={() => console.log('Inscrever:', searchState.event.id)}
+          onSignup={() => handleSignup(searchState.event.id)}
         />
       )}
+
+      <Toast
+        open={feedback.open}
+        message={feedback.message}
+        severity={feedback.severity}
+        onClose={() => setFeedback((prev) => ({ ...prev, open: false }))}
+      />
     </Box>
   );
 }

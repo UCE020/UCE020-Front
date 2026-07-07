@@ -53,7 +53,7 @@ export default function SignCertificatePage({
     if (!signatureData) {
       setSnackbar({
         open: true,
-        message: 'Por favor, faça o upload da imagem da assinatura antes de assinar.',
+        message: 'Por favor, faça o upload da imagem da assinatura em PNG antes de assinar.',
         severity: 'error',
       });
       return;
@@ -62,7 +62,7 @@ export default function SignCertificatePage({
     setIsLoading(true);
     try {
       // TODO: Chamar API para salvar a assinatura dps
-      console.log('Assinando certificado:', {
+      console.log('Assinando certificados em Lote:', {
         certId: cert.id,
         signaturePosition,
         signatureData: signatureData.slice(0, 50) + '...',
@@ -72,16 +72,16 @@ export default function SignCertificatePage({
 
       setSnackbar({
         open: true,
-        message: 'Certificado assinado com sucesso!',
+        message: 'Certificados assinados com sucesso!',
         severity: 'success',
       });
 
       setTimeout(() => router.push('/certificate/list'), 1500);
     } catch (error) {
-      console.error('Erro ao assinar certificado:', error);
+      console.error('Erro ao assinar certificados:', error);
       setSnackbar({
         open: true,
-        message: 'Ocorreu um erro ao assinar o certificado. Tente novamente.',
+        message: 'Ocorreu um erro ao assinar os certificados. Tente novamente.',
         severity: 'error',
       });
     } finally {
@@ -113,7 +113,7 @@ export default function SignCertificatePage({
                 lineHeight: 1.2,
               }}
             >
-              Assinar Certificado
+              Assinar Certificados
             </Typography>
             <Typography
               variant="caption"
@@ -178,11 +178,11 @@ export default function SignCertificatePage({
             <br />
             1. Faça o upload da imagem da sua assinatura (PNG com fundo transparente é ideal).
             <br />
-            2. Arraste a assinatura para a posição desejada no certificado.
+            2. Arraste a assinatura para a posição desejada nos certificados.
             <br />
             3. Ajuste o tamanho usando os controles de zoom.
             <br />
-            4. Clique em <strong>Assinar Certificado</strong> para confirmar.
+            4. Clique em <strong>Assinar Certificados em Lote</strong> para confirmar.
           </Typography>
         </Box>
 
@@ -219,7 +219,7 @@ export default function SignCertificatePage({
             fullWidth
             leftIcon={<Draw sx={{ fontSize: 18 }} />}
           >
-            Assinar Certificado
+            Assinar Certificados em Lote
           </Button>
         </Box>
       </Container>

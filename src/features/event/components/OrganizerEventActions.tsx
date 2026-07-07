@@ -1,16 +1,36 @@
 'use client';
 
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Box } from '@mui/material';
 import { Button } from '@/components/ui';
 
 interface OrganizerEventActionsProps {
-  eventId: string;
+  eventId: number;
 }
 
-export function OrganizerEventActions({
-  eventId,
-}: OrganizerEventActionsProps) {
+const actionButtonSx = {
+  height: 36,
+  fontSize: 'clamp(10px, 3vw, 12px)',
+  fontWeight: 700,
+  whiteSpace: 'nowrap',
+  flex: 1,
+} as const;
+
+export function OrganizerEventActions({ eventId }: OrganizerEventActionsProps) {
+  const router = useRouter();
+
+  function onManageMembers() {
+    router.push(`/event/${eventId}/manage-users`);
+  }
+
+  function onEditEvent() {
+    router.push(`/event/${eventId}/edit`);
+  }
+
+  function onFinalizeEvent() {
+    console.log('Finalizar evento');
+  }
+
   return (
     <Box
       sx={{
@@ -23,33 +43,30 @@ export function OrganizerEventActions({
       }}
     >
       <Button
-        component={Link}
-        href={`/event/${eventId}/activity/create`}
+        onClick={onManageMembers}
         variant="contained"
         color="secondary"
-        sx={{
-          minWidth: 180,
-          textTransform: 'none',
-          borderRadius: '10px',
-          fontWeight: 700,
-        }}
+        sx={{ ...actionButtonSx, minWidth: 160, textTransform: 'none', borderRadius: '10px' }}
       >
-        Cadastrar atividade
+        Gerenciar usuários
       </Button>
 
       <Button
-        component={Link}
-        href={`/event/${eventId}/edit`}
+        onClick={onEditEvent}
         variant="outlined"
         color="secondary"
-        sx={{
-          minWidth: 160,
-          textTransform: 'none',
-          borderRadius: '10px',
-          fontWeight: 700,
-        }}
+        sx={{ ...actionButtonSx, minWidth: 160, textTransform: 'none', borderRadius: '10px' }}
       >
         Editar evento
+      </Button>
+
+      <Button
+        onClick={onFinalizeEvent}
+        variant="outlined"
+        color="secondary"
+        sx={{ ...actionButtonSx, minWidth: 160, textTransform: 'none', borderRadius: '10px' }}
+      >
+        Finalizar evento
       </Button>
     </Box>
   );

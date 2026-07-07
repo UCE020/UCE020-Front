@@ -12,7 +12,7 @@ import { GreetingSection, QuickActions, useHomeEvents } from '@/features/home';
 import { useAuth } from '@/providers/auth-provider';
 import { eventService } from '@/services/eventService';
 import { participationService } from '@/services/participationService';
-import { isAxiosError } from 'axios';
+import { extractApiErrorMessage } from '@/utils/apiError';
 
 type SearchState =
   | { status: 'idle' }
@@ -101,11 +101,11 @@ export default function HomePage() {
       setCode('');
       router.push(`/event/${eventId}`);
     } catch (error) {
-      const message =
-        isAxiosError(error) && typeof error.response?.data?.message === 'string'
-          ? error.response.data.message
-          : 'Não foi possível concluir a inscrição';
-      setFeedback({ open: true, message, severity: ToastSeverity.Error });
+      setFeedback({
+        open: true,
+        message: extractApiErrorMessage(error, 'Não foi possível concluir a inscrição'),
+        severity: ToastSeverity.Error,
+      });
     } finally {
       isSubscribingRef.current = false;
     }

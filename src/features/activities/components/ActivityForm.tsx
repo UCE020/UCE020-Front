@@ -696,6 +696,7 @@ export default function ActivityForm({
       </Box>
 
       <RegisterGuestModal
+        key={editingGuestIndex ?? 'new'}
         open={guestModalOpen}
         onClose={() => setGuestModalOpen(false)}
         activityTitle={form.name || 'Nova atividade'}

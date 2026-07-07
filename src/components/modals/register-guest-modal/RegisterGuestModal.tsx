@@ -18,26 +18,13 @@ export default function RegisterGuestModal({
   isLoading = false,
   initialValues,
 }: RegisterGuestModalProps) {
-  const [fullName, setFullName] = useState("");
-  const [role, setRole] = useState("");
-  const [email, setEmail] = useState("");
+  const [fullName, setFullName] = useState(initialValues?.fullName ?? "");
+  const [role, setRole] = useState(initialValues?.role ?? "");
+  const [email, setEmail] = useState(initialValues?.email ?? "");
   const [touched, setTouched] = useState({ fullName: false, role: false, email: false });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const isEditMode = Boolean(initialValues);
-
-  useEffect(() => {
-    if (open && initialValues) {
-      setFullName(initialValues.fullName);
-      setRole(initialValues.role);
-      setEmail(initialValues.email);
-    } else if (open && !initialValues) {
-      setFullName("");
-      setRole("");
-      setEmail("");
-    }
-    setTouched({ fullName: false, role: false, email: false });
-  }, [open, initialValues]);
 
   const errors: FieldErrors = (() => {
     const newErrors: FieldErrors = {};

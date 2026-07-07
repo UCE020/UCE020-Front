@@ -932,19 +932,23 @@ export default function EventForm({ mode, eventId }: EventFormProps) {
               height: isMobile ? '92dvh' : '100dvh',
               borderTopLeftRadius: isMobile ? 20 : 0,
               borderTopRightRadius: isMobile ? 20 : 0,
-              overflowY: 'auto',
+              background: colorTokens.neutral.white,
+              display: 'flex',
+              flexDirection: 'column',
             },
           },
         }}
       >
-        <ActivityForm
-          mode={editingActivity ? 'edit' : 'create'}
-          variant="embedded"
-          eventInfo={activityEventInfo}
-          initialValues={editingActivity ?? undefined}
-          onSubmit={handleActivitySubmit}
-          onCancel={handleCloseDrawer}
-        />
+        <Box sx={{ flex: 1, overflowY: 'auto' }}>
+          <ActivityForm
+            mode={editingActivity ? 'edit' : 'create'}
+            variant="embedded"
+            eventInfo={activityEventInfo}
+            initialValues={editingActivity ?? undefined}
+            onSubmit={handleActivitySubmit}
+            onCancel={handleCloseDrawer}
+          />
+        </Box>
       </Drawer>
     </Box>
   );

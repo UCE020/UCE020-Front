@@ -254,6 +254,7 @@ export default function ActivityForm({
     <Box
       sx={{
         minHeight: isEmbedded ? '100%' : '100dvh',
+        height: isEmbedded ? '100%' : 'auto', // ← adicionado
         background: isEmbedded ? 'transparent' : colorTokens.surface.background,
         overflowX: 'hidden',
       }}

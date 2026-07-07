@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Box, CircularProgress, IconButton, Typography } from '@mui/material';
 import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded';
@@ -42,9 +42,6 @@ const STATUS_STYLES: Record<string, { bg: string; color: string; label: string }
   finalizada: { bg: '#EAF7EE', color: '#35A384', label: 'Finalizada' },
 };
 
-// Mapeia o tipo retornado pela API (pt-BR) para o "role" usado nos componentes de UI.
-// ATENÇÃO: ajuste os valores da direita ('organizer' | 'monitor' | 'participant') se
-// getActivityModalVariant / OrganizerEventActions esperarem outros literais.
 const TIPO_TO_ROLE: Record<TipoParticipante, 'organizer' | 'monitor' | 'participant'> = {
   organizador: 'organizer',
   monitor: 'monitor',
@@ -129,6 +126,8 @@ export function EventDetailView({ eventId }: EventDetailViewProps) {
 
   const [participantType, setParticipantType] = useState<TipoParticipante | null>(null);
   const [isLoadingParticipation, setIsLoadingParticipation] = useState(true);
+  const numericEventId = Number(eventId);
+  const isValidEventId = Number.isFinite(numericEventId);
 
   const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null);
   const [isQrModalOpen, setIsQrModalOpen] = useState(false);
@@ -146,10 +145,9 @@ export function EventDetailView({ eventId }: EventDetailViewProps) {
 
   // Busca os dados do evento
   useEffect(() => {
-    const numericEventId = Number(eventId);
     let isMounted = true;
 
-    if (!Number.isFinite(numericEventId)) {
+    if (!isValidEventId) {
       Promise.resolve().then(() => {
         if (isMounted) {
           setSelectedActivity(null);
@@ -195,40 +193,7 @@ export function EventDetailView({ eventId }: EventDetailViewProps) {
     return () => {
       isMounted = false;
     };
-  }, [eventId]);
-
-  useEffect(() => {
-    const numericEventId = Number(eventId);
-    if (!Number.isFinite(numericEventId)) return;
-
-    let isMounted = true;
-
-    eventService
-      .findParticipatingEvents()
-      .then((events) => {
-        if (isMounted) {
-          setIsSubscribed(events.some((e) => e.id === numericEventId));
-        }
-      })
-      .catch((error) => {
-        if (isMounted) {
-          console.error('Falha ao verificar inscrição no evento:', error);
-          setToast({
-            open: true,
-            message: 'Não foi possível verificar sua inscrição neste evento',
-            severity: ToastSeverity.Warning,
-          });
-          setIsSubscribed(false);
-        }
-      })
-      .finally(() => {
-        if (isMounted) setIsCheckingSubscription(false);
-      });
-
-    return () => {
-      isMounted = false;
-    };
-  }, [eventId]);
+  }, [numericEventId, isValidEventId]);
 
   function extractErrorMessage(error: unknown, fallback: string): string {
     if (isAxiosError(error) && typeof error.response?.data?.message === 'string') {
@@ -237,8 +202,7 @@ export function EventDetailView({ eventId }: EventDetailViewProps) {
     return fallback;
   }
 
-  function handleSubscribe() {
-    const numericEventId = Number(eventId);
+  const handleSubscribe = useCallback(() => {
     setIsSubscriptionLoading(true);
     participationService
       .subscribe(numericEventId)
@@ -254,10 +218,9 @@ export function EventDetailView({ eventId }: EventDetailViewProps) {
         });
       })
       .finally(() => setIsSubscriptionLoading(false));
-  }
+  }, [numericEventId]); 
 
-  function handleUnsubscribe() {
-    const numericEventId = Number(eventId);
+  const handleUnsubscribe = useCallback(() => {
     setIsSubscriptionLoading(true);
     participationService
       .unsubscribe(numericEventId)
@@ -272,25 +235,42 @@ export function EventDetailView({ eventId }: EventDetailViewProps) {
           severity: ToastSeverity.Error,
         });
       })
-      .finally(() => setIsSubscriptionLoading(false));
-  }
+    .finally(() => setIsSubscriptionLoading(false));
+  }, [numericEventId, router]);
 
   // Busca o tipo de participação do usuário logado naquele evento
   useEffect(() => {
-  const numericEventId = Number(eventId);
-  participationService.getTipoParticipante(numericEventId)
-    .then((tipo: TipoParticipante) => {
-      console.log('[participação] tipo recebido:', tipo); // debug
-      setParticipantType(tipo);
-    })
-    .catch((err) => {
-      console.error('[participação] erro ao buscar tipo:', err); // debug
-      setParticipantType(null);
-    })
-    .finally(() => {
-      setIsLoadingParticipation(false);
-    });
-}, [eventId, user?.id]);
+    if (!isValidEventId) return;
+
+    let isMounted = true;
+
+    participationService.getTipoParticipante(numericEventId)
+      .then((tipo: TipoParticipante) => {
+        if (!isMounted) return;
+        setParticipantType(tipo);
+        setIsSubscribed(true);
+      })
+      .catch((err) => {
+        if (!isMounted) return;
+        setParticipantType(null);
+        setIsSubscribed(false);
+        if (err?.response?.status !== 404) {
+          setToast({
+            open: true,
+            message: 'Não foi possível verificar sua inscrição neste evento',
+            severity: ToastSeverity.Warning,
+          });
+        }
+      })
+      .finally(() => {
+        if (isMounted) {
+          setIsLoadingParticipation(false);
+          setIsCheckingSubscription(false);
+        }
+      });
+
+    return () => { isMounted = false; };
+  }, [numericEventId]);
 
   const role = participantType ? TIPO_TO_ROLE[participantType] : 'participant';
   const isOrganizer = role === 'organizer';
@@ -617,7 +597,7 @@ export function EventDetailView({ eventId }: EventDetailViewProps) {
           <DetailTile
             icon={<PersonRoundedIcon sx={{ fontSize: 21 }} />}
             label="Inscritos"
-            value="0 inscritos"
+            value={`${event.totalInscritos ?? 0} inscritos`}
           />
         </Box>
 

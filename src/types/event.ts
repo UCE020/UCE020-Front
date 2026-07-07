@@ -12,6 +12,7 @@ export interface Event {
   foto: string | null;
   createdAt: string;
   updatedAt: string;
+  totalInscritos?: number;
 }
 
 export interface EventCardProps {

@@ -27,6 +27,24 @@ interface EventsResponse {
   data: Event[];
 }
 
+export interface EventMember {
+  id: number;
+  usuarioId: number;
+  tipo: TipoParticipante;
+  nome: string;
+  email: string;
+}
+
+interface EventMembersResponse {
+  message: string;
+  data: EventMember[];
+}
+
+interface EventMemberResponse {
+  message: string;
+  data: EventMember;
+}
+
 class EventService {
   async create(payload: CreateEventPayload): Promise<Event> {
     const { data } = await api.post<EventResponse>('/event', payload);
@@ -67,7 +85,20 @@ class EventService {
     return data.data;
   }
 
+  async getEventMembers(eventId: number): Promise<EventMember[]> {
+    const { data } = await api.get<EventMembersResponse>(`/event/${eventId}/members`);
+    return data.data;
+  }
 
+  async updateEventMember(eventId: number, userId: number, tipo: TipoParticipante): Promise<EventMember> {
+    const { data } = await api.patch<EventMemberResponse>(`/event/${eventId}/members/${userId}`, { tipo });
+    return data.data;
+  }
+
+  async removeEventMember(eventId: number, userId: number): Promise<EventMember> {
+    const { data } = await api.delete<EventMemberResponse>(`/event/${eventId}/members/${userId}`);
+    return data.data;
+  }
 }
 
 export const eventService = new EventService();

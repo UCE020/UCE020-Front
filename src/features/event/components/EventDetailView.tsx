@@ -621,7 +621,7 @@ export function EventDetailView({ eventId }: EventDetailViewProps) {
           />
         )}
 
-        {isOrganizer && <OrganizerEventActions />}
+        {isOrganizer && <OrganizerEventActions eventId={eventId} />}
 
         <EventActivitiesSection
           activities={activities}

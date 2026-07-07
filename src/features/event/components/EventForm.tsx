@@ -30,6 +30,7 @@ import { colorTokens } from '@/lib/colors';
 import { useCreateEvent } from '../../evento/hooks/useCreateEvent';
 import { useEditEvent } from '../../evento/hooks/useEditEvent';
 import ActivityForm, { ActivityFormState } from '@/features/activities/components/ActivityForm';
+import { Activity, ActivityGuest } from '@/types';
 
 type EventFormMode = 'create' | 'edit';
 
@@ -199,12 +200,12 @@ export default function EventForm({ mode, eventId }: EventFormProps) {
 
       if (Array.isArray(existingEvent.atividades)) {
         setActivities(
-          existingEvent.atividades.map((a: any) => ({
+          existingEvent.atividades.map((a: Activity) => ({
             id: String(a.id),
             name: a.name ?? '',
             category: a.category ?? '',
             guests: a.guests
-              ? a.guests.map((g: any) => ({
+              ? a.guests.map((g: ActivityGuest) => ({
                   name: g.name ?? '',
                   email: g.email ?? '',
                   role: g.role ?? '',

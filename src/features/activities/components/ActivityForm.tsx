@@ -48,10 +48,7 @@ export type ActivityFormState = {
   guests: ActivityGuest[];
 };
 
-type TouchedState = Record<
-  Exclude<keyof ActivityFormState, 'guests'>,
-  boolean
->;
+type TouchedState = Record<Exclude<keyof ActivityFormState, 'guests'>, boolean>;
 
 export type ActivityEventInfo = {
   title: string;
@@ -72,9 +69,8 @@ const CATEGORY_OPTIONS = [
 
 const GUEST_ROLE_OPTIONS = [
   { value: 'palestrante', label: 'Palestrante' },
-  { value: 'convidado', label: 'Convidado' },
-  { value: 'organizador', label: 'Organizador' },
-  { value: 'monitor', label: 'Monitor' },
+  { value: 'ministrante', label: 'Ministrante' },
+  { value: 'moderador', label: 'Moderador' },
 ];
 
 const EMPTY_FORM: ActivityFormState = {
@@ -190,6 +186,7 @@ export default function ActivityForm({
   const [touched, setTouched] = useState<TouchedState>(createTouchedState);
 
   const [guestModalOpen, setGuestModalOpen] = useState(false);
+  const [editingGuestIndex, setEditingGuestIndex] = useState<number | null>(null);
 
   const errors = useMemo(() => getErrors(form, touched), [form, touched]);
   const canSubmit = isFormValid(form, errors);
@@ -210,14 +207,34 @@ export default function ActivityForm({
   }
 
   async function handleGuestSubmit(payload: { fullName: string; role: string; email: string }) {
-    setForm((cur) => ({
-      ...cur,
-      guests: [...cur.guests, { name: payload.fullName, email: payload.email, role: payload.role }],
-    }));
+    const guestData = { name: payload.fullName, email: payload.email, role: payload.role };
+
+    setForm((cur) => {
+      if (editingGuestIndex !== null) {
+        // edição: substitui no índice correto
+        const next = [...cur.guests];
+        next[editingGuestIndex] = guestData;
+        return { ...cur, guests: next };
+      }
+      // criação: adiciona no final
+      return { ...cur, guests: [...cur.guests, guestData] };
+    });
+
+    setEditingGuestIndex(null);
   }
 
   function handleRemoveGuest(index: number) {
     setForm((cur) => ({ ...cur, guests: cur.guests.filter((_, i) => i !== index) }));
+  }
+
+  function handleOpenEditGuest(index: number) {
+    setEditingGuestIndex(index);
+    setGuestModalOpen(true);
+  }
+
+  function handleCloseGuestModal() {
+    setGuestModalOpen(false);
+    setEditingGuestIndex(null);
   }
 
   function handleSubmit() {
@@ -339,9 +356,7 @@ export default function ActivityForm({
             </Box>
 
             <Box>
-              <Typography
-                sx={{ fontSize: 13, fontWeight: 600, color: colorTokens.text.primary }}
-              >
+              <Typography sx={{ fontSize: 13, fontWeight: 600, color: colorTokens.text.primary }}>
                 {displayedEvent.title}
               </Typography>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
@@ -353,9 +368,7 @@ export default function ActivityForm({
                 </Typography>
               </Box>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                <LocationOnOutlinedIcon
-                  sx={{ fontSize: 12, color: colorTokens.neutral.gray500 }}
-                />
+                <LocationOnOutlinedIcon sx={{ fontSize: 12, color: colorTokens.neutral.gray500 }} />
                 <Typography sx={{ fontSize: 11, color: colorTokens.neutral.gray500 }}>
                   {displayedEvent.location}
                 </Typography>
@@ -578,8 +591,17 @@ export default function ActivityForm({
 
               {/* ── Convidados ── */}
               <Box>
-                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 0.75 }}>
-                  <Typography sx={{ fontSize: 12, fontWeight: 500, color: colorTokens.text.primary }}>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    mb: 0.75,
+                  }}
+                >
+                  <Typography
+                    sx={{ fontSize: 12, fontWeight: 500, color: colorTokens.text.primary }}
+                  >
                     Convidados (opcional)
                   </Typography>
 
@@ -595,7 +617,10 @@ export default function ActivityForm({
                       fontWeight: 600,
                       color: colorTokens.navigation.default,
                       textTransform: 'none',
-                      '&:hover': { backgroundColor: 'transparent', color: colorTokens.navigation.hover },
+                      '&:hover': {
+                        backgroundColor: 'transparent',
+                        color: colorTokens.navigation.hover,
+                      },
                     }}
                   >
                     + Adicionar convidado
@@ -603,27 +628,19 @@ export default function ActivityForm({
                 </Box>
                 <Divider sx={{ borderColor: colorTokens.neutral.gray300, mb: 1.25 }} />
 
-                {form.guests.length === 0 ? (
-                  <Typography sx={{ fontSize: 12, color: colorTokens.neutral.gray500, fontStyle: 'italic' }}>
-                    Nenhum convidado adicionado ainda.
-                  </Typography>
-                ) : (
-                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.75 }}>
-                    {form.guests.map((guest, index) => (
-                      <Chip
-                        key={`${guest.email}-${index}`}
-                        icon={<PersonOutlineRoundedIcon sx={{ fontSize: 16 }} />}
-                        label={`${guest.name} · ${
-                          GUEST_ROLE_OPTIONS.find((r) => r.value === guest.role)?.label ??
-                          guest.role
-                        }`}
-                        onDelete={() => handleRemoveGuest(index)}
-                        size="small"
-                        sx={{ fontSize: 12 }}
-                      />
-                    ))}
-                  </Box>
-                )}
+                {form.guests.map((guest, index) => (
+                  <Chip
+                    key={`${guest.email}-${index}`}
+                    icon={<PersonOutlineRoundedIcon sx={{ fontSize: 16 }} />}
+                    label={`${guest.name} · ${
+                      GUEST_ROLE_OPTIONS.find((r) => r.value === guest.role)?.label ?? guest.role
+                    }`}
+                    onClick={() => handleOpenEditGuest(index)}
+                    onDelete={() => handleRemoveGuest(index)}
+                    size="small"
+                    sx={{ fontSize: 12, cursor: 'pointer' }}
+                  />
+                ))}
               </Box>
             </Box>
 
@@ -689,6 +706,15 @@ export default function ActivityForm({
         activityLocation={form.location || displayedEvent.location}
         roleOptions={GUEST_ROLE_OPTIONS}
         onSubmit={handleGuestSubmit}
+        initialValues={
+          editingGuestIndex !== null
+            ? {
+                fullName: form.guests[editingGuestIndex].name,
+                role: form.guests[editingGuestIndex].role,
+                email: form.guests[editingGuestIndex].email,
+              }
+            : undefined
+        }
       />
     </Box>
   );

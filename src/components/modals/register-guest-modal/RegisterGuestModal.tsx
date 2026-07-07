@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import {Box, Typography} from "@mui/material";
+import { useState, useEffect } from "react";
+import { Box, Typography } from "@mui/material";
 import { Button, SelectInput, TextInput } from "@/components/ui";
 import { ModalContainer, CloseButton, ModalContent } from "@/components/modals";
 import { ActivityDetail } from "@/components";
@@ -16,12 +16,28 @@ export default function RegisterGuestModal({
   roleOptions,
   onSubmit,
   isLoading = false,
+  initialValues,
 }: RegisterGuestModalProps) {
   const [fullName, setFullName] = useState("");
   const [role, setRole] = useState("");
   const [email, setEmail] = useState("");
   const [touched, setTouched] = useState({ fullName: false, role: false, email: false });
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const isEditMode = Boolean(initialValues);
+
+  useEffect(() => {
+    if (open && initialValues) {
+      setFullName(initialValues.fullName);
+      setRole(initialValues.role);
+      setEmail(initialValues.email);
+    } else if (open && !initialValues) {
+      setFullName("");
+      setRole("");
+      setEmail("");
+    }
+    setTouched({ fullName: false, role: false, email: false });
+  }, [open, initialValues]);
 
   const errors: FieldErrors = (() => {
     const newErrors: FieldErrors = {};
@@ -61,10 +77,6 @@ export default function RegisterGuestModal({
       setIsSubmitting(true);
       await onSubmit({ fullName, role, email });
       onClose();
-      setFullName("");
-      setRole("");
-      setEmail("");
-      setTouched({ fullName: false, role: false, email: false });
     } finally {
       setIsSubmitting(false);
     }
@@ -77,11 +89,13 @@ export default function RegisterGuestModal({
       <ModalContent paddingX={0} marginBottom={0}>
         <Box sx={{ px: 3, mt: 0, mb: 2.5 }}>
           <Typography sx={{ fontSize: 24, fontWeight: 800, color: 'text.primary', mt: 4 }}>
-            Cadastrar Convidado
+            {isEditMode ? 'Editar Convidado' : 'Cadastrar Convidado'}
           </Typography>
 
           <Typography sx={{ color: 'text.secondary', fontSize: 11, mb: 3, mt: 3 }}>
-            Preencha os dados abaixo para cadastrar palestrantes ou ministrantes do evento
+            {isEditMode
+              ? 'Atualize os dados do convidado abaixo'
+              : 'Preencha os dados abaixo para cadastrar palestrantes ou ministrantes do evento'}
           </Typography>
 
           <ActivityDetail
@@ -165,7 +179,7 @@ export default function RegisterGuestModal({
               textTransform: 'none',
             }}
           >
-            Cadastrar
+            {isEditMode ? 'Salvar' : 'Cadastrar'}
           </Button>
         </Box>
       </ModalContent>

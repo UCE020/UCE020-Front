@@ -23,10 +23,14 @@ type ApiErrorResponse = {
 
 class RegistrationService {
   private normalizeActivityId(activityId: string | number): number {
-    if (typeof activityId === 'number') return activityId;
+    if (typeof activityId === 'number') {
+      return activityId;
+    }
 
     const mappedId = ACTIVITY_ID_MAP[activityId];
-    if (mappedId) return mappedId;
+    if (mappedId) {
+      return mappedId;
+    }
 
     const normalized = Number(activityId);
 
@@ -40,13 +44,15 @@ class RegistrationService {
   async register(
     _eventId: string,
     activityId: string,
-    _participantId: string,
   ): Promise<RegistrationResponse> {
     const normalizedActivityId = this.normalizeActivityId(activityId);
 
     try {
-      const { data } = await api.post(`/activity/${normalizedActivityId}/subscribe`);
-      return data.data;
+      const { data } = await api.post<RegistrationResponse>(
+        `/activity/${normalizedActivityId}/subscribe`,
+      );
+
+      return data;
     } catch (error: unknown) {
       const errorData = (error as AxiosError<ApiErrorResponse>).response?.data;
 
@@ -61,13 +67,15 @@ class RegistrationService {
   async unregister(
     _eventId: string,
     activityId: string,
-    _participantId: string,
   ): Promise<RegistrationResponse> {
     const normalizedActivityId = this.normalizeActivityId(activityId);
 
     try {
-      const { data } = await api.delete(`/activity/${normalizedActivityId}/unsubscribe`);
-      return data.data;
+      const { data } = await api.delete<RegistrationResponse>(
+        `/activity/${normalizedActivityId}/unsubscribe`,
+      );
+
+      return data;
     } catch (error: unknown) {
       const errorData = (error as AxiosError<ApiErrorResponse>).response?.data;
 

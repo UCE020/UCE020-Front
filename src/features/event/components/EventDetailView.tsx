@@ -133,7 +133,6 @@ export function EventDetailView({ eventId }: EventDetailViewProps) {
   const [loadError, setLoadError] = useState('');
 
   const [participantType, setParticipantType] = useState<TipoParticipante | null>(null);
-  const [isLoadingParticipation, setIsLoadingParticipation] = useState(true);
 
   const [selectedActivity, setSelectedActivity] = useState<ActivityLike | null>(null);
   const [isQrModalOpen, setIsQrModalOpen] = useState(false);
@@ -180,6 +179,7 @@ export function EventDetailView({ eventId }: EventDetailViewProps) {
         setIsDescriptionExpanded(false);
         setIsLoadingEvent(true);
         setLoadError('');
+        setParticipantType(null);
       }
     });
 
@@ -232,7 +232,9 @@ export function EventDetailView({ eventId }: EventDetailViewProps) {
         }
       })
       .finally(() => {
-        if (isMounted) setIsCheckingSubscription(false);
+        if (isMounted) {
+          setIsCheckingSubscription(false);
+        }
       });
 
     return () => {
@@ -286,13 +288,10 @@ export function EventDetailView({ eventId }: EventDetailViewProps) {
     const numericEventId = Number(eventId);
 
     if (!Number.isFinite(numericEventId)) {
-      setParticipantType(null);
-      setIsLoadingParticipation(false);
       return;
     }
 
     let isMounted = true;
-    setIsLoadingParticipation(true);
 
     participationService
       .getTipoParticipante(numericEventId)
@@ -305,12 +304,7 @@ export function EventDetailView({ eventId }: EventDetailViewProps) {
       .catch((err) => {
         if (isMounted) {
           console.error('[participação] erro ao buscar tipo:', err);
-          setParticipantType(null);
-        }
-      })
-      .finally(() => {
-        if (isMounted) {
-          setIsLoadingParticipation(false);
+          setParticipantType('participante');
         }
       });
 
@@ -318,6 +312,10 @@ export function EventDetailView({ eventId }: EventDetailViewProps) {
       isMounted = false;
     };
   }, [eventId, user?.id]);
+
+  const numericEventId = Number(eventId);
+  const hasValidEventId = Number.isFinite(numericEventId);
+  const isLoadingParticipation = hasValidEventId && participantType === null;
 
   const role = participantType ? TIPO_TO_ROLE[participantType] : 'participant';
   const isOrganizer = role === 'organizer';
@@ -330,7 +328,7 @@ export function EventDetailView({ eventId }: EventDetailViewProps) {
     if (!selectedActivity || !user?.id) return;
 
     try {
-      await registrationService.register(eventId, String(selectedActivity.id), String(user.id));
+      await registrationService.register(eventId, String(selectedActivity.id));
 
       const activityKey = String(selectedActivity.id);
 
@@ -369,7 +367,7 @@ export function EventDetailView({ eventId }: EventDetailViewProps) {
     if (!selectedActivity || !user?.id) return;
 
     try {
-      await registrationService.unregister(eventId, String(selectedActivity.id), String(user.id));
+      await registrationService.unregister(eventId, String(selectedActivity.id));
 
       const activityKey = String(selectedActivity.id);
 
@@ -713,9 +711,8 @@ export function EventDetailView({ eventId }: EventDetailViewProps) {
             setIsCheckingActivityEnrollment(true);
 
             try {
-              const response = await activityService.findOne(activity.id);
-              const activityDetails = response?.data ?? response;
-              const isRegistered = Boolean(activityDetails?.isRegistered);
+              const activityDetails = await activityService.findOne(activity.id);
+              const isRegistered = Boolean(activityDetails.isRegistered);
 
               setIsActivityEnrolled(isRegistered);
               setActivityEnrollmentMap((prev) => ({

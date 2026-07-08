@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Box, IconButton, Typography } from '@mui/material';
 import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded';
@@ -9,12 +9,15 @@ import { ContentCard } from '@/components/layout/ContentCard';
 import { presenceService } from '@/services/presenceService';
 import { colorTokens } from '@/lib/colors';
 import { validatePresenceScan } from '@/features/participants/presence/utils/validatePresenceScan';
-import { requirePresenceContext } from '@/features/participants/presence/utils/resolvePresenceContext';
+import {
+  fetchPresenceContext,
+  requirePresenceContext,
+} from '@/features/participants/presence/utils/resolvePresenceContext';
 import { buildListParticipantsPath } from '@/features/participants/presence/utils/routes';
 import { PresenceContextMissing } from './PresenceContextMissing';
 import { QrCodeScanner } from './QrCodeScanner';
 import { PresenceScanModal } from './PresenceScanModal';
-import type { PresenceScanResult } from '@/types/presence';
+import type { PresenceScanResult, PresenceValidationContext } from '@/types/presence';
 
 interface ScanState {
   modalOpen: boolean;
@@ -97,13 +100,31 @@ function PresenceScannerPanel({
 export function ValidatePresenceView() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const context = requirePresenceContext(
-    searchParams.get('eventId'),
-    searchParams.get('activityId'),
-  );
+  const eventIdParam = searchParams.get('eventId');
+  const activityIdParam = searchParams.get('activityId');
 
+  const [context, setContext] = useState<PresenceValidationContext | null>(() =>
+    requirePresenceContext(eventIdParam, activityIdParam),
+  );
   const [state, setState] = useState<ScanState>(INITIAL_STATE);
   const [scanKey, setScanKey] = useState(0);
+
+  useEffect(() => {
+    const fallbackContext = requirePresenceContext(eventIdParam, activityIdParam);
+    setContext(fallbackContext);
+
+    let isMounted = true;
+
+    void fetchPresenceContext(eventIdParam, activityIdParam).then((resolvedContext) => {
+      if (isMounted) {
+        setContext(resolvedContext ?? fallbackContext);
+      }
+    });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [eventIdParam, activityIdParam]);
 
   function handleScan(qrCode: string) {
     if (!context || state.modalOpen) return;
@@ -144,10 +165,10 @@ export function ValidatePresenceView() {
     return <PresenceContextMissing />;
   }
 
-  const { eventId, activityId, eventName, activityTitle } = context;
+  const { eventId: contextEventId, activityId: contextActivityId, eventName, activityTitle } = context;
 
   function handleBack() {
-    router.push(buildListParticipantsPath(eventId, activityId));
+    router.push(buildListParticipantsPath(contextEventId, contextActivityId));
   }
 
   return (

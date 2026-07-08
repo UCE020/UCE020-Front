@@ -2,13 +2,13 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { IconButton } from '@mui/material';
+import { IconButton, CircularProgress, Box } from '@mui/material';
 import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded';
 import { AppPageContainer } from '@/components/layout/AppPageContainer';
-import { useMockUser } from '@/mocks/useMockUser';
-import { unconfirmParticipantForActivity } from '@/mocks/participants-storage';
+import { useAuth } from '@/providers/auth-provider';
+import { participationService, type TipoParticipante } from '@/services/participationService';
+import { presenceService } from '@/services/presenceService';
 import { requirePresenceContext } from '@/features/participants/presence/utils/resolvePresenceContext';
-import { getParticipantsForActivity } from '@/features/participants/presence/utils/getParticipantsForActivity';
 import { buildValidatePresencePath } from '@/features/participants/presence/utils/routes';
 import { PresenceContextMissing } from '@/features/participants/presence/components/PresenceContextMissing';
 import { RemovePresenceModal } from '@/features/participants/presence/components/RemovePresenceModal';
@@ -22,72 +22,136 @@ import {
 import { colorTokens } from '@/lib/colors';
 import type { Participant, PresenceFilter } from '@/types/participant';
 
+const TIPO_TO_ROLE: Record<TipoParticipante, 'organizer' | 'monitor' | 'participant'> = {
+  organizador: 'organizer',
+  monitor: 'monitor',
+  participante: 'participant',
+};
+
 export function ListParticipantsView() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const mockUser = useMockUser();
+  const { user } = useAuth();
 
-  const context = requirePresenceContext(
-    searchParams.get('eventId'),
-    searchParams.get('activityId'),
+  const eventIdParam = searchParams.get('eventId');
+  const activityIdParam = searchParams.get('activityId');
+
+  const [context, setContext] = useState(() =>
+    requirePresenceContext(eventIdParam, activityIdParam),
   );
 
   const [participants, setParticipants] = useState<Participant[]>([]);
   const [search, setSearch] = useState('');
   const [presenceFilter, setPresenceFilter] = useState<PresenceFilter>('all');
-  const [selectedParticipant, setSelectedParticipant] =
-    useState<Participant | null>(null);
+  const [selectedParticipant, setSelectedParticipant] = useState<Participant | null>(null);
+  const [isLoadingParticipants, setIsLoadingParticipants] = useState(true);
+  const [isLoadingRole, setIsLoadingRole] = useState(true);
+  const [participantType, setParticipantType] = useState<TipoParticipante | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-  const eventId = context?.eventId ?? '';
-  const activityId = context?.activityId ?? '';
+    const fallbackContext = requirePresenceContext(eventIdParam, activityIdParam);
+    setContext(fallbackContext);
 
-  if (!eventId || !activityId) return;
+    let isMounted = true;
 
-  let isMounted = true;
+    void import('@/features/participants/presence/utils/resolvePresenceContext').then(({ fetchPresenceContext }) => {
+      void fetchPresenceContext(eventIdParam, activityIdParam).then((resolvedContext) => {
+        if (isMounted) {
+          setContext(resolvedContext ?? fallbackContext);
+        }
+      });
+    });
 
-  async function refreshParticipants() {
-    try {
-      const data = await getParticipantsForActivity(eventId, activityId);
+    return () => {
+      isMounted = false;
+    };
+  }, [eventIdParam, activityIdParam]);
 
+  // Busca o tipo de participação do usuário logado naquele evento
+  useEffect(() => {
+    if (!context?.eventId) return;
+
+    const numericEventId = Number(context.eventId);
+    if (!Number.isFinite(numericEventId)) return;
+
+    let isMounted = true;
+
+    participationService
+      .getTipoParticipante(numericEventId)
+      .then((tipo) => {
+        if (isMounted) {
+          setParticipantType(tipo);
+        }
+      })
+      .catch(() => {
+        if (isMounted) {
+          setParticipantType(null);
+        }
+      })
+      .finally(() => {
+        if (isMounted) {
+          setIsLoadingRole(false);
+        }
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [context?.eventId, user?.id]);
+
+  // Busca os participantes da atividade
+  useEffect(() => {
+    if (!context?.eventId || !context?.activityId) return;
+
+    const numericEventId = Number(context.eventId);
+    const numericActivityId = Number(context.activityId);
+
+    if (!Number.isFinite(numericEventId) || !Number.isFinite(numericActivityId)) return;
+
+    let isMounted = true;
+
+    queueMicrotask(() => {
       if (isMounted) {
-        setParticipants(Array.isArray(data) ? data : []);
+        setIsLoadingParticipants(true);
+        setError(null);
       }
-    } catch (error) {
-      console.error('Erro ao carregar participantes da atividade:', error);
+    });
 
-      if (isMounted) {
-        setParticipants([]);
-      }
-    }
-  }
+    participationService
+      .getActivityParticipants(numericEventId, numericActivityId)
+      .then((data) => {
+        if (isMounted) {
+          setParticipants(data);
+        }
+      })
+      .catch((err) => {
+        if (isMounted) {
+          const errorMessage = err instanceof Error ? err.message : 'Erro ao carregar participantes';
+          setError(errorMessage);
+          setParticipants([]);
+        }
+      })
+      .finally(() => {
+        if (isMounted) {
+          setIsLoadingParticipants(false);
+        }
+      });
 
-  void refreshParticipants();
-
-  function handlePageShow() {
-    void refreshParticipants();
-  }
-
-  window.addEventListener('pageshow', handlePageShow);
-
-  return () => {
-    isMounted = false;
-    window.removeEventListener('pageshow', handlePageShow);
-  };
-}, [context?.eventId, context?.activityId]);
+    return () => {
+      isMounted = false;
+    };
+  }, [context?.eventId, context?.activityId]);
 
   if (!context) {
     return <PresenceContextMissing />;
   }
 
   const { eventId, activityId, activityTitle } = context;
-  const isMonitor = mockUser.role === 'monitor';
-  const canEditPresence = isMonitor || mockUser.role === 'organizer';
-  const filteredParticipants = filterParticipants(
-    participants,
-    search,
-    presenceFilter,
-  );
+  const role = participantType ? TIPO_TO_ROLE[participantType] : 'participant';
+  const isMonitor = role === 'monitor';
+  const canEditPresence = isMonitor || role === 'organizer';
+  const filteredParticipants = filterParticipants(participants, search, presenceFilter);
 
   function handleFilterToggle(filter: Exclude<PresenceFilter, 'all'>) {
     setPresenceFilter((current) => togglePresenceFilter(current, filter));
@@ -110,23 +174,29 @@ export function ListParticipantsView() {
   }
 
   async function handleRemovePresence() {
-    if (!selectedParticipant) return;
-
-    unconfirmParticipantForActivity(eventId, activityId, selectedParticipant.id);
+    if (!selectedParticipant || !context?.eventId || !context?.activityId) return;
 
     try {
-      const updatedParticipants = await getParticipantsForActivity(
-        eventId,
-        activityId,
+      await presenceService.removePresence({
+        participantId: selectedParticipant.id,
+        eventId: context.eventId,
+        activityId: context.activityId,
+      });
+
+      setParticipants((current) =>
+        current.map((participant) =>
+          participant.id === selectedParticipant.id
+            ? { ...participant, presenceStatus: 'pending' }
+            : participant,
+        ),
       );
-
-      setParticipants(Array.isArray(updatedParticipants) ? updatedParticipants : []);
-    } catch (error) {
-      console.error('Erro ao atualizar participantes após remoção:', error);
-      setParticipants([]);
+      setError(null);
+      closeRemoveModal();
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Erro ao remover presença';
+      setError(errorMessage);
+      console.error(errorMessage);
     }
-
-    closeRemoveModal();
   }
 
   function renderParticipantActions(participant: Participant) {
@@ -145,6 +215,8 @@ export function ListParticipantsView() {
     router.push(`/event/${eventId}`);
   }
 
+  const isLoading = isLoadingParticipants || isLoadingRole;
+
   return (
     <AppPageContainer>
       <IconButton
@@ -157,14 +229,24 @@ export function ListParticipantsView() {
 
       {isMonitor && <ValidatePresencesButton onClick={goToValidatePresence} />}
 
-      <ParticipantsListCard
-        participants={filteredParticipants}
-        search={search}
-        presenceFilter={presenceFilter}
-        onSearchChange={setSearch}
-        onFilterToggle={handleFilterToggle}
-        renderParticipantActions={renderParticipantActions}
-      />
+      {isLoading ? (
+        <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+          <CircularProgress />
+        </Box>
+      ) : error ? (
+        <Box sx={{ color: 'error.main', textAlign: 'center', py: 2 }}>
+          {error}
+        </Box>
+      ) : (
+        <ParticipantsListCard
+          participants={filteredParticipants}
+          search={search}
+          presenceFilter={presenceFilter}
+          onSearchChange={setSearch}
+          onFilterToggle={handleFilterToggle}
+          renderParticipantActions={renderParticipantActions}
+        />
+      )}
 
       <RemovePresenceModal
         open={!!selectedParticipant}

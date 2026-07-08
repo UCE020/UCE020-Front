@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { Box, CircularProgress, IconButton, Typography } from '@mui/material';
 import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded';
@@ -15,7 +15,6 @@ import { ContentCard } from '@/components/layout/ContentCard';
 import { AppPageContainer } from '@/components/layout/AppPageContainer';
 import { buildListParticipantsPath } from '@/features/participants/presence/utils/routes';
 import { useAuth } from '@/providers/auth-provider';
-import { registrationService } from '@/services/registrationService';
 import { eventService, TipoParticipante } from '@/services/eventService';
 import { getActivityModalVariant } from '@/features/event/utils/getActivityModalVariant';
 import { ParticipantQrCodeModal } from '@/features/participants/presence/components/ParticipantQrCodeModal';
@@ -147,6 +146,9 @@ export function EventDetailView({ eventId }: EventDetailViewProps) {
   const [isActivityEnrolled, setIsActivityEnrolled] = useState(false);
   const [activityEnrollmentMap, setActivityEnrollmentMap] = useState<Record<string, boolean>>({});
   const [isCheckingActivityEnrollment, setIsCheckingActivityEnrollment] = useState(false);
+
+  const isSignupProcessingRef = useRef(false);
+  const pendingEnrollmentChecksRef = useRef<Set<string>>(new Set());
 
   const [toast, setToast] = useState<{ open: boolean; message: string; severity: ToastSeverity }>({
     open: false,
@@ -327,8 +329,12 @@ export function EventDetailView({ eventId }: EventDetailViewProps) {
   async function handleSignup() {
     if (!selectedActivity || !user?.id) return;
 
+    // prevent duplicate subscribe requests
+    if (isSignupProcessingRef.current) return;
+    isSignupProcessingRef.current = true;
+
     try {
-      await registrationService.register(eventId, String(selectedActivity.id));
+      await participationService.subscribeToActivity(Number(selectedActivity.id), Number(user.id));
 
       const activityKey = String(selectedActivity.id);
 
@@ -360,17 +366,23 @@ export function EventDetailView({ eventId }: EventDetailViewProps) {
         message,
         severity: ToastSeverity.Error,
       });
+    } finally {
+      isSignupProcessingRef.current = false;
     }
   }
 
   async function handleCancelParticipation() {
-    if (!selectedActivity || !user?.id) return;
+    if (!selectedActivity || !user?.id || isSignupProcessingRef.current) return;
+
+    isSignupProcessingRef.current = true;
 
     try {
-      await registrationService.unregister(eventId, String(selectedActivity.id));
+      await participationService.unsubscribeFromActivity(
+        Number(selectedActivity.id),
+        Number(user.id),
+      );
 
       const activityKey = String(selectedActivity.id);
-
       setIsActivityEnrolled(false);
       setActivityEnrollmentMap((prev) => ({
         ...prev,
@@ -388,6 +400,8 @@ export function EventDetailView({ eventId }: EventDetailViewProps) {
         message: extractApiErrorMessage(error, 'Não foi possível cancelar a inscrição'),
         severity: ToastSeverity.Error,
       });
+    } finally {
+      isSignupProcessingRef.current = false;
     }
   }
 
@@ -705,14 +719,34 @@ export function EventDetailView({ eventId }: EventDetailViewProps) {
           activities={activities}
           onSelectActivity={async (activity) => {
             const activityKey = String(activity.id);
+            const normalizedEventId = Number(event?.id ?? eventId);
 
             setSelectedActivity(activity as ActivityLike);
+            setIsActivityEnrolled(activityEnrollmentMap[activityKey] ?? false);
             setIsQrModalOpen(false);
+
+            if (pendingEnrollmentChecksRef.current.has(activityKey)) {
+              return;
+            }
+
+            pendingEnrollmentChecksRef.current.add(activityKey);
             setIsCheckingActivityEnrollment(true);
 
             try {
               const activityDetails = await activityService.findOne(activity.id);
-              const isRegistered = Boolean(activityDetails.isRegistered);
+              let isRegistered = Boolean(activityDetails?.isRegistered ?? false);
+
+              if (!isRegistered && Number.isFinite(normalizedEventId) && Number.isFinite(Number(activity.id)) && user?.id) {
+                try {
+                  const participants = await participationService.getActivityParticipants(
+                    normalizedEventId,
+                    Number(activity.id),
+                  );
+                  isRegistered = participants.some((participant) => participant.id === String(user.id));
+                } catch (participantsError) {
+                  console.error('[ATIVIDADE] erro ao listar participantes para verificar inscrição:', participantsError);
+                }
+              }
 
               setIsActivityEnrolled(isRegistered);
               setActivityEnrollmentMap((prev) => ({
@@ -723,6 +757,7 @@ export function EventDetailView({ eventId }: EventDetailViewProps) {
               console.error('[ATIVIDADE] erro ao verificar inscrição:', error);
               setIsActivityEnrolled(activityEnrollmentMap[activityKey] ?? false);
             } finally {
+              pendingEnrollmentChecksRef.current.delete(activityKey);
               setIsCheckingActivityEnrollment(false);
             }
           }}
@@ -749,6 +784,7 @@ export function EventDetailView({ eventId }: EventDetailViewProps) {
             ? 'signup'
             : activityModalVariant
         }
+        isLoading={isCheckingActivityEnrollment}
         onSignup={handleSignup}
         onCancelParticipation={handleCancelParticipation}
         onMarkPresence={handleMarkPresence}

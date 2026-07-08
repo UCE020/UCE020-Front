@@ -24,6 +24,7 @@ export default function ActivityModal({
   onMarkPresence,
   onValidatePresences,
   onListParticipants,
+  isLoading,
 }: ActivityModalProps) {
   if (!open) return null;
 
@@ -42,9 +43,11 @@ export default function ActivityModal({
         overflowY: 'auto',
       }}
     >
-      <CloseButton onClick={onClose} />
+      <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 1.25 }}>
+        <CloseButton onClick={onClose} position="relative" top={0} right={0} />
+      </Box>
 
-      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: { xs: 0.5, sm: 0.75 } }}>
         <ScheduleCard
           title={title}
           image={image}
@@ -64,6 +67,7 @@ export default function ActivityModal({
           onMarkPresence={onMarkPresence}
           onValidatePresences={onValidatePresences}
           onListParticipants={onListParticipants}
+          isLoading={isLoading}
         />
       </Box>
     </ModalContainer>

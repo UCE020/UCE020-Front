@@ -51,7 +51,6 @@ export function ListParticipantsView() {
 
   useEffect(() => {
     const fallbackContext = requirePresenceContext(eventIdParam, activityIdParam);
-    setContext(fallbackContext);
 
     let isMounted = true;
 

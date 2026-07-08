@@ -1,5 +1,6 @@
 'use client';
 
+import { Box } from '@mui/material';
 import { ModalContainer, CloseButton } from '@/components/modals';
 import { ScheduleCard } from '@/components';
 import type { ActivityModalProps } from '@/types/activity';
@@ -24,6 +25,8 @@ export default function ActivityModal({
   onValidatePresences,
   onListParticipants,
 }: ActivityModalProps) {
+  if (!open) return null;
+
   return (
     <ModalContainer
       open={open}
@@ -41,26 +44,28 @@ export default function ActivityModal({
     >
       <CloseButton onClick={onClose} />
 
-      <ScheduleCard
-        title={title}
-        image={image}
-        startDate={startDate}
-        endDate={endDate}
-        location={location}
-        hours={hours}
-        participantsCount={participantsCount}
-        status={status}
-        description={description}
-      />
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <ScheduleCard
+          title={title}
+          image={image}
+          startDate={startDate}
+          endDate={endDate}
+          location={location}
+          hours={hours}
+          participantsCount={participantsCount}
+          status={status}
+          description={description}
+        />
 
-      <ActivityModalActions
-        variant={variant}
-        onSignup={onSignup}
-        onCancelParticipation={onCancelParticipation}
-        onMarkPresence={onMarkPresence}
-        onValidatePresences={onValidatePresences}
-        onListParticipants={onListParticipants}
-      />
+        <ActivityModalActions
+          variant={variant}
+          onSignup={onSignup}
+          onCancelParticipation={onCancelParticipation}
+          onMarkPresence={onMarkPresence}
+          onValidatePresences={onValidatePresences}
+          onListParticipants={onListParticipants}
+        />
+      </Box>
     </ModalContainer>
   );
 }

@@ -15,7 +15,10 @@ import { RemovePresenceModal } from '@/features/participants/presence/components
 import { ParticipantsListCard } from '@/features/participants/components/ParticipantsListCard';
 import { ParticipantPresenceActions } from '@/features/participants/components/ParticipantPresenceActions';
 import { ValidatePresencesButton } from '@/features/participants/components/ValidatePresencesButton';
-import { filterParticipants, togglePresenceFilter } from '@/features/participants/utils/filterParticipants';
+import {
+  filterParticipants,
+  togglePresenceFilter,
+} from '@/features/participants/utils/filterParticipants';
 import { colorTokens } from '@/lib/colors';
 import type { Participant, PresenceFilter } from '@/types/participant';
 
@@ -23,6 +26,7 @@ export function ListParticipantsView() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const mockUser = useMockUser();
+
   const context = requirePresenceContext(
     searchParams.get('eventId'),
     searchParams.get('activityId'),
@@ -31,7 +35,8 @@ export function ListParticipantsView() {
   const [participants, setParticipants] = useState<Participant[]>([]);
   const [search, setSearch] = useState('');
   const [presenceFilter, setPresenceFilter] = useState<PresenceFilter>('all');
-  const [selectedParticipant, setSelectedParticipant] = useState<Participant | null>(null);
+  const [selectedParticipant, setSelectedParticipant] =
+    useState<Participant | null>(null);
 
   useEffect(() => {
     const eventId = context?.eventId;
@@ -39,18 +44,35 @@ export function ListParticipantsView() {
 
     if (!eventId || !activityId) return;
 
-    const currentEventId = eventId;
-    const currentActivityId = activityId;
+    let isMounted = true;
 
-    function refreshParticipants() {
-      setParticipants(getParticipantsForActivity(currentEventId, currentActivityId));
+    async function refreshParticipants() {
+      try {
+        const data = await getParticipantsForActivity(eventId, activityId);
+
+        if (isMounted) {
+          setParticipants(Array.isArray(data) ? data : []);
+        }
+      } catch (error) {
+        console.error('Erro ao carregar participantes da atividade:', error);
+
+        if (isMounted) {
+          setParticipants([]);
+        }
+      }
     }
 
-    refreshParticipants();
-    window.addEventListener('pageshow', refreshParticipants);
+    void refreshParticipants();
+
+    function handlePageShow() {
+      void refreshParticipants();
+    }
+
+    window.addEventListener('pageshow', handlePageShow);
 
     return () => {
-      window.removeEventListener('pageshow', refreshParticipants);
+      isMounted = false;
+      window.removeEventListener('pageshow', handlePageShow);
     };
   }, [context?.eventId, context?.activityId]);
 
@@ -61,7 +83,11 @@ export function ListParticipantsView() {
   const { eventId, activityId, activityTitle } = context;
   const isMonitor = mockUser.role === 'monitor';
   const canEditPresence = isMonitor || mockUser.role === 'organizer';
-  const filteredParticipants = filterParticipants(participants, search, presenceFilter);
+  const filteredParticipants = filterParticipants(
+    participants,
+    search,
+    presenceFilter,
+  );
 
   function handleFilterToggle(filter: Exclude<PresenceFilter, 'all'>) {
     setPresenceFilter((current) => togglePresenceFilter(current, filter));
@@ -73,7 +99,9 @@ export function ListParticipantsView() {
 
   function openRemoveModal(participantId: string) {
     const participant = participants.find((item) => item.id === participantId);
+
     if (!participant || participant.presenceStatus !== 'confirmed') return;
+
     setSelectedParticipant(participant);
   }
 
@@ -81,11 +109,23 @@ export function ListParticipantsView() {
     setSelectedParticipant(null);
   }
 
-  function handleRemovePresence() {
+  async function handleRemovePresence() {
     if (!selectedParticipant) return;
 
     unconfirmParticipantForActivity(eventId, activityId, selectedParticipant.id);
-    setParticipants(getParticipantsForActivity(eventId, activityId));
+
+    try {
+      const updatedParticipants = await getParticipantsForActivity(
+        eventId,
+        activityId,
+      );
+
+      setParticipants(Array.isArray(updatedParticipants) ? updatedParticipants : []);
+    } catch (error) {
+      console.error('Erro ao atualizar participantes após remoção:', error);
+      setParticipants([]);
+    }
+
     closeRemoveModal();
   }
 

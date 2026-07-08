@@ -1,5 +1,5 @@
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001/api';
+import { AxiosError } from 'axios';
+import { api } from './api';
 
 const ACTIVITY_ID_MAP: Record<string, number> = {
   a1: 1,
@@ -18,18 +18,15 @@ type RegistrationResponse = {
 
 type ApiErrorResponse = {
   error?: string;
+  message?: string;
 };
 
 class RegistrationService {
   private normalizeActivityId(activityId: string | number): number {
-    if (typeof activityId === 'number') {
-      return activityId;
-    }
+    if (typeof activityId === 'number') return activityId;
 
     const mappedId = ACTIVITY_ID_MAP[activityId];
-    if (mappedId) {
-      return mappedId;
-    }
+    if (mappedId) return mappedId;
 
     const normalized = Number(activityId);
 
@@ -40,72 +37,46 @@ class RegistrationService {
     return normalized;
   }
 
-  private normalizeParticipantId(participantId: string | number): number {
-    const normalized = Number(participantId);
-
-    if (Number.isNaN(normalized)) {
-      throw new Error(
-        `Usuário mock inválido para integração com o banco: ${participantId}`,
-      );
-    }
-
-    return normalized;
-  }
-
   async register(
     _eventId: string,
     activityId: string,
-    participantId: string,
+    _participantId: string,
   ): Promise<RegistrationResponse> {
     const normalizedActivityId = this.normalizeActivityId(activityId);
-    const normalizedParticipantId = this.normalizeParticipantId(participantId);
 
-    const response = await fetch(
-      `${API_BASE_URL}/v1/activity/${normalizedActivityId}/subscribe`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          userId: normalizedParticipantId,
-        }),
-      },
-    );
+    try {
+      const { data } = await api.post(`/activity/${normalizedActivityId}/subscribe`);
+      return data.data;
+    } catch (error: unknown) {
+      const errorData = (error as AxiosError<ApiErrorResponse>).response?.data;
 
-    const data = await response.json();
-
-    if (!response.ok) {
-      const errorData = data as ApiErrorResponse;
-      throw new Error(errorData.error || 'Erro ao realizar inscrição');
+      throw new Error(
+        errorData?.error ||
+          errorData?.message ||
+          'Erro ao realizar inscrição',
+      );
     }
-
-    return data as RegistrationResponse;
   }
 
   async unregister(
     _eventId: string,
     activityId: string,
-    participantId: string,
+    _participantId: string,
   ): Promise<RegistrationResponse> {
     const normalizedActivityId = this.normalizeActivityId(activityId);
-    const normalizedParticipantId = this.normalizeParticipantId(participantId);
 
-    const response = await fetch(
-      `${API_BASE_URL}/v1/activity/${normalizedActivityId}/unsubscribe/${normalizedParticipantId}`,
-      {
-        method: 'DELETE',
-      },
-    );
+    try {
+      const { data } = await api.delete(`/activity/${normalizedActivityId}/unsubscribe`);
+      return data.data;
+    } catch (error: unknown) {
+      const errorData = (error as AxiosError<ApiErrorResponse>).response?.data;
 
-    const data = await response.json();
-
-    if (!response.ok) {
-      const errorData = data as ApiErrorResponse;
-      throw new Error(errorData.error || 'Erro ao cancelar inscrição');
+      throw new Error(
+        errorData?.error ||
+          errorData?.message ||
+          'Erro ao cancelar inscrição',
+      );
     }
-
-    return data as RegistrationResponse;
   }
 
   canRegister(isRegistered: boolean): boolean {

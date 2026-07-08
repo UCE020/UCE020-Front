@@ -20,7 +20,7 @@ export function OrganizerEventActions({ eventId }: { eventId: string }) {
   }
 
   function onEditEvent() {
-    router.push('/event/edit');
+    router.push(`/event/edit/${eventId}`);
   }
 
   function onFinalizeEvent() {

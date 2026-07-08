@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import {
   Box,
@@ -140,13 +140,47 @@ interface EventFormProps {
   eventId?: number;
 }
 
+function mapEventToForm(event: {
+  nome?: string | null;
+  localizacao?: string | null;
+  responsavel?: string | null;
+  descricao?: string | null;
+  dataInicio?: string | null;
+  dataFim?: string | null;
+  cargaHoraria?: number | null;
+  status?: string | null;
+  foto?: string | null;
+} | null): FormState {
+  if (!event) {
+    return DEFAULT_FORM;
+  }
+
+  const startDT = event.dataInicio ? new Date(event.dataInicio) : null;
+  const endDT = event.dataFim ? new Date(event.dataFim) : null;
+  const pad = (n: number) => String(n).padStart(2, '0');
+  const toDate = (dt: Date | null) =>
+    dt ? `${dt.getFullYear()}-${pad(dt.getMonth() + 1)}-${pad(dt.getDate())}` : '';
+  const toTime = (dt: Date | null) =>
+    dt ? `${pad(dt.getHours())}:${pad(dt.getMinutes())}` : '';
+
+  return {
+    nome: event.nome ?? '',
+    localizacao: event.localizacao ?? '',
+    responsavel: event.responsavel ?? '',
+    descricao: event.descricao ?? '',
+    startDate: toDate(startDT),
+    endDate: toDate(endDT),
+    startTime: toTime(startDT),
+    endTime: toTime(endDT),
+    cargaHoraria: String(event.cargaHoraria ?? ''),
+    status: (event.status as FormState['status']) ?? 'pendente',
+    foto: event.foto ?? null,
+  };
+}
+
 export default function EventForm({ mode, eventId }: EventFormProps) {
   const isEdit = mode === 'edit';
-  const [form, setForm] = useState<FormState>(DEFAULT_FORM);
-  const [touched, setTouched] = useState<TouchedState>(createTouchedState);
-  const [activities, setActivities] = useState<ActivityItem[]>([]);
-  const [editingActivityId, setEditingActivityId] = useState<string | null>(null);
-
+  const isEditIdPresent = isEdit && eventId != null;
   const { handleCreate, loading: createLoading, error: createError } = useCreateEvent();
   const {
     event: existingEvent,
@@ -155,39 +189,89 @@ export default function EventForm({ mode, eventId }: EventFormProps) {
     handleUpdate,
     loading: updateLoading,
     error: updateError,
-  } = useEditEvent(isEdit && eventId != null ? eventId : null);
+  } = useEditEvent(isEditIdPresent ? eventId : null);
+
+  if (isEdit && loadingEvent) {
+    return (
+      <Box
+        sx={{
+          minHeight: '100dvh',
+          background: colorTokens.surface.background,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (isEdit && loadError) {
+    return (
+      <Box
+        sx={{
+          minHeight: '100dvh',
+          background: colorTokens.surface.background,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          flexDirection: 'column',
+          gap: 2,
+        }}
+      >
+        <Typography color="error">{loadError}</Typography>
+        <Button variant="outlined" component={Link} href="/home">
+          Voltar ao início
+        </Button>
+      </Box>
+    );
+  }
+
+  return (
+    <EventFormContent
+      key={isEdit ? eventId ?? 'edit' : 'create'}
+      mode={mode}
+      initialForm={mapEventToForm(existingEvent)}
+      handleCreate={handleCreate}
+      createLoading={createLoading}
+      createError={createError}
+      handleUpdate={handleUpdate}
+      updateLoading={updateLoading}
+      updateError={updateError}
+    />
+  );
+}
+
+type EventFormContentProps = {
+  mode: EventFormMode;
+  initialForm: FormState;
+  handleCreate: ReturnType<typeof useCreateEvent>['handleCreate'];
+  createLoading: boolean;
+  createError: string | null;
+  handleUpdate: (payload: Parameters<ReturnType<typeof useEditEvent>['handleUpdate']>[0]) => Promise<void>;
+  updateLoading: boolean;
+  updateError: string | null;
+};
+
+function EventFormContent({
+  mode,
+  initialForm,
+  handleCreate,
+  createLoading,
+  createError,
+  handleUpdate,
+  updateLoading,
+  updateError,
+}: EventFormContentProps) {
+  const isEdit = mode === 'edit';
+  const [form, setForm] = useState<FormState>(() => initialForm);
+  const [touched, setTouched] = useState<TouchedState>(createTouchedState);
+  const [activities, setActivities] = useState<ActivityItem[]>([]);
+  const [editingActivityId, setEditingActivityId] = useState<string | null>(null);
 
   const isSubmitting = createLoading || updateLoading;
   const submitError = createError || updateError;
-
-  useEffect(() => {
-    if (!existingEvent) return;
-
-    Promise.resolve().then(() => {
-      const startDT = existingEvent.dataInicio ? new Date(existingEvent.dataInicio) : null;
-      const endDT = existingEvent.dataFim ? new Date(existingEvent.dataFim) : null;
-
-      const pad = (n: number) => String(n).padStart(2, '0');
-      const toDate = (dt: Date | null) =>
-        dt ? `${dt.getFullYear()}-${pad(dt.getMonth() + 1)}-${pad(dt.getDate())}` : '';
-      const toTime = (dt: Date | null) =>
-        dt ? `${pad(dt.getHours())}:${pad(dt.getMinutes())}` : '';
-
-      setForm({
-        nome: existingEvent.nome ?? '',
-        localizacao: existingEvent.localizacao ?? '',
-        responsavel: existingEvent.responsavel ?? '',
-        descricao: existingEvent.descricao ?? '',
-        startDate: toDate(startDT),
-        endDate: toDate(endDT),
-        startTime: toTime(startDT),
-        endTime: toTime(endDT),
-        cargaHoraria: String(existingEvent.cargaHoraria ?? ''),
-        status: (existingEvent.status as FormState['status']) ?? 'pendente',
-        foto: existingEvent.foto ?? null,
-      });
-    });
-  }, [existingEvent]);
 
   const errors = useMemo(() => getErrors(form, touched), [form, touched]);
   const canSubmit =
@@ -289,43 +373,6 @@ export default function EventForm({ mode, eventId }: EventFormProps) {
   function handleUpdateActivityTitle(id: string, newTitle: string) {
     setActivities((cur) =>
       cur.map((a) => (a.id === id ? { ...a, title: newTitle } : a))
-    );
-  }
-
-  if (isEdit && loadingEvent) {
-    return (
-      <Box
-        sx={{
-          minHeight: '100dvh',
-          background: colorTokens.surface.background,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
-        <CircularProgress />
-      </Box>
-    );
-  }
-
-  if (isEdit && loadError) {
-    return (
-      <Box
-        sx={{
-          minHeight: '100dvh',
-          background: colorTokens.surface.background,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          flexDirection: 'column',
-          gap: 2,
-        }}
-      >
-        <Typography color="error">{loadError}</Typography>
-        <Button variant="outlined" component={Link} href="/home">
-          Voltar ao início
-        </Button>
-      </Box>
     );
   }
 

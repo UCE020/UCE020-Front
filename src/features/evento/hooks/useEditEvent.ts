@@ -18,22 +18,24 @@ export function useEditEvent(eventId: number | null) {
     if (eventId === null) return;
     let isMounted = true;
 
-    Promise.resolve().then(() => {
-      if (isMounted) {
-        setLoadingEvent(true);
-        setLoadError(null);
-      }
-    });
+    setLoadingEvent(true);
+    setLoadError(null);
 
     eventService.findOne(eventId)
       .then(data => {
+        console.log('Evento recebido:', data);
+
         if (isMounted) setEvent(data);
       })
       .catch(() => {
-        if (isMounted) setLoadError('Não foi possível carregar os dados do evento.');
+        if (isMounted) {
+          setLoadError('Não foi possível carregar os dados do evento.');
+        }
       })
       .finally(() => {
-        if (isMounted) setLoadingEvent(false);
+        if (isMounted) {
+          setLoadingEvent(false);
+        }
       });
 
     return () => {
@@ -47,7 +49,7 @@ export function useEditEvent(eventId: number | null) {
     setError(null);
     try {
       await eventService.update(eventId, payload);
-      router.push('/home');
+      router.push(`/event/${eventId}`);
     } catch (err: unknown) {
       const axiosErr = err as { response?: { data?: { message?: string | string[] } } };
       const raw = axiosErr.response?.data?.message;

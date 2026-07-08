@@ -6,42 +6,23 @@ import { Box, CircularProgress } from '@mui/material';
 import { ProfileHeader, ProfileForm } from '@/features/user-profile';
 import type { UserProfile } from '@/types/userProfile';
 import { userProfileService } from '@/services/userProfileService';
-import { Toast } from '@/components/ui/Toast';
-import { ToastSeverity } from '@/types/toast';
-import { isAxiosError } from 'axios';
 
 export default function ProfilePage() {
   const [isEditing, setIsEditing] = useState(false);
   const [user, setUser] = useState<UserProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [toast, setToast] = useState<{
-    open: boolean;
-    message: string;
-    severity: ToastSeverity;
-  }>({
-    open: false,
-    message: '',
-    severity: ToastSeverity.Error,
-  });
 
   useEffect(() => {
     userProfileService
       .getProfile()
       .then(({ data }) => setUser(data))
-      .catch((err) => {
-        console.error('Falha ao carregar perfil:', err);
-        setToast({
-          open: true,
-          message: 'Não foi possível carregar o perfil',
-          severity: ToastSeverity.Error,
-        });
-      })
       .finally(() => setIsLoading(false));
   }, []);
 
   const handleSaveProfile = async (userData: UserProfile) => {
     const previousUser = user;
 
+    // Atualização otimista da UI
     setUser(userData);
 
     try {
@@ -70,26 +51,15 @@ export default function ProfilePage() {
   };
 
   const handleChangePassword = async (currentPassword: string, newPassword: string) => {
+    // Deixamos o erro propagar para que o ProfileForm exiba a mensagem
+    // apropriada (ex: senha atual incorreta).
     await userProfileService.changePassword({ currentPassword, newPassword });
   };
 
-  if (isLoading) {
+  if (isLoading || !user) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', pt: 8 }}>
         <CircularProgress />
-      </Box>
-    );
-  }
-
-  if (!user) {
-    return (
-      <Box sx={{ minHeight: '100dvh', bgcolor: 'background.default' }}>
-        <Toast
-          open={toast.open}
-          message={toast.message}
-          severity={toast.severity}
-          onClose={() => setToast((prev) => ({ ...prev, open: false }))}
-        />
       </Box>
     );
   }
@@ -107,13 +77,6 @@ export default function ProfilePage() {
           onChangePassword={handleChangePassword}
         />
       </Box>
-
-      <Toast
-        open={toast.open}
-        message={toast.message}
-        severity={toast.severity}
-        onClose={() => setToast((prev) => ({ ...prev, open: false }))}
-      />
     </Box>
   );
 }

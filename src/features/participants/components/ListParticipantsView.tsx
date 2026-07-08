@@ -39,42 +39,42 @@ export function ListParticipantsView() {
     useState<Participant | null>(null);
 
   useEffect(() => {
-    const eventId = context?.eventId;
-    const activityId = context?.activityId;
+  const eventId = context?.eventId ?? '';
+  const activityId = context?.activityId ?? '';
 
-    if (!eventId || !activityId) return;
+  if (!eventId || !activityId) return;
 
-    let isMounted = true;
+  let isMounted = true;
 
-    async function refreshParticipants() {
-      try {
-        const data = await getParticipantsForActivity(eventId, activityId);
+  async function refreshParticipants() {
+    try {
+      const data = await getParticipantsForActivity(eventId, activityId);
 
-        if (isMounted) {
-          setParticipants(Array.isArray(data) ? data : []);
-        }
-      } catch (error) {
-        console.error('Erro ao carregar participantes da atividade:', error);
+      if (isMounted) {
+        setParticipants(Array.isArray(data) ? data : []);
+      }
+    } catch (error) {
+      console.error('Erro ao carregar participantes da atividade:', error);
 
-        if (isMounted) {
-          setParticipants([]);
-        }
+      if (isMounted) {
+        setParticipants([]);
       }
     }
+  }
 
+  void refreshParticipants();
+
+  function handlePageShow() {
     void refreshParticipants();
+  }
 
-    function handlePageShow() {
-      void refreshParticipants();
-    }
+  window.addEventListener('pageshow', handlePageShow);
 
-    window.addEventListener('pageshow', handlePageShow);
-
-    return () => {
-      isMounted = false;
-      window.removeEventListener('pageshow', handlePageShow);
-    };
-  }, [context?.eventId, context?.activityId]);
+  return () => {
+    isMounted = false;
+    window.removeEventListener('pageshow', handlePageShow);
+  };
+}, [context?.eventId, context?.activityId]);
 
   if (!context) {
     return <PresenceContextMissing />;

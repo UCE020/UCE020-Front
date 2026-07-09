@@ -394,6 +394,8 @@ export function EventDetailView({ eventId }: EventDetailViewProps) {
         message: 'Inscrição cancelada com sucesso',
         severity: ToastSeverity.Success,
       });
+      setSelectedActivity(null);
+      setIsQrModalOpen(false);
     } catch (error) {
       setToast({
         open: true,

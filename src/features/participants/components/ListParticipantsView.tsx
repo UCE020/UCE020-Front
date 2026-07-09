@@ -5,9 +5,11 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { IconButton, CircularProgress, Box } from '@mui/material';
 import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded';
 import { AppPageContainer } from '@/components/layout/AppPageContainer';
+import { Toast } from '@/components/ui';
 import { useAuth } from '@/providers/auth-provider';
 import { participationService, type TipoParticipante } from '@/services/participationService';
 import { presenceService } from '@/services/presenceService';
+import { ToastSeverity } from '@/types/toast';
 import { requirePresenceContext } from '@/features/participants/presence/utils/resolvePresenceContext';
 import { buildValidatePresencePath } from '@/features/participants/presence/utils/routes';
 import { PresenceContextMissing } from '@/features/participants/presence/components/PresenceContextMissing';
@@ -48,6 +50,11 @@ export function ListParticipantsView() {
   const [isLoadingRole, setIsLoadingRole] = useState(true);
   const [participantType, setParticipantType] = useState<TipoParticipante | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [toast, setToast] = useState<{ open: boolean; message: string; severity: ToastSeverity }>({
+    open: false,
+    message: '',
+    severity: ToastSeverity.Success,
+  });
 
   useEffect(() => {
     const fallbackContext = requirePresenceContext(eventIdParam, activityIdParam);
@@ -190,10 +197,19 @@ export function ListParticipantsView() {
         ),
       );
       setError(null);
+      setToast({
+        open: true,
+        message: 'Presença removida com sucesso.',
+        severity: ToastSeverity.Success,
+      });
       closeRemoveModal();
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Erro ao remover presença';
-      setError(errorMessage);
+      setToast({
+        open: true,
+        message: errorMessage,
+        severity: ToastSeverity.Error,
+      });
       console.error(errorMessage);
     }
   }

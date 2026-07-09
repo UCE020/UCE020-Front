@@ -10,6 +10,7 @@ type ActivityModalActionsProps = Pick<
   | 'onMarkPresence'
   | 'onValidatePresences'
   | 'onListParticipants'
+  | 'isLoading'
 >;
 
 const actionButtonSx = {
@@ -25,6 +26,7 @@ export function ActivityModalActions({
   onMarkPresence,
   onValidatePresences,
   onListParticipants,
+  isLoading,
 }: ActivityModalActionsProps) {
   return (
     <Box
@@ -32,12 +34,14 @@ export function ActivityModalActions({
         display: 'flex',
         gap: 1.5,
         flexWrap: 'wrap',
-        mt: 2,
-        justifyContent: 'flex-end',
+        mt: 3,
+        width: '100%',
+        justifyContent: 'center',
+        alignItems: 'center',
       }}
     >
       {variant === 'signup' && (
-        <Button sx={actionButtonSx} onClick={onSignup}>
+        <Button sx={actionButtonSx} onClick={onSignup} disabled={Boolean(isLoading)}>
           Inscrever-se
         </Button>
       )}
@@ -48,11 +52,12 @@ export function ActivityModalActions({
             sx={actionButtonSx}
             variant="outlined"
             onClick={onCancelParticipation}
+            disabled={Boolean(isLoading)}
           >
             Cancelar participação
           </Button>
 
-          <Button sx={actionButtonSx} onClick={onMarkPresence}>
+          <Button sx={actionButtonSx} onClick={onMarkPresence} disabled={Boolean(isLoading)}>
             Marcar Presença
           </Button>
         </>

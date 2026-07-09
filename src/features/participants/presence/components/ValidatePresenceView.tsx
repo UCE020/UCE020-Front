@@ -6,8 +6,10 @@ import { Box, IconButton, Typography } from '@mui/material';
 import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded';
 import { AppPageContainer } from '@/components/layout/AppPageContainer';
 import { ContentCard } from '@/components/layout/ContentCard';
+import { Toast } from '@/components/ui';
 import { presenceService } from '@/services/presenceService';
 import { colorTokens } from '@/lib/colors';
+import { ToastSeverity } from '@/types/toast';
 import { validatePresenceScan } from '@/features/participants/presence/utils/validatePresenceScan';
 import {
   fetchPresenceContext,
@@ -108,6 +110,11 @@ export function ValidatePresenceView() {
   );
   const [state, setState] = useState<ScanState>(INITIAL_STATE);
   const [scanKey, setScanKey] = useState(0);
+  const [toast, setToast] = useState<{ open: boolean; message: string; severity: ToastSeverity }>({
+    open: false,
+    message: '',
+    severity: ToastSeverity.Success,
+  });
 
   useEffect(() => {
     const fallbackContext = requirePresenceContext(eventIdParam, activityIdParam);
@@ -153,9 +160,20 @@ export function ValidatePresenceView() {
         eventId: payload.eventId,
         activityId: payload.activityId,
       });
+
+      setToast({
+        open: true,
+        message: 'Presença confirmada com sucesso',
+        severity: ToastSeverity.Success,
+      });
       closeModal();
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Erro ao confirmar presença';
+      setToast({
+        open: true,
+        message,
+        severity: ToastSeverity.Error,
+      });
       setState((prev) => ({ ...prev, error: message, isConfirming: false }));
     }
   }
@@ -199,6 +217,13 @@ export function ValidatePresenceView() {
         onConfirm={handleConfirmPresence}
         isConfirming={state.isConfirming}
         confirmError={state.error}
+      />
+
+      <Toast
+        open={toast.open}
+        message={toast.message}
+        severity={toast.severity}
+        onClose={() => setToast((prev) => ({ ...prev, open: false }))}
       />
     </AppPageContainer>
   );

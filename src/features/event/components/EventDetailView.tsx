@@ -397,7 +397,10 @@ export function EventDetailView({ eventId }: EventDetailViewProps) {
     } catch (error) {
       setToast({
         open: true,
-        message: extractApiErrorMessage(error, 'Não foi possível cancelar a inscrição'),
+        message: extractApiErrorMessage(
+          error,
+          'Não foi possível cancelar a inscrição, presença registrada',
+        ),
         severity: ToastSeverity.Error,
       });
     } finally {

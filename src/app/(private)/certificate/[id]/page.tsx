@@ -58,6 +58,8 @@ export default function CertificateViewPage({ params }: { params: Promise<{ id: 
     );
   }
 
+  const isOrganizer = MOCK_USER.role === 'organizer';
+
   return (
     <Box sx={{ minHeight: '100dvh', bgcolor: 'background.default' }}>
       <Container maxWidth="sm" sx={{ px: 3, py: 2, pb: 6 }}>
@@ -141,15 +143,17 @@ export default function CertificateViewPage({ params }: { params: Promise<{ id: 
         </Box>
 
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 8 }}>
-          <Button
-            variant="contained"
-            color="primary"
-            sx={{ px: 6, borderRadius: '50px', fontWeight: 700 }}
-            leftIcon={<Draw />}
-            onClick={() => router.push(`/certificate/${cert.id}/sign`)}
-          >
-            Assinar Certificado
-          </Button>
+          {isOrganizer && (
+            <Button
+              variant="contained"
+              color="primary"
+              sx={{ px: 6, borderRadius: '50px', fontWeight: 700 }}
+              leftIcon={<Draw />}
+              onClick={() => router.push(`/certificate/${cert.id}/sign`)}
+            >
+              Assinar Certificado
+            </Button>
+            )}
           <Button
             variant="outlined"
             color="secondary"

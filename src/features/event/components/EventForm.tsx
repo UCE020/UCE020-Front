@@ -792,7 +792,7 @@ export default function EventForm({ mode, eventId }: EventFormProps) {
 
               {activities.length === 0 ? (
                 <Typography
-                  sx={{ fontSize: 12, color: colorTokens.neutral.gray500, fontStyle: 'italic' }}
+                  sx={{ fontSize: 12, color: colorTokens.neutral.gray500, fontStyle: 'italic', textAlign: 'center'}}
                 >
                   Nenhuma atividade cadastrada ainda.
                 </Typography>

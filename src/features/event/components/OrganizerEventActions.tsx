@@ -8,12 +8,16 @@ import { Button } from '@/components/ui';
 import { ConfirmModal } from '@/components/modals/confirm-modal';
 import { eventService } from '@/services/eventService';
 
+interface OrganizerEventActionsProps {
+  eventId: number;
+}
+
 const actionButtonSx = {
   height: 36,
   fontSize: 'clamp(10px, 3vw, 12px)',
   fontWeight: 700,
   whiteSpace: 'nowrap',
-  flex: 1
+  flex: 1,
 } as const;
 
 interface OrganizerEventActionsProps {
@@ -57,15 +61,23 @@ export function OrganizerEventActions({ eventId, isFinalized = false, onFinalize
   }
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 2, mt: 2 }}>
+    <Box
+      sx={{
+        display: 'flex',
+        gap: 1.5,
+        flexWrap: 'wrap',
+        px: { xs: 2, sm: 3 },
+        py: 2,
+        justifyContent: 'flex-start',
+      }}
+    >
       <Button
-        variant="outlined"
-        color="primary"
-        fullWidth
         onClick={onManageMembers}
-        sx={{ ...actionButtonSx }}
+        variant="contained"
+        color="secondary"
+        sx={{ ...actionButtonSx, minWidth: 160, textTransform: 'none', borderRadius: '10px' }}
       >
-        Gerenciar Membros
+        Gerenciar usuários
       </Button>
       {!isFinalized && (
         <Button
@@ -86,7 +98,7 @@ export function OrganizerEventActions({ eventId, isFinalized = false, onFinalize
           onClick={() => setIsConfirmOpen(true)}
           sx={{ ...actionButtonSx }}
         >
-          Finalizar
+          Finalizar Evento
         </Button>
       )}
 

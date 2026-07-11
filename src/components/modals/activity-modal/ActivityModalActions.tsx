@@ -10,11 +10,13 @@ type ActivityModalActionsProps = Pick<
   | 'onMarkPresence'
   | 'onValidatePresences'
   | 'onListParticipants'
+  | 'isLoading'
 >;
 
 const actionButtonSx = {
-  height: 36,
-  fontSize: 'clamp(10px, 3vw, 12px)',
+  height: 40,
+  fontSize: 'clamp(12px, 3vw, 14px)',
+  minWidth: 160,
 } as const;
 
 export function ActivityModalActions({
@@ -24,26 +26,22 @@ export function ActivityModalActions({
   onMarkPresence,
   onValidatePresences,
   onListParticipants,
+  isLoading,
 }: ActivityModalActionsProps) {
   return (
     <Box
       sx={{
         display: 'flex',
-        flexDirection: { xs: 'column', sm: 'row' },
-        justifyContent: 'center',
-        gap: 1,
+        gap: 1.5,
+        flexWrap: 'wrap',
+        mt: 3,
         width: '100%',
-        mt: 'auto',
+        justifyContent: 'center',
+        alignItems: 'center',
       }}
     >
       {variant === 'signup' && (
-        <Button
-          variant="contained"
-          color="secondary"
-          onClick={onSignup}
-          fullWidth
-          sx={{ ...actionButtonSx, maxWidth: { xs: '100%', sm: 160 }, alignSelf: 'center' }}
-        >
+        <Button sx={actionButtonSx} onClick={onSignup} disabled={Boolean(isLoading)}>
           Inscrever-se
         </Button>
       )}
@@ -51,44 +49,28 @@ export function ActivityModalActions({
       {variant === 'manage' && (
         <>
           <Button
+            sx={actionButtonSx}
             variant="outlined"
-            color="secondary"
             onClick={onCancelParticipation}
-            sx={{ ...actionButtonSx, flex: 1 }}
+            disabled={Boolean(isLoading)}
           >
             Cancelar participação
           </Button>
-          <Button
-            variant="contained"
-            color="secondary"
-            onClick={onMarkPresence}
-            sx={{ ...actionButtonSx, flex: 1 }}
-          >
+
+          <Button sx={actionButtonSx} onClick={onMarkPresence} disabled={Boolean(isLoading)}>
             Marcar Presença
           </Button>
         </>
       )}
 
       {variant === 'monitor' && (
-        <Button
-          variant="contained"
-          color="secondary"
-          onClick={onValidatePresences}
-          fullWidth
-          sx={actionButtonSx}
-        >
+        <Button sx={actionButtonSx} onClick={onValidatePresences}>
           Validar Presenças
         </Button>
       )}
 
       {variant === 'organizer' && (
-        <Button
-          variant="contained"
-          color="secondary"
-          onClick={onListParticipants}
-          fullWidth
-          sx={actionButtonSx}
-        >
+        <Button sx={actionButtonSx} onClick={onListParticipants}>
           Participantes
         </Button>
       )}

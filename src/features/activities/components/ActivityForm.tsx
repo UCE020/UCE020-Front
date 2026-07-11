@@ -232,11 +232,6 @@ export default function ActivityForm({
     setGuestModalOpen(true);
   }
 
-  function handleCloseGuestModal() {
-    setGuestModalOpen(false);
-    setEditingGuestIndex(null);
-  }
-
   function handleSubmit() {
     const allTouched = createTouchedState();
     (Object.keys(allTouched) as (keyof TouchedState)[]).forEach((key) => {

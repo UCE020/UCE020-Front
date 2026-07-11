@@ -6,6 +6,7 @@ import { CalendarToday, AccessTime, ArrowBack, Draw } from '@mui/icons-material'
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/Button';
 import { MOCK_CERTIFICATES } from '@/mocks/certificates';
+import { MOCK_USER } from '@/mocks/user';
 
 function formatCardDate(dateString: string) {
   const [year, month, day] = dateString.split('-');
@@ -17,11 +18,14 @@ export default function CertificateViewPage({ params }: { params: Promise<{ id: 
   const router = useRouter();
 
   const cert = MOCK_CERTIFICATES.find((c) => c.id === id);
+ 
 
   if (!cert) {
     router.push('/certificados');
     return null;
   }
+
+  const isOrganizer = MOCK_USER.role === 'organizer';
 
   return (
     <Box sx={{ minHeight: '100dvh', bgcolor: 'background.default' }}>
@@ -107,15 +111,17 @@ export default function CertificateViewPage({ params }: { params: Promise<{ id: 
         </Box>
 
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 8 }}>
-          <Button
-            variant="contained"
-            color="primary"
-            sx={{ px: 6, borderRadius: '50px', fontWeight: 700 }}
-            leftIcon={<Draw />}
-            onClick={() => router.push(`/certificate/${cert.id}/sign`)}
-          >
-            Assinar Certificado
-          </Button>
+          {isOrganizer && (
+            <Button
+              variant="contained"
+              color="primary"
+              sx={{ px: 6, borderRadius: '50px', fontWeight: 700 }}
+              leftIcon={<Draw />}
+              onClick={() => router.push(`/certificate/${cert.id}/sign`)}
+            >
+              Assinar Certificado
+            </Button>
+            )}
           <Button
             variant="outlined"
             color="secondary"

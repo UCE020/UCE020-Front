@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Box, CircularProgress, IconButton, Typography } from '@mui/material';
 import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded';
@@ -30,6 +30,7 @@ import { ToastSeverity } from '@/types/toast';
 import { Toast } from '@/components/ui/Toast';
 import { extractApiErrorMessage } from '@/utils/apiError';
 import { activityService } from '@/services/activityService';
+import { isAxiosError } from 'axios';
 
 interface EventDetailViewProps {
   eventId: string;

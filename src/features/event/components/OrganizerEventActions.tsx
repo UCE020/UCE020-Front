@@ -7,6 +7,7 @@ import { Box } from '@mui/material';
 import { Button } from '@/components/ui';
 import { ConfirmModal } from '@/components/modals/confirm-modal';
 import { eventService } from '@/services/eventService';
+import { certificateService } from '@/services/certificate.service';
 
 const actionButtonSx = {
   height: 36,
@@ -43,10 +44,26 @@ export function OrganizerEventActions({ eventId, isFinalized = false, onFinalize
     router.push(`/event/${eventId}/edit`);
   }
 
+  function onViewCertificates() {
+    router.push(`/certificate/generated/${eventId}`);
+  }
+
   async function onFinalizeEvent() {
     setIsFinalizing(true);
     try {
       await eventService.finalize(eventId);
+
+      // Gera os certificados na sequência. Cada chamada é best-effort — um
+      // evento/atividade sem ninguém a certificar (ex: atividade sem convidado)
+      // não deve impedir a navegação para a tela de certificados gerados.
+      const evento = await eventService.findOne(eventId).catch(() => null);
+      const activityIds = evento?.atividades?.map((activity) => activity.id) ?? [];
+
+      await Promise.allSettled([
+        certificateService.generateParticipantCertificates(eventId),
+        ...activityIds.map((activityId) => certificateService.generateGuestCertificates(activityId)),
+      ]);
+
       onFinalized?.();
       router.push(`/certificate/generated/${eventId}`);
     } catch (error) {
@@ -78,6 +95,17 @@ export function OrganizerEventActions({ eventId, isFinalized = false, onFinalize
           Editar
         </Button>
       )}
+      {isFinalized && (
+        <Button
+          variant="outlined"
+          color="secondary"
+          fullWidth
+          onClick={onViewCertificates}
+          sx={{ ...actionButtonSx }}
+        >
+          Certificados Gerados
+        </Button>
+      )}
       {!isFinalized && (
         <Button
           variant="contained"
@@ -93,7 +121,7 @@ export function OrganizerEventActions({ eventId, isFinalized = false, onFinalize
       <ConfirmModal
         open={isConfirmOpen}
         onClose={() => setIsConfirmOpen(false)}
-        message="Tem certeza que deseja finalizar este evento?"
+        message="Você deseja finalizar o evento e gerar os certificados?"
         emphasisEndText="Essa ação não pode ser desfeita."
         confirmText="Finalizar"
         cancelText="Cancelar"

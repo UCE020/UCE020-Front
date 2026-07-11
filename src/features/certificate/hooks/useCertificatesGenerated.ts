@@ -18,6 +18,8 @@ const ROLE_LABEL: Record<CertificateManagementRole, string> = {
   Monitor:     'Monitores',
   Organizador: 'Organizadores',
   Palestrante: 'Palestrantes',
+  Ministrante: 'Ministrantes',
+  Moderador:   'Moderadores',
 };
 
 export function useCertificatesGenerated(eventoId: number) {
@@ -25,8 +27,15 @@ export function useCertificatesGenerated(eventoId: number) {
   const [isLoading, setIsLoading]       = useState(false);
   const [isError, setIsError]           = useState(false);
   const [page, setPage]   = useState(1);
-  const [total, setTotal] = useState(0);
   const [hasMore, setHasMore] = useState(false);
+
+  const [roleStats, setRoleStats] = useState<
+    { role: CertificateManagementRole; label: string; value: number }[]
+  >(() =>
+    (['Ouvinte', 'Monitor', 'Organizador', 'Palestrante'] as CertificateManagementRole[]).map(
+      role => ({ role, label: ROLE_LABEL[role], value: 0 }),
+    ),
+  );
 
   const [roleTab, setRoleTab]                     = useState<CertificateRoleTab>('Todos');
   const [search, setSearch]                       = useState('');
@@ -39,33 +48,54 @@ export function useCertificatesGenerated(eventoId: number) {
   useEffect(() => {
     if (!eventoId) return;
 
-    // na primeira página limpa a lista, nas demais acumula
-    if (page === 1) {
-      setIsLoading(true);
-      setIsError(false);
-    }
+    let cancelled = false;
 
-    certificateService
-      .getCertificatesByEvent(eventoId, page)
-      .then(({ items, total }) => {
+    // na primeira página limpa a lista, nas demais acumula
+    const load = async () => {
+      if (page === 1) {
+        setIsLoading(true);
+        setIsError(false);
+      }
+
+      try {
+        const { items, hasMore } = await certificateService.getCertificatesByEvent(eventoId, page);
+        if (cancelled) return;
         setCertificates(prev => page === 1 ? items : [...prev, ...items]);
-        setTotal(total);
-        setHasMore(certificates.length + items.length < total); // ← calcula se tem mais
-      })
-      .catch(() => setIsError(true))
-      .finally(() => setIsLoading(false));
+        setHasMore(hasMore);
+      } catch {
+        if (!cancelled) setIsError(true);
+      } finally {
+        if (!cancelled) setIsLoading(false);
+      }
+    };
+
+    void load();
+
+    return () => {
+      cancelled = true;
+    };
   }, [eventoId, page]);
 
   const loadMore = () => setPage(prev => prev + 1);
 
-  const roleStats = useMemo(() => {
-    const roles: CertificateManagementRole[] = ['Ouvinte', 'Monitor', 'Organizador', 'Palestrante'];
-    return roles.map(role => ({
-      role,
-      label: ROLE_LABEL[role],
-      value: certificates.filter(c => c.role === role).length,
-    }));
-  }, [certificates]);
+  useEffect(() => {
+    if (!eventoId) return;
+
+    certificateService
+      .getCertificateStatsByEvent(eventoId)
+      .then(stats => {
+        setRoleStats(
+          stats.map(stat => ({
+            role:  stat.role,
+            label: ROLE_LABEL[stat.role],
+            value: stat.count,
+          })),
+        );
+      })
+      .catch(() => {
+        // mantém os totais zerados se a busca de estatísticas falhar
+      });
+  }, [eventoId]);
 
   const filteredCertificates = useMemo(() => {
     const filtered = filterCertificates({

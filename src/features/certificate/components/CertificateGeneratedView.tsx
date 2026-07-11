@@ -51,8 +51,10 @@ export function CertificatesGeneratedView({eventoId}: CertificatesGeneratedViewP
     router.push(`/certificate/${certificate.id}`);
   const handleEdit = (certificate: CertificateManagementItem) =>
     router.push(`/certificate/edit?id=${certificate.id}`);
-  const handleDownload = (certificate: CertificateManagementItem) =>
-    console.log('TODO: baixar certificado', certificate.id);
+  const handleDownload = (certificate: CertificateManagementItem) => {
+    if (!certificate.imageUrl) return;
+    window.open(certificate.imageUrl, '_blank', 'noopener,noreferrer');
+  };
   const handleDelete = (certificate: CertificateManagementItem) =>
     console.log('TODO: excluir certificado', certificate.id);
   const handleSignBatch = () => console.log('TODO: assinar em lote');

@@ -72,6 +72,8 @@ export const CERTIFICATE_ROLE_COLORS: Record<CertificateManagementRole, { bg: st
   Monitor: { bg: '#EEF2FF', color: '#3730A3' },
   Organizador: { bg: '#F3E8FF', color: '#6D28D9' },
   Palestrante: { bg: '#FFF7ED', color: '#B45309' },
+  Ministrante: { bg: '#FFF7ED', color: '#B45309' },
+  Moderador: { bg: '#FFF7ED', color: '#B45309' },
 };
 
 export const CERTIFICATE_STATUS_META: Record<

@@ -1,4 +1,10 @@
-export type CertificateManagementRole = 'Ouvinte' | 'Monitor' | 'Organizador' | 'Palestrante';
+export type CertificateManagementRole =
+  | 'Ouvinte'
+  | 'Monitor'
+  | 'Organizador'
+  | 'Palestrante'
+  | 'Ministrante'
+  | 'Moderador';
 export type CertificateManagementStatus = 'Pendente' | 'Assinado' | 'Encaminhado';
 
 export interface CertificateManagementItem {
@@ -15,7 +21,10 @@ export interface CertificateManagementItem {
 
 export interface CertificatePageResponse {
   items: CertificateManagementItem[];
-  total: number;
-  page:  number;
-  limit: number;
+  hasMore: boolean;
+}
+
+export interface CertificateRoleStat {
+  role:  CertificateManagementRole;
+  count: number;
 }

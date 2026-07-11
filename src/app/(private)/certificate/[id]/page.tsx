@@ -6,11 +6,13 @@ import { CalendarToday, AccessTime, ArrowBack, Draw, Download, PictureAsPdf } fr
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/Button';
 import { certificateService } from '@/services/certificate.service';
+import { useMockUser } from '@/mocks/useMockUser';
 import type { CertificateManagementItem } from '@/types/certificate-management';
 
 export default function CertificateViewPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const router = useRouter();
+  const mockUser = useMockUser();
 
   const [cert, setCert] = useState<CertificateManagementItem | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -58,7 +60,7 @@ export default function CertificateViewPage({ params }: { params: Promise<{ id: 
     );
   }
 
-  const isOrganizer = MOCK_USER.role === 'organizer';
+  const isOrganizer = mockUser.role === 'organizer';
 
   return (
     <Box sx={{ minHeight: '100dvh', bgcolor: 'background.default' }}>

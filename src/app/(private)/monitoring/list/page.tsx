@@ -1,9 +1,10 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Box, CircularProgress, Container, Typography } from '@mui/material';
+import { Box, Container, Typography } from '@mui/material';
 
 import { EventList } from '@/components/event/EventList';
+import { PageLoader } from '@/components/ui';
 import { useAuth } from '@/providers/auth-provider';
 import { eventService } from '@/services/eventService';
 import type { Event } from '@/types/event';
@@ -55,9 +56,7 @@ export default function EventCreatedPage() {
       <Container sx={{ py: { xs: 3, md: 4 } }}>
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, alignItems: 'center', mb: 2 }}>
           {isFetchingEvents ? (
-            <Box sx={{ display: 'flex', justifyContent: 'center', py: 8, width: '100%' }}>
-              <CircularProgress />
-            </Box>
+            <PageLoader minHeight="calc(100dvh - 160px)" />
           ) : (
             <>
               {loadError ? (

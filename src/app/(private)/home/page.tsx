@@ -38,7 +38,7 @@ function searchReducer(_: SearchState, action: SearchAction): SearchState {
 export default function HomePage() {
   const router = useRouter();
   const { user } = useAuth();
-  const { filteredEvents } = useHomeEvents();
+  const { filteredEvents, loading: eventsLoading } = useHomeEvents();
   const [code, setCode] = useState('');
   const [searchCode, setSearchCode] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
@@ -132,6 +132,7 @@ export default function HomePage() {
         <QuickActions />
         <EventList
           events={filteredEvents}
+          loading={eventsLoading}
           onEventClick={handleEventClick}
         />
       </Box>

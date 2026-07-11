@@ -24,11 +24,13 @@ export default function ScheduleCard({
       <Typography
         variant="h3"
         sx={{
-          fontSize: 'clamp(16px, 5vw, 20px)',
-          color: 'primary.contrastText',
+          fontSize: 'clamp(17px, 5vw, 21px)',
+          fontWeight: 700,
+          letterSpacing: '-0.01em',
+          color: 'text.primary',
           textAlign: 'center',
-          mt: { xs: 1, sm: 2 },
-          mb: { xs: 2, sm: 3 },
+          mt: { xs: 0.5, sm: 1 },
+          mb: { xs: 2.5, sm: 3 },
           px: { xs: 4, sm: 5 },
           display: '-webkit-box',
           WebkitLineClamp: 2,

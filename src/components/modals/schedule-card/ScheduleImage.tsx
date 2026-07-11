@@ -14,7 +14,10 @@ export default function ScheduleImage({ title, image }: ScheduleImageProps) {
         position: 'relative',
         overflow: 'hidden',
         flexShrink: 0,
-        borderRadius: { xs: 1, sm: 0 },
+        borderRadius: '14px',
+        border: '1px solid',
+        borderColor: 'divider',
+        boxShadow: '0 4px 14px rgba(15, 30, 59, 0.08)',
       }}
     >
       {image && !hasError ? (

@@ -2,7 +2,8 @@
 
 import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { Box, CircularProgress, IconButton, Typography } from '@mui/material';
+import { Box, IconButton, Typography } from '@mui/material';
+import { PageLoader } from '@/components/ui';
 import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded';
 import AccessTimeRoundedIcon from '@mui/icons-material/AccessTimeRounded';
 import CalendarTodayRoundedIcon from '@mui/icons-material/CalendarTodayRounded';
@@ -423,6 +424,13 @@ export function EventDetailView({ eventId }: EventDetailViewProps) {
   }
 
   function handleBack() {
+    // Volta para a página anterior; se não houver histórico (acesso direto
+    // por link), cai para a home como fallback.
+    if (typeof window !== 'undefined' && window.history.length > 1) {
+      router.back();
+      return;
+    }
+
     router.push('/home');
   }
 
@@ -441,19 +449,7 @@ export function EventDetailView({ eventId }: EventDetailViewProps) {
   const isLoading = isLoadingEvent || isLoadingParticipation;
 
   if (isLoading) {
-    return (
-      <AppPageContainer
-        sx={{
-          borderRadius: '28px',
-          minHeight: '100dvh',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
-        <CircularProgress />
-      </AppPageContainer>
-    );
+    return <PageLoader />;
   }
 
   if (!event) {

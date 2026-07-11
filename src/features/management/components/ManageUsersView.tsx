@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Box, CircularProgress, Typography, IconButton } from '@mui/material';
+import { Box, Typography, IconButton } from '@mui/material';
+import { PageLoader } from '@/components/ui';
 import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded';
 import { useRouter } from 'next/navigation';
 import { colorTokens } from '@/lib/colors';
@@ -173,18 +174,7 @@ export function ManageUsersView({ eventId }: ManageUsersViewProps) {
     : { message: '', emphasisEndText: '' };
 
   if (isLoading) {
-    return (
-      <AppPageContainer
-        sx={{
-          minHeight: '100dvh',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
-        <CircularProgress />
-      </AppPageContainer>
-    );
+    return <PageLoader />;
   }
 
   return (

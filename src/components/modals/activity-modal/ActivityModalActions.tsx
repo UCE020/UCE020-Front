@@ -14,9 +14,10 @@ type ActivityModalActionsProps = Pick<
 >;
 
 const actionButtonSx = {
-  height: 40,
+  height: 44,
   fontSize: 'clamp(12px, 3vw, 14px)',
-  minWidth: 160,
+  width: { xs: '100%', sm: 'auto' },
+  minWidth: { xs: 0, sm: 160 },
 } as const;
 
 export function ActivityModalActions({
@@ -32,6 +33,7 @@ export function ActivityModalActions({
     <Box
       sx={{
         display: 'flex',
+        flexDirection: { xs: 'column', sm: 'row' },
         gap: 1.5,
         flexWrap: 'wrap',
         mt: 3,

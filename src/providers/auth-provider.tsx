@@ -1,6 +1,7 @@
 'use client';
 
 import { createContext, useContext, useEffect, useState } from 'react';
+import { isAxiosError } from 'axios';
 import { authService } from '@/services/authService';
 
 interface User {
@@ -77,14 +78,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const payload = isRecord(res.data) && 'user' in res.data ? res.data.user : res.data;
         const normalizedUser = normalizeUser(payload);
 
-        console.log('[AuthProvider] getMe raw', res.data);
-        console.log('[AuthProvider] getMe normalized', normalizedUser);
-
         setUser(normalizedUser);
       })
       .catch((error) => {
-        console.error('[AuthProvider] erro no getMe', error);
-        localStorage.removeItem('token');
+        // Token expirado/inválido (401): logout silencioso, é um fluxo esperado
+        if (isAxiosError(error) && error.response?.status === 401) {
+          localStorage.removeItem('token');
+          setUser(null);
+          return;
+        }
+
+        // Erros inesperados (backend fora do ar, 500, rede): loga sem derrubar a UI
+        if (isAxiosError(error) && !error.response) {
+          console.warn(
+            '[AuthProvider] Não foi possível conectar à API. Verifique se o backend está rodando em ' +
+              (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api/v1'),
+          );
+        } else {
+          console.error('[AuthProvider] erro inesperado no getMe', error);
+        }
+
         setUser(null);
       })
       .finally(() => {

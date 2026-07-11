@@ -24,7 +24,7 @@ import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined
 import AddRoundedIcon from '@mui/icons-material/AddRounded';
 import EventOutlinedIcon from '@mui/icons-material/EventOutlined';
 import ScheduleOutlinedIcon from '@mui/icons-material/ScheduleOutlined';
-import { Button, TextInput } from '@/components/ui';
+import { Button, TextInput, PageLoader } from '@/components/ui';
 import { ImageUpload } from '@/components/ui/inputs';
 import { colorTokens } from '@/lib/colors';
 import { useCreateEvent } from '../../evento/hooks/useCreateEvent';
@@ -358,19 +358,7 @@ export default function EventForm({ mode, eventId }: EventFormProps) {
   }
 
   if (isEdit && loadingEvent) {
-    return (
-      <Box
-        sx={{
-          minHeight: '100dvh',
-          background: colorTokens.surface.background,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
-        <CircularProgress />
-      </Box>
-    );
+    return <PageLoader sx={{ background: colorTokens.surface.background }} />;
   }
 
   if (isEdit && loadError) {

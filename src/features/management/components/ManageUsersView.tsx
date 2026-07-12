@@ -13,6 +13,7 @@ import { EditUserRoleModal, USER_ROLES } from '../../../components/modals/manage
 import { eventService, TipoParticipante } from '@/services/eventService';
 import { Toast } from '@/components/ui/Toast';
 import { ToastSeverity } from '@/types/toast';
+import { useAuth } from '@/providers/auth-provider';
 import type { ManagedUser, StaffRole } from '@/types/management';
 
 interface ManageUsersViewProps {
@@ -33,6 +34,7 @@ const ROLE_MAP_REVERSE: Record<string, TipoParticipante> = {
 
 export function ManageUsersView({ eventId }: ManageUsersViewProps) {
   const router = useRouter();
+  const { user: currentUser } = useAuth();
   const [users, setUsers] = useState<ManagedUser[]>([]);
   const [search, setSearch] = useState('');
   const [isLoading, setIsLoading] = useState(true);
@@ -185,15 +187,18 @@ export function ManageUsersView({ eventId }: ManageUsersViewProps) {
         isEmpty={filteredUsers.length === 0}
         emptyMessage="Nenhum usuário encontrado"
       >
-        {filteredUsers.map((user) => (
-          <StaffListRow
-            key={user.id}
-            name={user.name}
-            role={user.role}
-            onEdit={() => openEditModal(user.id)}
-            onDelete={() => openDeleteModal(user.id)}
-          />
-        ))}
+        {filteredUsers.map((user) => {
+          const isCurrentUser = String(currentUser?.id) === user.id;
+          return (
+            <StaffListRow
+              key={user.id}
+              name={user.name}
+              role={user.role}
+              onEdit={isCurrentUser ? undefined : () => openEditModal(user.id)}
+              onDelete={isCurrentUser ? undefined : () => openDeleteModal(user.id)}
+            />
+          );
+        })}
       </ManagementListCard>
 
       {/* Modal de edição de tipo aplicando a renderização condicional correta com a key */}

@@ -213,20 +213,6 @@ export function ManageUsersView({ eventId }: ManageUsersViewProps) {
           maxWidth: 800,
         }}
       >
-        <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-          <IconButton
-            onClick={() => router.push(`/event/${eventId}`)}
-            aria-label="Voltar"
-            sx={{
-              color: colorTokens.text.primary,
-              bgcolor: '#F8FAFC',
-              border: '1px solid rgba(15, 29, 53, 0.06)',
-              '&:hover': { bgcolor: '#EEF2F6' },
-            }}
-          >
-            <ArrowBackRoundedIcon />
-          </IconButton>
-        </Box>
         <ManagementListCard
           title="Gerenciar Membros do Evento"
           search={search}

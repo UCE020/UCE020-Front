@@ -48,12 +48,13 @@ export default function ScheduleDetails({
   hours,
   participantsCount,
   status,
+  fullWidth = false,
 }: ScheduleDetailsProps) {
   return (
     <Box
       sx={{
-        width: { xs: '100%', sm: '50%' },
-        aspectRatio: { xs: 'auto', sm: '1/1' },
+        width: fullWidth ? '100%' : { xs: '100%', sm: '50%' },
+        aspectRatio: fullWidth ? 'auto' : { xs: 'auto', sm: '1/1' },
         position: 'relative',
         flexShrink: 0,
       }}

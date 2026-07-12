@@ -19,6 +19,7 @@ export default function ActivityModal({
   status,
   description,
   variant,
+  presenceConfirmed,
   onSignup,
   onCancelParticipation,
   onMarkPresence,
@@ -62,6 +63,7 @@ export default function ActivityModal({
 
         <ActivityModalActions
           variant={variant}
+          presenceConfirmed={presenceConfirmed}
           onSignup={onSignup}
           onCancelParticipation={onCancelParticipation}
           onMarkPresence={onMarkPresence}

@@ -1,11 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Box, Typography, IconButton } from '@mui/material';
 import { PageLoader } from '@/components/ui';
-import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded';
 import { useRouter } from 'next/navigation';
-import { colorTokens } from '@/lib/colors';
 import { ConfirmModal } from '@/components/modals/confirm-modal';
 import { AppPageContainer } from '@/components/layout/AppPageContainer';
 import { getRemoveStaffMessage } from '@/features/participants/presence/utils/presenceMessages';
@@ -178,62 +175,26 @@ export function ManageUsersView({ eventId }: ManageUsersViewProps) {
   }
 
   return (
-    <AppPageContainer
-      sx={{
-        bgcolor: { xs: 'background.default', sm: '#e8eaf0' },
-        display: { sm: 'flex' },
-        flexDirection: { sm: 'column' },
-        alignItems: { sm: 'center' },
-        justifyContent: { sm: 'center' },
-        py: { sm: 4 },
-      }}
-    >
-      <Box
-        sx={{
-          minHeight: { xs: '100dvh', sm: 'auto' },
-          bgcolor: 'background.paper',
-          borderRadius: { xs: 0, sm: 4 },
-          mx: { xs: -2, sm: 0 },
-          px: { xs: 2, sm: 3 },
-          py: { xs: 4, sm: 4 },
-          boxShadow: { xs: 'none', sm: '0 4px 24px rgba(0,0,0,0.08)' },
-          width: '100%',
-          maxWidth: 800,
-        }}
+    <AppPageContainer maxWidth={800}>
+      <ManagementListCard
+        title="Gerenciar Membros do Evento"
+        search={search}
+        onSearchChange={setSearch}
+        searchAriaLabel="Buscar usuário"
+        onBack={() => router.push(`/event/${eventId}`)}
+        isEmpty={filteredUsers.length === 0}
+        emptyMessage="Nenhum usuário encontrado"
       >
-        <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-          <IconButton
-            onClick={() => router.push(`/event/${eventId}`)}
-            aria-label="Voltar"
-            sx={{
-              color: colorTokens.text.primary,
-              bgcolor: '#F8FAFC',
-              border: '1px solid rgba(15, 29, 53, 0.06)',
-              '&:hover': { bgcolor: '#EEF2F6' },
-            }}
-          >
-            <ArrowBackRoundedIcon />
-          </IconButton>
-        </Box>
-        <ManagementListCard
-          title="Gerenciar Membros do Evento"
-          search={search}
-          onSearchChange={setSearch}
-          searchAriaLabel="Buscar usuário"
-          isEmpty={filteredUsers.length === 0}
-          emptyMessage="Nenhum usuário encontrado"
-        >
-          {filteredUsers.map((user) => (
-            <StaffListRow
-              key={user.id}
-              name={user.name}
-              role={user.role}
-              onEdit={() => openEditModal(user.id)}
-              onDelete={() => openDeleteModal(user.id)}
-            />
-          ))}
-        </ManagementListCard>
-      </Box>
+        {filteredUsers.map((user) => (
+          <StaffListRow
+            key={user.id}
+            name={user.name}
+            role={user.role}
+            onEdit={() => openEditModal(user.id)}
+            onDelete={() => openDeleteModal(user.id)}
+          />
+        ))}
+      </ManagementListCard>
 
       {/* Modal de edição de tipo aplicando a renderização condicional correta com a key */}
       {editModalOpen && editingUser && (

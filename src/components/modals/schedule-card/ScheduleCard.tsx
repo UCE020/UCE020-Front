@@ -51,7 +51,7 @@ export default function ScheduleCard({
           gap: { xs: 2, sm: 0 },
         }}
       >
-        <ScheduleImage title={title} image={image} />
+        {image && <ScheduleImage title={title} image={image} />}
         <ScheduleDetails
           startDate={startDate}
           endDate={endDate}
@@ -59,6 +59,7 @@ export default function ScheduleCard({
           hours={hours}
           participantsCount={participantsCount}
           status={status}
+          fullWidth={!image}
         />
       </Box>
 

@@ -1,10 +1,12 @@
-import { Box } from '@mui/material';
+import { Box, Typography } from '@mui/material';
+import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded';
 import { Button } from '@/components/ui';
 import type { ActivityModalProps } from '@/types/activity';
 
 type ActivityModalActionsProps = Pick<
   ActivityModalProps,
   | 'variant'
+  | 'presenceConfirmed'
   | 'onSignup'
   | 'onCancelParticipation'
   | 'onMarkPresence'
@@ -22,6 +24,7 @@ const actionButtonSx = {
 
 export function ActivityModalActions({
   variant,
+  presenceConfirmed,
   onSignup,
   onCancelParticipation,
   onMarkPresence,
@@ -29,6 +32,30 @@ export function ActivityModalActions({
   onListParticipants,
   isLoading,
 }: ActivityModalActionsProps) {
+  // Participante inscrito com presença já confirmada: nenhuma ação disponível,
+  // apenas o status "Presença registrada".
+  if (variant === 'manage' && presenceConfirmed) {
+    return (
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: 1,
+          mt: 3,
+          width: '100%',
+          py: 1.5,
+          borderRadius: '12px',
+          bgcolor: 'rgba(16, 185, 129, 0.12)',
+          color: 'success.main',
+        }}
+      >
+        <CheckCircleRoundedIcon sx={{ fontSize: 22 }} />
+        <Typography sx={{ fontWeight: 700, fontSize: 14 }}>Presença registrada</Typography>
+      </Box>
+    );
+  }
+
   return (
     <Box
       sx={{

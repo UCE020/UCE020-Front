@@ -15,6 +15,8 @@ export interface ActivityModalProps {
   status: string;
   description: string;
   variant: ActivityModalVariant;
+  /** Quando o participante já teve a presença confirmada nesta atividade. */
+  presenceConfirmed?: boolean;
   onSignup?: AsyncVoidHandler;
   onCancelParticipation?: AsyncVoidHandler;
   onMarkPresence?: AsyncVoidHandler;

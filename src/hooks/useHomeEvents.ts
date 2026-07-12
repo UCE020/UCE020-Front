@@ -9,6 +9,7 @@ export function useHomeEvents() {
   const { user, isLoading } = useAuth();
   const [events, setEvents] = useState<Event[]>([]);
   const [isFetchingEvents, setIsFetchingEvents] = useState(false);
+  const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
 
   useEffect(() => {
     if (isLoading || !user) return;
@@ -35,6 +36,7 @@ export function useHomeEvents() {
       .finally(() => {
         if (isMounted) {
           setIsFetchingEvents(false);
+          setHasLoadedOnce(true);
         }
       });
 
@@ -45,5 +47,9 @@ export function useHomeEvents() {
 
   const filteredEvents = useMemo(() => (user ? events : []), [events, user]);
 
-  return { filteredEvents, isFetchingEvents };
+  // Só é "carregando" enquanto há uma sessão sendo resolvida ou os eventos
+  // ainda não terminaram de buscar pela primeira vez. Deslogado => não carrega.
+  const loading = isLoading || isFetchingEvents || (!!user && !hasLoadedOnce);
+
+  return { filteredEvents, isFetchingEvents, loading };
 }

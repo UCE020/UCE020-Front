@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Box, CircularProgress, Typography, IconButton } from '@mui/material';
+import { Box, CircularProgress, IconButton } from '@mui/material';
 import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded';
 import { useRouter } from 'next/navigation';
 import { colorTokens } from '@/lib/colors';
@@ -230,6 +230,7 @@ export function ManageUsersView({ eventId }: ManageUsersViewProps) {
           search={search}
           onSearchChange={setSearch}
           searchAriaLabel="Buscar usuário"
+          onBack={() => router.push(`/event/${eventId}`)}
           isEmpty={filteredUsers.length === 0}
           emptyMessage="Nenhum usuário encontrado"
         >

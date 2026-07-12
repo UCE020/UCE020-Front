@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import {
   Box,
+  Chip,
   Divider,
   IconButton,
   InputAdornment,
@@ -14,64 +15,81 @@ import {
   Typography,
 } from '@mui/material';
 import ArrowBackIosNewRoundedIcon from '@mui/icons-material/ArrowBackIosNewRounded';
-import AddRoundedIcon from '@mui/icons-material/AddRounded';
+import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import CalendarTodayOutlinedIcon from '@mui/icons-material/CalendarTodayOutlined';
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
-
+import PersonOutlineRoundedIcon from '@mui/icons-material/PersonOutlineRounded';
 import { Button, TextInput } from '@/components/ui';
 import { colorTokens } from '@/lib/colors';
+import RegisterGuestModal from '@/components/modals/register-guest-modal/RegisterGuestModal';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
-type ActivityFormMode = 'create' | 'edit';
+export type ActivityFormMode = 'create' | 'edit';
 
-type FormState = {
+export type ActivityFormVariant = 'page' | 'embedded';
+
+export type ActivityGuest = {
+  name: string;
+  email: string;
+  role: string;
+};
+
+export type ActivityFormState = {
   name: string;
   category: string;
-  guests: string;
+  location: string;
   workload: string;
   description: string;
   startDate: string;
   endDate: string;
   startTime: string;
   endTime: string;
+  guests: ActivityGuest[];
 };
 
-type TouchedState = Record<keyof FormState, boolean>;
+type TouchedState = Record<Exclude<keyof ActivityFormState, 'guests'>, boolean>;
+
+export type ActivityEventInfo = {
+  title: string;
+  date: string;
+  location: string;
+};
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
 const CATEGORY_OPTIONS = [
-  'Palestra',
-  'Oficina',
-  'Mesa Redonda',
-  'Minicurso',
-  'Workshop',
-  'Outro',
+  { value: 'palestra', label: 'Palestra' },
+  { value: 'oficina', label: 'Oficina' },
+  { value: 'mesa_redonda', label: 'Mesa Redonda' },
+  { value: 'minicurso', label: 'Minicurso' },
+  { value: 'workshop', label: 'Workshop' },
+  { value: 'outro', label: 'Outro' },
 ];
 
-const DEFAULT_FORM: FormState = {
+const GUEST_ROLE_OPTIONS = [
+  { value: 'palestrante', label: 'Palestrante' },
+  { value: 'ministrante', label: 'Ministrante' },
+  { value: 'moderador', label: 'Moderador' },
+];
+
+const EMPTY_FORM: ActivityFormState = {
   name: '',
   category: '',
-  guests: '',
+  location: '',
   workload: '',
   description: '',
   startDate: '',
   endDate: '',
   startTime: '',
   endTime: '',
+  guests: [],
 };
 
-const EDIT_FORM: FormState = {
-  name: 'Introdução ao React',
-  category: 'Oficina',
-  guests: 'Kauan Farias',
-  workload: '4',
-  description: 'Atividade prática com foco em componentes e hooks do React.',
-  startDate: '2026-05-20',
-  endDate: '2026-05-20',
-  startTime: '08:00',
-  endTime: '12:00',
+const FALLBACK_EVENT_INFO: ActivityEventInfo = {
+  title: 'Título do Evento',
+  date: 'dd/mm/yyyy',
+  location: 'localização',
 };
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -80,7 +98,7 @@ function createTouchedState(): TouchedState {
   return {
     name: false,
     category: false,
-    guests: false,
+    location: false,
     workload: false,
     description: false,
     startDate: false,
@@ -90,17 +108,17 @@ function createTouchedState(): TouchedState {
   };
 }
 
-function getErrors(form: FormState, touched: TouchedState) {
+function getErrors(form: ActivityFormState, touched: TouchedState) {
   return {
     name:
       touched.name && form.name.trim().length < 3
         ? 'Informe um nome com pelo menos 3 caracteres.'
         : '',
-    category:
-      touched.category && !form.category
-        ? 'Selecione uma categoria.'
+    category: touched.category && !form.category ? 'Selecione uma categoria.' : '',
+    location:
+      touched.location && form.location.trim().length < 1
+        ? 'Informe a localização da atividade.'
         : '',
-    guests: '', // optional field — no validation required
     workload:
       touched.workload && form.workload !== '' && isNaN(Number(form.workload))
         ? 'Informe um número válido de horas.'
@@ -109,22 +127,19 @@ function getErrors(form: FormState, touched: TouchedState) {
       touched.description && form.description.trim().length < 10
         ? 'Descreva melhor a atividade (mínimo 10 caracteres).'
         : '',
-    startDate:
-      touched.startDate && !form.startDate ? 'Selecione a data de início.' : '',
-    endDate:
-      touched.endDate && !form.endDate ? 'Selecione a data de término.' : '',
-    startTime:
-      touched.startTime && !form.startTime ? 'Selecione o horário de início.' : '',
-    endTime:
-      touched.endTime && !form.endTime ? 'Selecione o horário de término.' : '',
+    startDate: touched.startDate && !form.startDate ? 'Selecione a data de início.' : '',
+    endDate: touched.endDate && !form.endDate ? 'Selecione a data de término.' : '',
+    startTime: touched.startTime && !form.startTime ? 'Selecione o horário de início.' : '',
+    endTime: touched.endTime && !form.endTime ? 'Selecione o horário de término.' : '',
   };
 }
 
-function isFormValid(form: FormState, errors: ReturnType<typeof getErrors>) {
+function isFormValid(form: ActivityFormState, errors: ReturnType<typeof getErrors>) {
   return (
     Object.values(errors).every((e) => e === '') &&
     form.name.trim().length >= 3 &&
     Boolean(form.category) &&
+    form.location.trim().length >= 1 &&
     form.description.trim().length >= 10 &&
     Boolean(form.startDate) &&
     Boolean(form.endDate) &&
@@ -135,95 +150,151 @@ function isFormValid(form: FormState, errors: ReturnType<typeof getErrors>) {
 
 // ─── Component ───────────────────────────────────────────────────────────────
 
-// Mock event info shown at the top of the form (would come from props/context in real usage)
-type EventInfo = {
-  title: string;
-  date: string;
-  location: string;
-};
+export interface ActivityFormProps {
+  mode: ActivityFormMode;
+  /** 'page' (padrão) = tela cheia com botão de voltar. 'embedded' = uso dentro de Drawer/Modal. */
+  variant?: ActivityFormVariant;
+  /** Dados do evento-pai a exibir no card superior. Se omitido, usa um fallback ilustrativo. */
+  eventInfo?: ActivityEventInfo;
+  /** Valores iniciais (usado em modo de edição, ou para pré-preencher em variant="embedded"). */
+  initialValues?: Partial<ActivityFormState>;
+  /** Chamado com os dados válidos do formulário. Quem chama decide o que fazer (converter para o DTO, chamar API, etc). */
+  onSubmit?: (data: ActivityFormState) => void;
+  /** Chamado ao cancelar/fechar. Em variant="embedded" deve fechar o Drawer/Modal. */
+  onCancel?: () => void;
+  /** Rota de retorno usada apenas em variant="page". */
+  backHref?: string;
+}
 
-const MOCK_EVENT: EventInfo = {
-  title: 'Título do Evento',
-  date: 'dd/mm/yyyy',
-  location: 'localização',
-};
-
-export default function ActivityForm({ mode }: { mode: ActivityFormMode }) {
+export default function ActivityForm({
+  mode,
+  variant = 'page',
+  eventInfo,
+  initialValues,
+  onSubmit,
+  onCancel,
+  backHref = '/home',
+}: ActivityFormProps) {
   const isEdit = mode === 'edit';
+  const isEmbedded = variant === 'embedded';
 
-  const [form, setForm] = useState<FormState>(isEdit ? EDIT_FORM : DEFAULT_FORM);
+  const [form, setForm] = useState<ActivityFormState>({
+    ...EMPTY_FORM,
+    ...initialValues,
+    guests: initialValues?.guests ?? [],
+  });
   const [touched, setTouched] = useState<TouchedState>(createTouchedState);
+
+  const [guestModalOpen, setGuestModalOpen] = useState(false);
+  const [editingGuestIndex, setEditingGuestIndex] = useState<number | null>(null);
 
   const errors = useMemo(() => getErrors(form, touched), [form, touched]);
   const canSubmit = isFormValid(form, errors);
 
-  const title = isEdit ? 'Edição de Atividade' : 'Cadastrar Atividade';
+  const name = isEdit ? 'Edição de Atividade' : 'Cadastrar Atividade';
   const subtitle = isEdit
     ? 'Edite as informações da atividade abaixo'
     : 'Preencha os dados abaixo para cadastrar uma nova atividade';
   const actionLabel = isEdit ? 'Salvar' : 'Cadastrar';
+  const displayedEvent = eventInfo ?? FALLBACK_EVENT_INFO;
 
-  function updateField(field: keyof FormState, value: string) {
+  function updateField(field: Exclude<keyof ActivityFormState, 'guests'>, value: string) {
     setForm((current) => ({ ...current, [field]: value }));
   }
 
-  function markTouched(field: keyof FormState) {
+  function markTouched(field: Exclude<keyof ActivityFormState, 'guests'>) {
     setTouched((current) => ({ ...current, [field]: true }));
   }
 
+  async function handleGuestSubmit(payload: { fullName: string; role: string; email: string }) {
+    const guestData = { name: payload.fullName, email: payload.email, role: payload.role };
+
+    setForm((cur) => {
+      if (editingGuestIndex !== null) {
+        // edição: substitui no índice correto
+        const next = [...cur.guests];
+        next[editingGuestIndex] = guestData;
+        return { ...cur, guests: next };
+      }
+      // criação: adiciona no final
+      return { ...cur, guests: [...cur.guests, guestData] };
+    });
+
+    setEditingGuestIndex(null);
+  }
+
+  function handleRemoveGuest(index: number) {
+    setForm((cur) => ({ ...cur, guests: cur.guests.filter((_, i) => i !== index) }));
+  }
+
+  function handleOpenEditGuest(index: number) {
+    setEditingGuestIndex(index);
+    setGuestModalOpen(true);
+  }
+
   function handleSubmit() {
-    // Mark all fields as touched to trigger all validations
-    const allTouched: TouchedState = {
-      name: true,
-      category: true,
-      guests: true,
-      workload: true,
-      description: true,
-      startDate: true,
-      endDate: true,
-      startTime: true,
-      endTime: true,
-    };
+    const allTouched = createTouchedState();
+    (Object.keys(allTouched) as (keyof TouchedState)[]).forEach((key) => {
+      allTouched[key] = true;
+    });
     setTouched(allTouched);
 
     const currentErrors = getErrors(form, allTouched);
     if (!isFormValid(form, currentErrors)) return;
 
-    console.log(isEdit ? 'Salvar atividade' : 'Cadastrar atividade', form);
+    onSubmit?.(form);
   }
 
   return (
     <Box
       sx={{
-        minHeight: '100dvh',
-        background: colorTokens.surface.background,
+        minHeight: isEmbedded ? '100%' : '100dvh',
+        height: isEmbedded ? '100%' : 'auto', // ← adicionado
+        background: isEmbedded ? 'transparent' : colorTokens.surface.background,
         overflowX: 'hidden',
       }}
     >
-      <Box sx={{ px: 2, py: 3, display: 'flex', justifyContent: 'center' }}>
+      <Box
+        sx={{
+          px: isEmbedded ? 0 : 2,
+          py: isEmbedded ? 0 : 3,
+          display: 'flex',
+          justifyContent: 'center',
+        }}
+      >
         <Box
           sx={{
             width: '100%',
-            maxWidth: 520,
+            maxWidth: isEmbedded ? '100%' : 520,
             background: colorTokens.neutral.white,
-            borderRadius: '28px',
-            boxShadow: '0 18px 40px rgba(25, 44, 72, 0.12)',
-            px: { xs: 2, sm: 3 },
-            py: { xs: 2.5, sm: 3 },
+            borderRadius: isEmbedded ? 0 : '28px',
+            boxShadow: isEmbedded ? 'none' : '0 18px 40px rgba(25, 44, 72, 0.12)',
+            px: { xs: 2, sm: isEmbedded ? 2.5 : 3 },
+            py: { xs: 2.5, sm: isEmbedded ? 2.5 : 3 },
             boxSizing: 'border-box',
             overflow: 'hidden',
           }}
         >
           {/* ── Header ── */}
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
-            <IconButton
-              component={Link}
-              href="/home"
-              aria-label="Voltar"
-              sx={{ p: 0.5, color: colorTokens.text.primary }}
-            >
-              <ArrowBackIosNewRoundedIcon sx={{ fontSize: 16 }} />
-            </IconButton>
+            {isEmbedded ? (
+              <IconButton
+                aria-label="Fechar"
+                onClick={onCancel}
+                sx={{ p: 0.5, color: colorTokens.text.primary }}
+              >
+                <CloseRoundedIcon sx={{ fontSize: 18 }} />
+              </IconButton>
+            ) : (
+              <IconButton
+                component={Link}
+                href={backHref}
+                aria-label="Voltar"
+                sx={{ p: 0.5, color: colorTokens.text.primary }}
+              >
+                <ArrowBackIosNewRoundedIcon sx={{ fontSize: 16 }} />
+              </IconButton>
+            )}
 
             <Typography
               sx={{
@@ -233,7 +304,7 @@ export default function ActivityForm({ mode }: { mode: ActivityFormMode }) {
                 color: colorTokens.text.primary,
               }}
             >
-              {title}
+              {name}
             </Typography>
 
             <Box
@@ -281,25 +352,21 @@ export default function ActivityForm({ mode }: { mode: ActivityFormMode }) {
             </Box>
 
             <Box>
-              <Typography
-                sx={{ fontSize: 13, fontWeight: 600, color: colorTokens.text.primary }}
-              >
-                {MOCK_EVENT.title}
+              <Typography sx={{ fontSize: 13, fontWeight: 600, color: colorTokens.text.primary }}>
+                {displayedEvent.title}
               </Typography>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                 <CalendarTodayOutlinedIcon
                   sx={{ fontSize: 12, color: colorTokens.neutral.gray500 }}
                 />
                 <Typography sx={{ fontSize: 11, color: colorTokens.neutral.gray500 }}>
-                  {MOCK_EVENT.date}
+                  {displayedEvent.date}
                 </Typography>
               </Box>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                <LocationOnOutlinedIcon
-                  sx={{ fontSize: 12, color: colorTokens.neutral.gray500 }}
-                />
+                <LocationOnOutlinedIcon sx={{ fontSize: 12, color: colorTokens.neutral.gray500 }} />
                 <Typography sx={{ fontSize: 11, color: colorTokens.neutral.gray500 }}>
-                  {MOCK_EVENT.location}
+                  {displayedEvent.location}
                 </Typography>
               </Box>
             </Box>
@@ -307,7 +374,6 @@ export default function ActivityForm({ mode }: { mode: ActivityFormMode }) {
 
           {/* ── Form ── */}
           <Box sx={{ display: 'grid', gap: 1.75 }}>
-            {/* Section label */}
             <Box>
               <Typography
                 sx={{
@@ -323,7 +389,6 @@ export default function ActivityForm({ mode }: { mode: ActivityFormMode }) {
             </Box>
 
             <Box sx={{ display: 'grid', gap: 1.5 }}>
-              {/* Nome da Atividade */}
               <Box sx={{ minWidth: 0 }}>
                 <TextInput
                   label="Nome da Atividade"
@@ -341,57 +406,48 @@ export default function ActivityForm({ mode }: { mode: ActivityFormMode }) {
                 )}
               </Box>
 
-              {/* Categoria (Select) */}
-              <Box sx={{ minWidth: 0 }}>
-                <FormControl fullWidth size="small" error={Boolean(errors.category)}>
-                  <InputLabel
-                    sx={{ fontSize: 14, color: colorTokens.neutral.gray500 }}
-                  >
-                    Categoria
-                  </InputLabel>
-                  <Select
-                    value={form.category}
-                    label="Categoria"
-                    onChange={(e) => updateField('category', e.target.value)}
-                    onBlur={() => markTouched('category')}
-                    sx={{ borderRadius: '6px' }}
-                  >
-                    {CATEGORY_OPTIONS.map((option) => (
-                      <MenuItem key={option} value={option}>
-                        {option}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-                {errors.category && (
-                  <Typography sx={{ mt: 0.4, fontSize: 11, color: 'error.main' }}>
-                    {errors.category}
-                  </Typography>
-                )}
-              </Box>
+              <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1.5 }}>
+                <Box sx={{ minWidth: 0 }}>
+                  <FormControl fullWidth size="small" error={Boolean(errors.category)}>
+                    <InputLabel sx={{ fontSize: 14, color: colorTokens.neutral.gray500 }}>
+                      Categoria
+                    </InputLabel>
+                    <Select
+                      value={form.category}
+                      label="Categoria"
+                      onChange={(e) => updateField('category', e.target.value)}
+                      onBlur={() => markTouched('category')}
+                      sx={{ borderRadius: '6px' }}
+                    >
+                      {CATEGORY_OPTIONS.map((option) => (
+                        <MenuItem key={option.value} value={option.value}>
+                          {option.label}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                  {errors.category && (
+                    <Typography sx={{ mt: 0.4, fontSize: 11, color: 'error.main' }}>
+                      {errors.category}
+                    </Typography>
+                  )}
+                </Box>
 
-              {/* Convidados + Carga Horária */}
-              <Box
-                sx={{
-                  display: 'grid',
-                  gridTemplateColumns: '1fr 1fr',
-                  gap: 1.5,
-                }}
-              >
-                {/* Convidados — left side with "+" add button feel */}
                 <Box sx={{ minWidth: 0 }}>
                   <TextInput
-                    label="Convidados"
-                    value={form.guests}
-                    onChange={(value) => updateField('guests', value)}
-                    onBlur={() => markTouched('guests')}
+                    label="Localização"
+                    value={form.location}
+                    onChange={(value) => updateField('location', value)}
+                    onBlur={() => markTouched('location')}
+                    error={Boolean(errors.location)}
                     size="small"
                     fullWidth
+                    placeholder="Ex: Sala 01"
                     slotProps={{
                       input: {
-                        startAdornment: (
-                          <InputAdornment position="start">
-                            <AddRoundedIcon
+                        endAdornment: (
+                          <InputAdornment position="end">
+                            <LocationOnOutlinedIcon
                               sx={{ fontSize: 18, color: colorTokens.neutral.gray500 }}
                             />
                           </InputAdornment>
@@ -399,32 +455,33 @@ export default function ActivityForm({ mode }: { mode: ActivityFormMode }) {
                       },
                     }}
                   />
-                </Box>
-
-                {/* Carga Horária */}
-                <Box sx={{ minWidth: 0 }}>
-                  <TextInput
-                    label="Carga horária"
-                    value={form.workload}
-                    onChange={(value) => updateField('workload', value)}
-                    onBlur={() => markTouched('workload')}
-                    error={Boolean(errors.workload)}
-                    size="small"
-                    fullWidth
-                    type="number"
-                    slotProps={{
-                      input: { inputProps: { min: 0 } },
-                    }}
-                  />
-                  {errors.workload && (
+                  {errors.location && (
                     <Typography sx={{ mt: 0.4, fontSize: 11, color: 'error.main' }}>
-                      {errors.workload}
+                      {errors.location}
                     </Typography>
                   )}
                 </Box>
               </Box>
 
-              {/* Descrição da Atividade */}
+              <Box sx={{ minWidth: 0 }}>
+                <TextInput
+                  label="Carga horária (opcional)"
+                  value={form.workload}
+                  onChange={(value) => updateField('workload', value)}
+                  onBlur={() => markTouched('workload')}
+                  error={Boolean(errors.workload)}
+                  size="small"
+                  fullWidth
+                  type="number"
+                  slotProps={{ input: { inputProps: { min: 0 } } }}
+                />
+                {errors.workload && (
+                  <Typography sx={{ mt: 0.4, fontSize: 11, color: 'error.main' }}>
+                    {errors.workload}
+                  </Typography>
+                )}
+              </Box>
+
               <Box sx={{ minWidth: 0 }}>
                 <TextInput
                   label="Descrição da atividade"
@@ -444,7 +501,6 @@ export default function ActivityForm({ mode }: { mode: ActivityFormMode }) {
                 )}
               </Box>
 
-              {/* Datas e Horários */}
               <Box
                 sx={{
                   display: 'grid',
@@ -452,7 +508,6 @@ export default function ActivityForm({ mode }: { mode: ActivityFormMode }) {
                   gap: 1.5,
                 }}
               >
-                {/* Data de Início */}
                 <Box sx={{ minWidth: 0 }}>
                   <TextInput
                     label="Data de Início"
@@ -472,7 +527,6 @@ export default function ActivityForm({ mode }: { mode: ActivityFormMode }) {
                   )}
                 </Box>
 
-                {/* Data de Término */}
                 <Box sx={{ minWidth: 0 }}>
                   <TextInput
                     label="Data de Término"
@@ -492,7 +546,6 @@ export default function ActivityForm({ mode }: { mode: ActivityFormMode }) {
                   )}
                 </Box>
 
-                {/* Horário de Início */}
                 <Box sx={{ minWidth: 0 }}>
                   <TextInput
                     label="Horário de Início"
@@ -512,7 +565,6 @@ export default function ActivityForm({ mode }: { mode: ActivityFormMode }) {
                   )}
                 </Box>
 
-                {/* Horário de Término */}
                 <Box sx={{ minWidth: 0 }}>
                   <TextInput
                     label="Horário de Término"
@@ -532,10 +584,89 @@ export default function ActivityForm({ mode }: { mode: ActivityFormMode }) {
                   )}
                 </Box>
               </Box>
+
+              {/* ── Convidados ── */}
+              <Box>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    mb: 0.75,
+                  }}
+                >
+                  <Typography
+                    sx={{ fontSize: 12, fontWeight: 500, color: colorTokens.text.primary }}
+                  >
+                    Convidados (opcional)
+                  </Typography>
+
+                  <Button
+                    variant="text"
+                    color="secondary"
+                    onClick={() => setGuestModalOpen(true)}
+                    sx={{
+                      minWidth: 0,
+                      px: 0,
+                      py: 0,
+                      fontSize: 12,
+                      fontWeight: 600,
+                      color: colorTokens.navigation.default,
+                      textTransform: 'none',
+                      '&:hover': {
+                        backgroundColor: 'transparent',
+                        color: colorTokens.navigation.hover,
+                      },
+                    }}
+                  >
+                    + Adicionar convidado
+                  </Button>
+                </Box>
+                <Divider sx={{ borderColor: colorTokens.neutral.gray300, mb: 1.25 }} />
+
+                {form.guests.map((guest, index) => (
+                  <Chip
+                    key={`${guest.email}-${index}`}
+                    icon={<PersonOutlineRoundedIcon sx={{ fontSize: 16 }} />}
+                    label={`${guest.name} · ${
+                      GUEST_ROLE_OPTIONS.find((r) => r.value === guest.role)?.label ?? guest.role
+                    }`}
+                    onClick={() => handleOpenEditGuest(index)}
+                    onDelete={() => handleRemoveGuest(index)}
+                    size="small"
+                    sx={{ fontSize: 12, cursor: 'pointer' }}
+                  />
+                ))}
+              </Box>
             </Box>
 
-            {/* Submit */}
-            <Box sx={{ pt: 1.25, display: 'flex', justifyContent: 'center' }}>
+            {/* Actions */}
+            <Box
+              sx={{
+                pt: 1.25,
+                display: 'flex',
+                justifyContent: isEmbedded ? 'flex-end' : 'center',
+                gap: 1,
+              }}
+            >
+              {isEmbedded && (
+                <Button
+                  variant="outlined"
+                  color="secondary"
+                  onClick={onCancel}
+                  sx={{
+                    minWidth: 100,
+                    height: 34,
+                    borderRadius: '6px',
+                    fontSize: 14,
+                    fontWeight: 700,
+                    textTransform: 'none',
+                  }}
+                >
+                  Cancelar
+                </Button>
+              )}
+
               <Button
                 variant="contained"
                 color="secondary"
@@ -558,6 +689,30 @@ export default function ActivityForm({ mode }: { mode: ActivityFormMode }) {
           </Box>
         </Box>
       </Box>
+
+      <RegisterGuestModal
+        key={editingGuestIndex ?? 'new'}
+        open={guestModalOpen}
+        onClose={() => setGuestModalOpen(false)}
+        activityTitle={form.name || 'Nova atividade'}
+        activityDate={
+          form.startDate && form.startTime
+            ? new Date(`${form.startDate}T${form.startTime}:00`)
+            : new Date()
+        }
+        activityLocation={form.location || displayedEvent.location}
+        roleOptions={GUEST_ROLE_OPTIONS}
+        onSubmit={handleGuestSubmit}
+        initialValues={
+          editingGuestIndex !== null
+            ? {
+                fullName: form.guests[editingGuestIndex].name,
+                role: form.guests[editingGuestIndex].role,
+                email: form.guests[editingGuestIndex].email,
+              }
+            : undefined
+        }
+      />
     </Box>
   );
 }

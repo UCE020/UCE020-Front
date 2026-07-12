@@ -9,6 +9,7 @@ export interface RegisterGuestModalProps {
   roleOptions: ReadonlyArray<SelectOption>;
   onSubmit: (payload: RegisterGuestPayload) => void | Promise<void>;
   isLoading?: boolean;
+  initialValues?: RegisterGuestPayload;
 }
 
 export interface RegisterGuestPayload {

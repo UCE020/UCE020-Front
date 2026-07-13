@@ -103,14 +103,16 @@ function getErrors(form: FormState, touched: TouchedState, isEdit: boolean) {
       touched.descricao && form.descricao.trim().length < 10 ? 'Descreva melhor o evento.' : '',
     startDate: (() => {
       if (touched.startDate && !form.startDate) return 'Selecione a data de início.';
-      if (!isEdit && touched.startDate && form.startDate && form.startDate < getTodayString())
+      if (touched.startDate && form.startDate && form.startDate < getTodayString())
         return 'A data de início não pode ser no passado.';
       return '';
     })(),
     endDate: (() => {
       if (touched.endDate && !form.endDate) return 'Selecione a data de término.';
-      if (!isEdit && touched.endDate && form.endDate && form.endDate < getTodayString())
-        return 'A data de término não pode ser no passado.';
+      const todayStr = getTodayString();
+      const minEndDate = form.startDate && form.startDate > todayStr ? form.startDate : todayStr;
+      if (touched.endDate && form.endDate && form.endDate < minEndDate)
+        return 'A data de término inválida.';
       return '';
     })(),
     startTime: touched.startTime && !form.startTime ? 'Selecione o horário de início.' : '',
@@ -170,8 +172,9 @@ export default function EventForm({ mode, eventId }: EventFormProps) {
 
   const isSubmitting = createLoading || updateLoading;
   const submitError = createError || updateError;
-  const startDateMin = !isEdit ? getTodayString() : undefined;
-  const endDateMin = !isEdit ? form.startDate || getTodayString() : undefined;
+  const todayStr = getTodayString();
+  const startDateMin = todayStr;
+  const endDateMin = form.startDate && form.startDate > todayStr ? form.startDate : todayStr;
 
   useEffect(() => {
     if (!existingEvent) return;
@@ -235,7 +238,7 @@ export default function EventForm({ mode, eventId }: EventFormProps) {
     form.descricao.trim().length >= 10 &&
     form.startDate.length > 0 &&
     form.endDate.length > 0 &&
-    (!isEdit ? form.startDate >= getTodayString() : true) &&
+    form.startDate >= getTodayString() &&
     form.endDate >= form.startDate &&
     form.startTime.length > 0 &&
     form.endTime.length > 0 &&

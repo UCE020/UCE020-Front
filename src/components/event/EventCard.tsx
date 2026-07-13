@@ -56,12 +56,14 @@ export function EventCard({ event, onClick }: EventCardProps) {
           <h3 className="font-bold text-[#0F1D35] text-[15px] leading-snug group-hover:text-[#2EC4A0] transition-colors line-clamp-1">
             {event.nome}
           </h3>
-          <span
-            className="shrink-0 text-[11px] font-semibold px-2 py-[3px] rounded-full whitespace-nowrap"
-            style={{ backgroundColor: statusStyle.bg, color: statusStyle.color }}
-          >
-            {statusStyle.label}
-          </span>
+          <div className="flex items-center gap-1 shrink-0">
+            <span
+              className="shrink-0 text-[11px] font-semibold px-2 py-[3px] rounded-full whitespace-nowrap"
+              style={{ backgroundColor: statusStyle.bg, color: statusStyle.color }}
+            >
+              {statusStyle.label}
+            </span>
+          </div>
         </div>
 
         <div className="flex flex-col gap-1">

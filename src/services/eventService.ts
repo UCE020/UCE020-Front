@@ -71,6 +71,11 @@ class EventService {
     return data.data;
   }
 
+  async deleteEvent(id: number): Promise<Event> {
+    const { data } = await api.delete<EventResponse>(`/event/${id}`);
+    return data.data;
+  }
+
   async findByCodigo(codigo: string): Promise<Event> {
     const { data } = await api.get<EventResponse>(`/event/codigo/${codigo}`);
     return data.data;

@@ -66,6 +66,8 @@ export function ManageUsersView({ eventId }: ManageUsersViewProps) {
       }))
     ),
     enabled: hasValidEventId,
+    staleTime: 0,
+    refetchOnMount: 'always',
   });
 
   // Mostra um erro caso falhe a query de membros

@@ -93,6 +93,8 @@ export function ListParticipantsView() {
     queryKey: ['activity-participants', numericEventId, numericActivityId],
     queryFn: () => participationService.getActivityParticipants(numericEventId, numericActivityId),
     enabled: hasValidContext,
+    staleTime: 0,
+    refetchOnMount: 'always',
   });
 
   const error = isError ? (queryError instanceof Error ? queryError.message : 'Erro ao carregar participantes') : null;

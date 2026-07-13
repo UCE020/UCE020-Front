@@ -1,4 +1,10 @@
-export type CertificateManagementRole = 'Ouvinte' | 'Monitor' | 'Organizador' | 'Palestrante';
+export type CertificateManagementRole =
+  | 'Ouvinte'
+  | 'Monitor'
+  | 'Organizador'
+  | 'Palestrante'
+  | 'Ministrante'
+  | 'Moderador';
 export type CertificateManagementStatus = 'Pendente' | 'Assinado' | 'Encaminhado';
 
 export interface CertificateManagementItem {
@@ -11,4 +17,14 @@ export interface CertificateManagementItem {
   hours?: number;
   issueDate: string;
   imageUrl?: string;
+}
+
+export interface CertificatePageResponse {
+  items: CertificateManagementItem[];
+  hasMore: boolean;
+}
+
+export interface CertificateRoleStat {
+  role:  CertificateManagementRole;
+  count: number;
 }

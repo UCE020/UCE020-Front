@@ -22,9 +22,9 @@ export function AppPageContainer({ children, sx, maxWidth = 620, ...props }: App
       <Box
         sx={{
           width: '100%',
-          maxWidth,
+          maxWidth: { xs: 620, lg: 1100 },
           mx: 'auto',
-          p: { xs: 2, sm: 3 },
+          p: { xs: 2, lg: 4 },
           display: 'flex',
           flexDirection: 'column',
           gap: 2,

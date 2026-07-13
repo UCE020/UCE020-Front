@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { Box, IconButton, Typography } from '@mui/material';
 import { PageLoader } from '@/components/ui';
@@ -25,12 +25,14 @@ import { formatActivityDate } from '@/utils/format';
 import { EventActivitiesSection } from './EventActivitiesSection';
 import { OrganizerEventActions } from './OrganizerEventActions';
 import type { Activity } from '@/types/activity';
+import type { Event } from '@/types/event';
 import { participationService } from '@/services/participationService';
 import { EventSubscriptionAction } from './EventSubscriptionAction';
 import { ToastSeverity } from '@/types/toast';
 import { Toast } from '@/components/ui/Toast';
 import { extractApiErrorMessage } from '@/utils/apiError';
 import { activityService } from '@/services/activityService';
+import { isAxiosError } from 'axios';
 
 interface EventDetailViewProps {
   eventId: string;
@@ -141,11 +143,16 @@ export function EventDetailView({ eventId }: EventDetailViewProps) {
     enabled: hasValidEventId,
   });
 
-  const loadError = isEventError ? 'Não foi possível carregar os dados do evento.' : '';
+  const loadError = !hasValidEventId 
+    ? 'Evento não encontrado.' 
+    : isEventError 
+      ? 'Não foi possível carregar os dados do evento.' 
+      : '';
 
   const {
     data: participantType = null,
     isLoading: isLoadingParticipation,
+    error: participationError,
   } = useQuery({
     queryKey: ['participant-type', numericEventId, user?.id],
     queryFn: () => participationService.getTipoParticipante(numericEventId),
@@ -153,16 +160,27 @@ export function EventDetailView({ eventId }: EventDetailViewProps) {
     retry: false,
   });
 
-  const {
-    data: participatingEvents = [],
-    isLoading: isCheckingSubscription,
-  } = useQuery({
-    queryKey: ['participating-events', user?.id],
-    queryFn: () => eventService.findParticipatingEvents(),
-    enabled: hasValidEventId && !!user && !isAuthLoading,
+  const isSubscribed = !!participantType;
+  const isCheckingSubscription = isLoadingParticipation;
+
+  const [toast, setToast] = useState<{ open: boolean; message: string; severity: ToastSeverity }>({
+    open: false,
+    message: '',
+    severity: ToastSeverity.Error,
   });
 
-  const isSubscribed = participatingEvents.some((e) => e.id === numericEventId);
+  useEffect(() => {
+    if (participationError && isAxiosError(participationError) && participationError.response?.status !== 404) {
+      const timer = setTimeout(() => {
+        setToast({
+          open: true,
+          message: 'Não foi possível verificar sua inscrição neste evento',
+          severity: ToastSeverity.Warning,
+        });
+      }, 0);
+      return () => clearTimeout(timer);
+    }
+  }, [participationError]);
 
   const [selectedActivity, setSelectedActivity] = useState<ActivityLike | null>(null);
   const [isQrModalOpen, setIsQrModalOpen] = useState(false);
@@ -180,12 +198,6 @@ export function EventDetailView({ eventId }: EventDetailViewProps) {
   const isSignupProcessingRef = useRef(false);
   const pendingEnrollmentChecksRef = useRef<Set<string>>(new Set());
 
-  const [toast, setToast] = useState<{ open: boolean; message: string; severity: ToastSeverity }>({
-    open: false,
-    message: '',
-    severity: ToastSeverity.Error,
-  });
-
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isDeletingEvent, setIsDeletingEvent] = useState(false);
 
@@ -195,7 +207,7 @@ export function EventDetailView({ eventId }: EventDetailViewProps) {
     mutationFn: () => participationService.subscribe(numericEventId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['participating-events'] });
-      queryClient.invalidateQueries({ queryKey: ['participant-type', numericEventId] });
+      queryClient.invalidateQueries({ queryKey: ['participant-type', numericEventId, user?.id] });
       queryClient.invalidateQueries({ queryKey: ['home-events'] });
       setToast({
         open: true,
@@ -216,7 +228,7 @@ export function EventDetailView({ eventId }: EventDetailViewProps) {
     mutationFn: () => participationService.unsubscribe(numericEventId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['participating-events'] });
-      queryClient.invalidateQueries({ queryKey: ['participant-type', numericEventId] });
+      queryClient.invalidateQueries({ queryKey: ['participant-type', numericEventId, user?.id] });
       queryClient.invalidateQueries({ queryKey: ['home-events'] });
       router.push('/home');
     },
@@ -238,7 +250,6 @@ export function EventDetailView({ eventId }: EventDetailViewProps) {
   function handleUnsubscribe() {
     unsubscribeMutation.mutate();
   }
-
   const role = participantType ? TIPO_TO_ROLE[participantType] : 'participant';
   const isOrganizer = role === 'organizer';
 
@@ -346,6 +357,17 @@ export function EventDetailView({ eventId }: EventDetailViewProps) {
 
   function handleBack() {
     router.push('/home');
+  }
+
+  function handleEventFinalized() {
+    queryClient.setQueryData(['event', numericEventId], (oldData: Event | undefined) => {
+      return oldData ? { ...oldData, status: 'finalizada' } : oldData;
+    });
+    setToast({ open: true, message: 'Evento finalizado com sucesso', severity: ToastSeverity.Success });
+  }
+
+  function handleFinalizeError(message: string) {
+    setToast({ open: true, message, severity: ToastSeverity.Error });
   }
 
   async function handleCopyEventCode() {
@@ -638,7 +660,7 @@ export function EventDetailView({ eventId }: EventDetailViewProps) {
           <DetailTile
             icon={<PersonRoundedIcon sx={{ fontSize: 21 }} />}
             label="Inscritos"
-            value="0 inscritos"
+            value={`${event.totalInscritos ?? 0} inscritos`}
           />
         </Box>
 
@@ -651,7 +673,14 @@ export function EventDetailView({ eventId }: EventDetailViewProps) {
           />
         )}
 
-        {isOrganizer && <OrganizerEventActions eventId={Number(event.id)} />}
+        {isOrganizer && (
+          <OrganizerEventActions
+            eventId={Number(event.id)}
+            isFinalized={event.status.toLowerCase() === 'finalizada'}
+            onFinalized={handleEventFinalized}
+            onFinalizeError={handleFinalizeError}
+          />
+        )}
 
         <EventActivitiesSection
           activities={activities}

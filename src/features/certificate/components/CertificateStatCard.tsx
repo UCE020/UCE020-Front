@@ -10,6 +10,8 @@ const ROLE_ICONS: Record<CertificateManagementRole, React.ReactNode> = {
   Monitor: <SupervisorAccountOutlinedIcon sx={{ fontSize: 20, color: '#2EC4A0' }} />,
   Organizador: <BadgeOutlinedIcon sx={{ fontSize: 20, color: '#2EC4A0' }} />,
   Palestrante: <RecordVoiceOverOutlinedIcon sx={{ fontSize: 20, color: '#2EC4A0' }} />,
+  Ministrante: <RecordVoiceOverOutlinedIcon sx={{ fontSize: 20, color: '#2EC4A0' }} />,
+  Moderador: <RecordVoiceOverOutlinedIcon sx={{ fontSize: 20, color: '#2EC4A0' }} />,
 };
 
 interface CertificateStatCardProps {

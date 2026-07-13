@@ -8,12 +8,9 @@ interface CertificateBatchActionsProps {
   onSendBatch: () => void;
 }
 
-export function CertificateBatchActions({
-  onSignBatch,
-  onSendBatch,
-}: CertificateBatchActionsProps) {
+export function CertificateBatchActions({ onSignBatch, onSendBatch }: CertificateBatchActionsProps) {
   return (
-    <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 1.5 }}>
+    <Box sx={{ display: 'flex', flexDirection: 'row', gap: 1.5 }}> 
       <Button
         variant="contained"
         fullWidth
@@ -29,8 +26,7 @@ export function CertificateBatchActions({
         leftIcon={<SendOutlinedIcon sx={{ fontSize: 17 }} />}
         onClick={onSendBatch}
         sx={{
-          borderColor: '#2EC4A0',
-          color: '#2EC4A0',
+          borderColor: '#2EC4A0', color: '#2EC4A0',
           '&:hover': { borderColor: '#25a98a', bgcolor: '#f0fdf9' },
         }}
       >

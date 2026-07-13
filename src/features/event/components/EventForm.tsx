@@ -300,23 +300,6 @@ export default function EventForm({ mode, eventId }: EventFormProps) {
       cargaHoraria: Number(form.cargaHoraria),
       status: form.status,
       foto: form.foto ?? undefined,
-      atividades: activities.map(({ id, ...activity }) => {
-        const backendId = Number(id);
-        const isExistingActivity = isEdit && !Number.isNaN(backendId);
-
-        return {
-          id: isExistingActivity ? backendId : undefined,
-          name: activity.name,
-          category: activity.category,
-          guests: activity.guests,
-          location: activity.location,
-          workload: Number(activity.workload) || 0,
-          description: activity.description,
-          eventId: isEdit && existingEvent ? existingEvent.id : undefined,
-          startDate: toISODateTime(activity.startDate, activity.startTime),
-          endDate: toISODateTime(activity.endDate, activity.endTime),
-        };
-      }),
     };
 
     if (isEdit) {

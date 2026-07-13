@@ -9,9 +9,14 @@ interface CertificateStatsRowProps {
 
 export function CertificateStatsRow({ stats }: CertificateStatsRowProps) {
   return (
-    <ContentCard sx={{ p: 1.5, overflowX: 'auto' }}>
+    <ContentCard sx={{ p: 1.5, height: '100%' }}> 
       <Box
-        sx={{ display: 'flex', gap: { xs: 1, sm: 0 }, minWidth: { xs: 'max-content', sm: '100%' } }}
+        sx={{
+          display: 'flex',
+          gap: { xs: 1, sm: 0 },
+          height: '100%',
+          minWidth: { xs: 'max-content', sm: '100%' },
+        }}
       >
         {stats.map((stat, index) => (
           <CertificateStatCard key={stat.role} {...stat} isLast={index === stats.length - 1} />

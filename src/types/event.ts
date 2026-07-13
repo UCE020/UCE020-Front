@@ -15,6 +15,7 @@ export interface Event {
   atividades?: Activity[];
   createdAt: string;
   updatedAt: string;
+  totalInscritos?: number;
 }
 
 export interface EventCardProps {

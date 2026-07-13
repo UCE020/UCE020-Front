@@ -14,6 +14,7 @@ export function CertificateFilterTabs({ activeTab, onChange }: CertificateFilter
         gap: 1,
         overflowX: 'auto',
         pb: 0.5,
+        justifyContent: { xs: 'flex-start', lg: 'center' }, 
         '&::-webkit-scrollbar': { display: 'none' },
       }}
     >
@@ -22,7 +23,7 @@ export function CertificateFilterTabs({ activeTab, onChange }: CertificateFilter
           key={tab}
           onClick={() => onChange(tab)}
           sx={{
-            px: 1.5,
+            px: { xs: 1.5, lg: 2.5 },
             py: 0.75,
             borderRadius: '20px',
             cursor: 'pointer',

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Box, IconButton, Typography } from '@mui/material';
 import { PageLoader } from '@/components/ui';
@@ -31,6 +31,7 @@ import { ToastSeverity } from '@/types/toast';
 import { Toast } from '@/components/ui/Toast';
 import { extractApiErrorMessage } from '@/utils/apiError';
 import { activityService } from '@/services/activityService';
+import { isAxiosError } from 'axios';
 
 interface EventDetailViewProps {
   eventId: string;
@@ -133,6 +134,9 @@ export function EventDetailView({ eventId }: EventDetailViewProps) {
   const [loadError, setLoadError] = useState('');
 
   const [participantType, setParticipantType] = useState<TipoParticipante | null>(null);
+  const [isLoadingParticipation, setIsLoadingParticipation] = useState(true);
+  const numericEventId = Number(eventId);
+  const isValidEventId = Number.isFinite(numericEventId);
 
   const [selectedActivity, setSelectedActivity] = useState<ActivityLike | null>(null);
   const [isQrModalOpen, setIsQrModalOpen] = useState(false);
@@ -164,10 +168,9 @@ export function EventDetailView({ eventId }: EventDetailViewProps) {
   const [isDeletingEvent, setIsDeletingEvent] = useState(false);
 
   useEffect(() => {
-    const numericEventId = Number(eventId);
     let isMounted = true;
 
-    if (!Number.isFinite(numericEventId)) {
+    if (!isValidEventId) {
       Promise.resolve().then(() => {
         if (isMounted) {
           setSelectedActivity(null);
@@ -214,45 +217,16 @@ export function EventDetailView({ eventId }: EventDetailViewProps) {
     return () => {
       isMounted = false;
     };
-  }, [eventId]);
+  }, [numericEventId, isValidEventId]);
 
-  useEffect(() => {
-    const numericEventId = Number(eventId);
-    if (!Number.isFinite(numericEventId)) return;
+  function extractErrorMessage(error: unknown, fallback: string): string {
+    if (isAxiosError(error) && typeof error.response?.data?.message === 'string') {
+      return error.response.data.message;
+    }
+    return fallback;
+  }
 
-    let isMounted = true;
-
-    eventService
-      .findParticipatingEvents()
-      .then((events) => {
-        if (isMounted) {
-          setIsSubscribed(events.some((e) => e.id === numericEventId));
-        }
-      })
-      .catch((error) => {
-        if (isMounted) {
-          console.error('Falha ao verificar inscrição no evento:', error);
-          setToast({
-            open: true,
-            message: 'Não foi possível verificar sua inscrição neste evento',
-            severity: ToastSeverity.Warning,
-          });
-          setIsSubscribed(false);
-        }
-      })
-      .finally(() => {
-        if (isMounted) {
-          setIsCheckingSubscription(false);
-        }
-      });
-
-    return () => {
-      isMounted = false;
-    };
-  }, [eventId]);
-
-  function handleSubscribe() {
-    const numericEventId = Number(eventId);
+  const handleSubscribe = useCallback(() => {
     setIsSubscriptionLoading(true);
     participationService
       .subscribe(numericEventId)
@@ -272,10 +246,9 @@ export function EventDetailView({ eventId }: EventDetailViewProps) {
         });
       })
       .finally(() => setIsSubscriptionLoading(false));
-  }
+  }, [numericEventId]); 
 
-  function handleUnsubscribe() {
-    const numericEventId = Number(eventId);
+  const handleUnsubscribe = useCallback(() => {
     setIsSubscriptionLoading(true);
     participationService
       .unsubscribe(numericEventId)
@@ -290,41 +263,41 @@ export function EventDetailView({ eventId }: EventDetailViewProps) {
           severity: ToastSeverity.Error,
         });
       })
-      .finally(() => setIsSubscriptionLoading(false));
-  }
+    .finally(() => setIsSubscriptionLoading(false));
+  }, [numericEventId, router]);
 
   useEffect(() => {
-    const numericEventId = Number(eventId);
-
-    if (!Number.isFinite(numericEventId)) {
-      return;
-    }
+    if (!isValidEventId) return;
 
     let isMounted = true;
 
-    participationService
-      .getTipoParticipante(numericEventId)
+    participationService.getTipoParticipante(numericEventId)
       .then((tipo: TipoParticipante) => {
-        if (isMounted) {
-          console.log('[participação] tipo recebido:', tipo);
-          setParticipantType(tipo);
-        }
+        if (!isMounted) return;
+        setParticipantType(tipo);
+        setIsSubscribed(true);
       })
       .catch((err) => {
+        if (!isMounted) return;
+        setParticipantType(null);
+        setIsSubscribed(false);
+        if (err?.response?.status !== 404) {
+          setToast({
+            open: true,
+            message: 'Não foi possível verificar sua inscrição neste evento',
+            severity: ToastSeverity.Warning,
+          });
+        }
+      })
+      .finally(() => {
         if (isMounted) {
-          console.error('[participação] erro ao buscar tipo:', err);
-          setParticipantType('participante');
+          setIsLoadingParticipation(false);
+          setIsCheckingSubscription(false);
         }
       });
 
-    return () => {
-      isMounted = false;
-    };
-  }, [eventId, user?.id]);
-
-  const numericEventId = Number(eventId);
-  const hasValidEventId = Number.isFinite(numericEventId);
-  const isLoadingParticipation = hasValidEventId && participantType === null;
+    return () => { isMounted = false; };
+  }, [numericEventId]);
 
   const role = participantType ? TIPO_TO_ROLE[participantType] : 'participant';
   const isOrganizer = role === 'organizer';
@@ -431,6 +404,15 @@ export function EventDetailView({ eventId }: EventDetailViewProps) {
 
   function handleBack() {
     router.push('/home');
+  }
+
+  function handleEventFinalized() {
+    setEvent((prev) => (prev ? { ...prev, status: 'finalizada' } : prev));
+    setToast({ open: true, message: 'Evento finalizado com sucesso', severity: ToastSeverity.Success });
+  }
+
+  function handleFinalizeError(message: string) {
+    setToast({ open: true, message, severity: ToastSeverity.Error });
   }
 
   async function handleCopyEventCode() {
@@ -721,7 +703,7 @@ export function EventDetailView({ eventId }: EventDetailViewProps) {
           <DetailTile
             icon={<PersonRoundedIcon sx={{ fontSize: 21 }} />}
             label="Inscritos"
-            value="0 inscritos"
+            value={`${event.totalInscritos ?? 0} inscritos`}
           />
         </Box>
 
@@ -734,7 +716,14 @@ export function EventDetailView({ eventId }: EventDetailViewProps) {
           />
         )}
 
-        {isOrganizer && <OrganizerEventActions eventId={Number(event.id)} />}
+        {isOrganizer && (
+          <OrganizerEventActions
+            eventId={Number(event.id)}
+            isFinalized={event.status.toLowerCase() === 'finalizada'}
+            onFinalized={handleEventFinalized}
+            onFinalizeError={handleFinalizeError}
+          />
+        )}
 
         <EventActivitiesSection
           activities={activities}

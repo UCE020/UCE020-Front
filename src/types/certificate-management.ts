@@ -15,6 +15,7 @@ export interface CertificateManagementItem {
   role: CertificateManagementRole;
   status: CertificateManagementStatus;
   hours?: number;
+  location?: string;
   issueDate: string;
   imageUrl?: string;
 }

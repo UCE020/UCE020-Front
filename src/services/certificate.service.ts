@@ -72,6 +72,22 @@ class CertificateService {
   async generateGuestCertificates(atividadeId: number | string): Promise<void> {
     await api.post(`/activity/${atividadeId}/certificate/guests`);
   }
+
+  // Lista todos os certificados do usuário logado, de todos os eventos
+  async getMyCertificates(page = 1, limit = 100): Promise<CertificatePageResponse> {
+    try {
+      const { data } = await api.get<CertificateListResponse>('/certificate/me', {
+        params: { page, limit },
+      });
+      const items = data.data.map((item) => ({ ...item, status: DEFAULT_STATUS }));
+      return { items, hasMore: items.length === limit };
+    } catch (error) {
+      if (error instanceof AxiosError && error.response?.status === 404) {
+        return { items: [], hasMore: false };
+      }
+      throw error;
+    }
+  }
 }
 
 export const certificateService = new CertificateService();

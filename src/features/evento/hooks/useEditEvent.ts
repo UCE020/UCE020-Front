@@ -16,30 +16,33 @@ export function useEditEvent(eventId: number | null) {
 
   useEffect(() => {
     if (eventId === null) return;
-    let isMounted = true;
+    let cancelled = false;
 
-    setLoadingEvent(true);
-    setLoadError(null);
+    async function loadEvent() {
+      if (!cancelled) {
+        setLoadError(null);
+        setLoadingEvent(true);
+      }
 
-    eventService.findOne(eventId)
-      .then(data => {
-        console.log('Evento recebido:', data);
+      try {
+        const data = await eventService.findOne(eventId);
 
-        if (isMounted) setEvent(data);
-      })
-      .catch(() => {
-        if (isMounted) {
+        if (!cancelled) setEvent(data);
+      } catch {
+        if (!cancelled) {
           setLoadError('Não foi possível carregar os dados do evento.');
         }
-      })
-      .finally(() => {
-        if (isMounted) {
+      } finally {
+        if (!cancelled) {
           setLoadingEvent(false);
         }
-      });
+      }
+    }
+
+    void loadEvent();
 
     return () => {
-      isMounted = false;
+      cancelled = true;
     };
   }, [eventId]);
 

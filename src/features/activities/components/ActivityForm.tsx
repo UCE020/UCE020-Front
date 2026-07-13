@@ -108,6 +108,12 @@ function createTouchedState(): TouchedState {
   };
 }
 
+function getTodayString(): string {
+  const now = new Date();
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
+}
+
 function getErrors(form: ActivityFormState, touched: TouchedState) {
   return {
     name:
@@ -127,8 +133,20 @@ function getErrors(form: ActivityFormState, touched: TouchedState) {
       touched.description && form.description.trim().length < 10
         ? 'Descreva melhor a atividade (mínimo 10 caracteres).'
         : '',
-    startDate: touched.startDate && !form.startDate ? 'Selecione a data de início.' : '',
-    endDate: touched.endDate && !form.endDate ? 'Selecione a data de término.' : '',
+    startDate: (() => {
+      if (touched.startDate && !form.startDate) return 'Selecione a data de início.';
+      if (touched.startDate && form.startDate && form.startDate < getTodayString())
+        return 'A data de início não pode ser no passado.';
+      return '';
+    })(),
+    endDate: (() => {
+      if (touched.endDate && !form.endDate) return 'Selecione a data de término.';
+      const todayStr = getTodayString();
+      const minEndDate = form.startDate && form.startDate > todayStr ? form.startDate : todayStr;
+      if (touched.endDate && form.endDate && form.endDate < minEndDate)
+        return 'A data de término inválida.';
+      return '';
+    })(),
     startTime: touched.startTime && !form.startTime ? 'Selecione o horário de início.' : '',
     endTime: touched.endTime && !form.endTime ? 'Selecione o horário de término.' : '',
   };
@@ -141,8 +159,10 @@ function isFormValid(form: ActivityFormState, errors: ReturnType<typeof getError
     Boolean(form.category) &&
     form.location.trim().length >= 1 &&
     form.description.trim().length >= 10 &&
-    Boolean(form.startDate) &&
-    Boolean(form.endDate) &&
+    form.startDate.length > 0 &&
+    form.endDate.length > 0 &&
+    form.startDate >= getTodayString() &&
+    form.endDate >= form.startDate &&
     Boolean(form.startTime) &&
     Boolean(form.endTime)
   );
@@ -197,6 +217,10 @@ export default function ActivityForm({
     : 'Preencha os dados abaixo para cadastrar uma nova atividade';
   const actionLabel = isEdit ? 'Salvar' : 'Cadastrar';
   const displayedEvent = eventInfo ?? FALLBACK_EVENT_INFO;
+
+  const todayStr = getTodayString();
+  const startDateMin = todayStr;
+  const endDateMin = form.startDate && form.startDate > todayStr ? form.startDate : todayStr;
 
   function updateField(field: Exclude<keyof ActivityFormState, 'guests'>, value: string) {
     setForm((current) => ({ ...current, [field]: value }));
@@ -518,7 +542,12 @@ export default function ActivityForm({
                     size="small"
                     fullWidth
                     type="date"
-                    slotProps={{ inputLabel: { shrink: true } }}
+                    slotProps={{
+                      inputLabel: { shrink: true },
+                      input: {
+                        inputProps: startDateMin ? { min: startDateMin } : undefined,
+                      },
+                    }}
                   />
                   {errors.startDate && (
                     <Typography sx={{ mt: 0.4, fontSize: 11, color: 'error.main' }}>
@@ -537,7 +566,12 @@ export default function ActivityForm({
                     size="small"
                     fullWidth
                     type="date"
-                    slotProps={{ inputLabel: { shrink: true } }}
+                    slotProps={{
+                      inputLabel: { shrink: true },
+                      input: {
+                        inputProps: endDateMin ? { min: endDateMin } : undefined,
+                      },
+                    }}
                   />
                   {errors.endDate && (
                     <Typography sx={{ mt: 0.4, fontSize: 11, color: 'error.main' }}>

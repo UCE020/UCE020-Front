@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Box, CircularProgress } from '@mui/material';
+import { Box } from '@mui/material';
+import { PageLoader } from '@/components/ui';
 
 import { ProfileHeader, ProfileForm } from '@/features/user-profile';
 import type { UserProfile } from '@/types/userProfile';
@@ -57,11 +58,7 @@ export default function ProfilePage() {
   };
 
   if (isLoading || !user) {
-    return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', pt: 8 }}>
-        <CircularProgress />
-      </Box>
-    );
+    return <PageLoader />;
   }
 
   return (

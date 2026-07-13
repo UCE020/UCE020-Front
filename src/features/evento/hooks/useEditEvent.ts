@@ -47,7 +47,7 @@ export function useEditEvent(eventId: number | null) {
     setError(null);
     try {
       await eventService.update(eventId, payload);
-      router.push('/home');
+      router.push(`/event/${eventId}`);
     } catch (err: unknown) {
       const axiosErr = err as { response?: { data?: { message?: string | string[] } } };
       const raw = axiosErr.response?.data?.message;

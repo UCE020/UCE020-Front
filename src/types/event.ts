@@ -21,4 +21,5 @@ export interface Event {
 export interface EventCardProps {
   event: Event;
   onClick?: (event: Event) => void;
+  onDelete?: (event: Event) => void;
 }

@@ -71,8 +71,8 @@ class EventService {
     return data.data;
   }
 
-  async finalize(id: number): Promise<Event> {
-    const { data } = await api.patch<EventResponse>(`/event/${id}/finalizar`);
+  async deleteEvent(id: number): Promise<Event> {
+    const { data } = await api.delete<EventResponse>(`/event/${id}`);
     return data.data;
   }
 

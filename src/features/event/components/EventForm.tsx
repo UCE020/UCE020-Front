@@ -24,7 +24,7 @@ import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined
 import AddRoundedIcon from '@mui/icons-material/AddRounded';
 import EventOutlinedIcon from '@mui/icons-material/EventOutlined';
 import ScheduleOutlinedIcon from '@mui/icons-material/ScheduleOutlined';
-import { Button, TextInput } from '@/components/ui';
+import { Button, TextInput, PageLoader } from '@/components/ui';
 import { ImageUpload } from '@/components/ui/inputs';
 import { colorTokens } from '@/lib/colors';
 import { useCreateEvent } from '../../evento/hooks/useCreateEvent';
@@ -89,7 +89,7 @@ function createTouchedState(): TouchedState {
   };
 }
 
-function getErrors(form: FormState, touched: TouchedState) {
+function getErrors(form: FormState, touched: TouchedState, isEdit: boolean) {
   return {
     nome:
       touched.nome && form.nome.trim().length < 3
@@ -109,8 +109,10 @@ function getErrors(form: FormState, touched: TouchedState) {
     })(),
     endDate: (() => {
       if (touched.endDate && !form.endDate) return 'Selecione a data de término.';
-      if (touched.endDate && form.endDate && form.endDate < getTodayString())
-        return 'A data de término não pode ser no passado.';
+      const todayStr = getTodayString();
+      const minEndDate = form.startDate && form.startDate > todayStr ? form.startDate : todayStr;
+      if (touched.endDate && form.endDate && form.endDate < minEndDate)
+        return 'A data de término inválida.';
       return '';
     })(),
     startTime: touched.startTime && !form.startTime ? 'Selecione o horário de início.' : '',
@@ -170,6 +172,9 @@ export default function EventForm({ mode, eventId }: EventFormProps) {
 
   const isSubmitting = createLoading || updateLoading;
   const submitError = createError || updateError;
+  const todayStr = getTodayString();
+  const startDateMin = todayStr;
+  const endDateMin = form.startDate && form.startDate > todayStr ? form.startDate : todayStr;
 
   useEffect(() => {
     if (!existingEvent) return;
@@ -224,7 +229,7 @@ export default function EventForm({ mode, eventId }: EventFormProps) {
     });
   }, [existingEvent]);
 
-  const errors = useMemo(() => getErrors(form, touched), [form, touched]);
+  const errors = useMemo(() => getErrors(form, touched, isEdit), [form, touched, isEdit]);
   const canSubmit =
     Object.values(errors).every((e) => e === '') &&
     form.nome.trim().length >= 3 &&
@@ -233,6 +238,7 @@ export default function EventForm({ mode, eventId }: EventFormProps) {
     form.descricao.trim().length >= 10 &&
     form.startDate.length > 0 &&
     form.endDate.length > 0 &&
+    form.startDate >= getTodayString() &&
     form.endDate >= form.startDate &&
     form.startTime.length > 0 &&
     form.endTime.length > 0 &&
@@ -270,8 +276,7 @@ export default function EventForm({ mode, eventId }: EventFormProps) {
     const allTouched = Object.fromEntries(Object.keys(form).map((k) => [k, true])) as TouchedState;
     setTouched(allTouched);
 
-    const today = getTodayString();
-    const currentErrors = getErrors(form, allTouched);
+    const currentErrors = getErrors(form, allTouched, isEdit);
     const isValid =
       Object.values(currentErrors).every((e) => e === '') &&
       form.nome.trim().length >= 3 &&
@@ -279,7 +284,6 @@ export default function EventForm({ mode, eventId }: EventFormProps) {
       form.responsavel.trim().length >= 3 &&
       form.descricao.trim().length >= 10 &&
       form.startDate.length > 0 &&
-      form.startDate >= today &&
       form.endDate.length > 0 &&
       form.endDate >= form.startDate &&
       form.startTime.length > 0 &&
@@ -299,23 +303,6 @@ export default function EventForm({ mode, eventId }: EventFormProps) {
       cargaHoraria: Number(form.cargaHoraria),
       status: form.status,
       foto: form.foto ?? undefined,
-      atividades: activities.map(({ id, ...activity }) => {
-        const backendId = Number(id);
-        const isExistingActivity = isEdit && !Number.isNaN(backendId);
-
-        return {
-          id: isExistingActivity ? backendId : undefined,
-          name: activity.name,
-          category: activity.category,
-          guests: activity.guests,
-          location: activity.location,
-          workload: Number(activity.workload) || 0,
-          description: activity.description,
-          eventId: isEdit && existingEvent ? existingEvent.id : undefined,
-          startDate: toISODateTime(activity.startDate, activity.startTime),
-          endDate: toISODateTime(activity.endDate, activity.endTime),
-        };
-      }),
     };
 
     if (isEdit) {
@@ -358,19 +345,7 @@ export default function EventForm({ mode, eventId }: EventFormProps) {
   }
 
   if (isEdit && loadingEvent) {
-    return (
-      <Box
-        sx={{
-          minHeight: '100dvh',
-          background: colorTokens.surface.background,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
-        <CircularProgress />
-      </Box>
-    );
+    return <PageLoader sx={{ background: colorTokens.surface.background }} />;
   }
 
   if (isEdit && loadError) {
@@ -614,7 +589,7 @@ export default function EventForm({ mode, eventId }: EventFormProps) {
                     slotProps={{
                       inputLabel: { shrink: true },
                       input: {
-                        inputProps: { min: getTodayString() },
+                        inputProps: startDateMin ? { min: startDateMin } : undefined,
                         endAdornment: <InputAdornment position="end" />,
                       },
                     }}
@@ -639,7 +614,7 @@ export default function EventForm({ mode, eventId }: EventFormProps) {
                     slotProps={{
                       inputLabel: { shrink: true },
                       input: {
-                        inputProps: { min: form.startDate || getTodayString() },
+                        inputProps: endDateMin ? { min: endDateMin } : undefined,
                         endAdornment: <InputAdornment position="end" />,
                       },
                     }}

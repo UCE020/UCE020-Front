@@ -2,10 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { IconButton, CircularProgress, Box } from '@mui/material';
-import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded';
+import { Box } from '@mui/material';
 import { AppPageContainer } from '@/components/layout/AppPageContainer';
-import { Toast } from '@/components/ui';
+import { Toast, PageLoader } from '@/components/ui';
 import { useAuth } from '@/providers/auth-provider';
 import { participationService, type TipoParticipante } from '@/services/participationService';
 import { presenceService } from '@/services/presenceService';
@@ -21,7 +20,6 @@ import {
   filterParticipants,
   togglePresenceFilter,
 } from '@/features/participants/utils/filterParticipants';
-import { colorTokens } from '@/lib/colors';
 import type { Participant, PresenceFilter } from '@/types/participant';
 
 const TIPO_TO_ROLE: Record<TipoParticipante, 'organizer' | 'monitor' | 'participant'> = {
@@ -233,21 +231,11 @@ export function ListParticipantsView() {
   const isLoading = isLoadingParticipants || isLoadingRole;
 
   return (
-    <AppPageContainer>
-      <IconButton
-        onClick={handleBack}
-        aria-label="Voltar"
-        sx={{ alignSelf: 'flex-start', color: colorTokens.text.primary }}
-      >
-        <ArrowBackRoundedIcon />
-      </IconButton>
-
+    <AppPageContainer maxWidth={760}>
       {isMonitor && <ValidatePresencesButton onClick={goToValidatePresence} />}
 
       {isLoading ? (
-        <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
-          <CircularProgress />
-        </Box>
+        <PageLoader minHeight="calc(100dvh - 160px)" />
       ) : error ? (
         <Box sx={{ color: 'error.main', textAlign: 'center', py: 2 }}>
           {error}
@@ -259,6 +247,7 @@ export function ListParticipantsView() {
           presenceFilter={presenceFilter}
           onSearchChange={setSearch}
           onFilterToggle={handleFilterToggle}
+          onBack={handleBack}
           renderParticipantActions={renderParticipantActions}
         />
       )}

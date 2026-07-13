@@ -2,15 +2,16 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Box, CircularProgress, IconButton, Typography } from '@mui/material';
+import { Box, IconButton, Typography } from '@mui/material';
+import { PageLoader } from '@/components/ui';
 import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded';
 import AccessTimeRoundedIcon from '@mui/icons-material/AccessTimeRounded';
 import CalendarTodayRoundedIcon from '@mui/icons-material/CalendarTodayRounded';
 import ContentCopyRoundedIcon from '@mui/icons-material/ContentCopyRounded';
-import EventAvailableRoundedIcon from '@mui/icons-material/EventAvailableRounded';
 import PlaceRoundedIcon from '@mui/icons-material/PlaceRounded';
 import PersonRoundedIcon from '@mui/icons-material/PersonRounded';
-import { ActivityModal } from '@/components/modals';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutlined';
+import { ActivityModal, ConfirmModal } from '@/components/modals';
 import { ContentCard } from '@/components/layout/ContentCard';
 import { AppPageContainer } from '@/components/layout/AppPageContainer';
 import { buildListParticipantsPath } from '@/features/participants/presence/utils/routes';
@@ -151,6 +152,9 @@ export function EventDetailView({ eventId }: EventDetailViewProps) {
   const [activityEnrollmentMap, setActivityEnrollmentMap] = useState<Record<string, boolean>>({});
   const [isCheckingActivityEnrollment, setIsCheckingActivityEnrollment] = useState(false);
 
+  const [isPresenceConfirmed, setIsPresenceConfirmed] = useState(false);
+  const [activityPresenceMap, setActivityPresenceMap] = useState<Record<string, boolean>>({});
+
   const isSignupProcessingRef = useRef(false);
   const pendingEnrollmentChecksRef = useRef<Set<string>>(new Set());
 
@@ -159,6 +163,9 @@ export function EventDetailView({ eventId }: EventDetailViewProps) {
     message: '',
     severity: ToastSeverity.Error,
   });
+
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isDeletingEvent, setIsDeletingEvent] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -420,22 +427,32 @@ export function EventDetailView({ eventId }: EventDetailViewProps) {
     }
   }
 
+  const handleDeleteClick = () => {
+    setIsDeleteModalOpen(true);
+  };
+
+  const confirmDeleteEvent = async () => {
+    if (!event) return;
+    setIsDeletingEvent(true);
+    try {
+      await eventService.deleteEvent(Number(event.id));
+      setToast({ open: true, message: 'Evento excluído com sucesso!', severity: ToastSeverity.Success });
+      setIsDeleteModalOpen(false);
+      setTimeout(() => {
+        router.push('/home');
+      }, 1500);
+    } catch (error) {
+      console.error('Erro ao excluir evento:', error);
+      setToast({ open: true, message: 'Erro ao excluir o evento.', severity: ToastSeverity.Error });
+      setIsDeletingEvent(false);
+      setIsDeleteModalOpen(false);
+    }
+  };
+
   const isLoading = isLoadingEvent || isLoadingParticipation;
 
   if (isLoading) {
-    return (
-      <AppPageContainer
-        sx={{
-          borderRadius: '28px',
-          minHeight: '100dvh',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
-        <CircularProgress />
-      </AppPageContainer>
-    );
+    return <PageLoader />;
   }
 
   if (!event) {
@@ -476,7 +493,7 @@ export function EventDetailView({ eventId }: EventDetailViewProps) {
           boxShadow: '0 18px 45px rgba(15, 29, 53, 0.08)',
         }}
       >
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <IconButton
             onClick={handleBack}
             aria-label="Voltar"
@@ -489,26 +506,38 @@ export function EventDetailView({ eventId }: EventDetailViewProps) {
           >
             <ArrowBackRoundedIcon />
           </IconButton>
+          {isOrganizer && event.status.toLowerCase() === 'pendente' && (
+            <IconButton
+              size="medium"
+              onClick={handleDeleteClick}
+              sx={{ color: '#F04438', padding: '8px', bgcolor: '#F044381A', '&:hover': { bgcolor: '#F0443833' } }}
+              aria-label="Excluir evento"
+            >
+              <DeleteOutlineIcon fontSize="medium" />
+            </IconButton>
+          )}
         </Box>
 
         <Box
           sx={{
             display: 'grid',
-            gridTemplateColumns: { xs: '1fr', md: 'minmax(320px, 0.9fr) minmax(0, 1.1fr)' },
+            gridTemplateColumns: event.foto
+              ? { xs: '1fr', md: 'minmax(320px, 0.9fr) minmax(0, 1.1fr)' }
+              : '1fr',
             gap: { xs: 2.5, md: 3 },
             alignItems: 'stretch',
           }}
         >
-          <Box
-            sx={{
-              minHeight: { xs: 220, md: 360 },
-              borderRadius: { xs: '18px', md: '22px' },
-              overflow: 'hidden',
-              position: 'relative',
-              bgcolor: '#F0FAF7',
-            }}
-          >
-            {event.foto ? (
+          {event.foto && (
+            <Box
+              sx={{
+                minHeight: { xs: 220, md: 360 },
+                borderRadius: { xs: '18px', md: '22px' },
+                overflow: 'hidden',
+                position: 'relative',
+                bgcolor: '#F0FAF7',
+              }}
+            >
               <Box
                 component="img"
                 src={event.foto}
@@ -522,21 +551,8 @@ export function EventDetailView({ eventId }: EventDetailViewProps) {
                   display: 'block',
                 }}
               />
-            ) : (
-              <Box
-                sx={{
-                  height: '100%',
-                  minHeight: 'inherit',
-                  display: 'grid',
-                  placeItems: 'center',
-                  color: '#2EC4A0',
-                  bgcolor: '#E6F7F0',
-                }}
-              >
-                <EventAvailableRoundedIcon sx={{ fontSize: 76 }} />
-              </Box>
-            )}
-          </Box>
+            </Box>
+          )}
 
           <Box sx={{ minWidth: 0, display: 'flex', flexDirection: 'column', gap: 2.25 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25, flexWrap: 'wrap' }}>
@@ -717,6 +733,7 @@ export function EventDetailView({ eventId }: EventDetailViewProps) {
 
             setSelectedActivity(activity as ActivityLike);
             setIsActivityEnrolled(activityEnrollmentMap[activityKey] ?? false);
+            setIsPresenceConfirmed(activityPresenceMap[activityKey] ?? false);
             setIsQrModalOpen(false);
 
             if (pendingEnrollmentChecksRef.current.has(activityKey)) {
@@ -729,27 +746,39 @@ export function EventDetailView({ eventId }: EventDetailViewProps) {
             try {
               const activityDetails = await activityService.findOne(activity.id);
               let isRegistered = Boolean(activityDetails?.isRegistered ?? false);
+              let presenceConfirmed = false;
 
-              if (!isRegistered && Number.isFinite(normalizedEventId) && Number.isFinite(Number(activity.id)) && user?.id) {
+              if (Number.isFinite(normalizedEventId) && Number.isFinite(Number(activity.id)) && user?.id) {
                 try {
                   const participants = await participationService.getActivityParticipants(
                     normalizedEventId,
                     Number(activity.id),
                   );
-                  isRegistered = participants.some((participant) => participant.id === String(user.id));
+                  const me = participants.find((participant) => participant.id === String(user.id));
+
+                  if (me) {
+                    isRegistered = true;
+                    presenceConfirmed = me.presenceStatus === 'confirmed';
+                  }
                 } catch (participantsError) {
-                  console.error('[ATIVIDADE] erro ao listar participantes para verificar inscrição:', participantsError);
+                  console.error('[ATIVIDADE] erro ao listar participantes para verificar inscrição/presença:', participantsError);
                 }
               }
 
               setIsActivityEnrolled(isRegistered);
+              setIsPresenceConfirmed(presenceConfirmed);
               setActivityEnrollmentMap((prev) => ({
                 ...prev,
                 [activityKey]: isRegistered,
               }));
+              setActivityPresenceMap((prev) => ({
+                ...prev,
+                [activityKey]: presenceConfirmed,
+              }));
             } catch (error) {
               console.error('[ATIVIDADE] erro ao verificar inscrição:', error);
               setIsActivityEnrolled(activityEnrollmentMap[activityKey] ?? false);
+              setIsPresenceConfirmed(activityPresenceMap[activityKey] ?? false);
             } finally {
               pendingEnrollmentChecksRef.current.delete(activityKey);
               setIsCheckingActivityEnrollment(false);
@@ -778,6 +807,7 @@ export function EventDetailView({ eventId }: EventDetailViewProps) {
             ? 'signup'
             : activityModalVariant
         }
+        presenceConfirmed={isPresenceConfirmed}
         isLoading={isCheckingActivityEnrollment}
         onSignup={handleSignup}
         onCancelParticipation={handleCancelParticipation}
@@ -805,6 +835,18 @@ export function EventDetailView({ eventId }: EventDetailViewProps) {
         message={toast.message}
         severity={toast.severity}
         onClose={() => setToast((prev) => ({ ...prev, open: false }))}
+      />
+
+      <ConfirmModal
+        open={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        message="Tem certeza que deseja excluir este evento?"
+        emphasisEndText="Esta ação não poderá ser desfeita."
+        confirmText="Excluir"
+        cancelText="Cancelar"
+        onConfirm={confirmDeleteEvent}
+        isLoading={isDeletingEvent}
+        type="error"
       />
     </AppPageContainer>
   );

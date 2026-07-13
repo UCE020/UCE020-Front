@@ -4,9 +4,10 @@ import { colorTokens } from '@/lib/colors';
 
 interface AppPageContainerProps extends BoxProps {
   children: ReactNode;
+  maxWidth?: number | string;
 }
 
-export function AppPageContainer({ children, sx, ...props }: AppPageContainerProps) {
+export function AppPageContainer({ children, sx, maxWidth = 620, ...props }: AppPageContainerProps) {
   return (
     <Box
       sx={{

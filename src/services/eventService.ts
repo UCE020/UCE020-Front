@@ -1,6 +1,23 @@
 import { api } from './api';
 import { Event } from '../types/event';
 
+export interface CreateActivityPayload {
+  id?: number;
+  name: string;
+  category: string;
+  location: string;
+  workload: number;
+  description: string;
+  startDate: string;
+  endDate: string;
+  eventId?: number;
+  guests?: {
+    name: string;
+    email: string;
+    role: string;
+  }[];
+}
+
 export interface CreateEventPayload {
   nome: string;
   codigo?: string;
@@ -12,6 +29,7 @@ export interface CreateEventPayload {
   dataFim: string;
   status: 'pendente' | 'iniciada' | 'andamento' | 'finalizada';
   foto?: string;
+  atividades?: CreateActivityPayload[];
 }
 
 export type UpdateEventPayload = Partial<CreateEventPayload>;

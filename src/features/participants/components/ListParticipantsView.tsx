@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Box } from '@mui/material';
 import { AppPageContainer } from '@/components/layout/AppPageContainer';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Toast, PageLoader } from '@/components/ui';
 import { useAuth } from '@/providers/auth-provider';
 import { participationService, type TipoParticipante } from '@/services/participationService';
@@ -40,19 +41,20 @@ export function ListParticipantsView() {
     requirePresenceContext(eventIdParam, activityIdParam),
   );
 
-  const [participants, setParticipants] = useState<Participant[]>([]);
   const [search, setSearch] = useState('');
   const [presenceFilter, setPresenceFilter] = useState<PresenceFilter>('all');
   const [selectedParticipant, setSelectedParticipant] = useState<Participant | null>(null);
-  const [isLoadingParticipants, setIsLoadingParticipants] = useState(true);
-  const [isLoadingRole, setIsLoadingRole] = useState(true);
-  const [participantType, setParticipantType] = useState<TipoParticipante | null>(null);
-  const [error, setError] = useState<string | null>(null);
+
   const [toast, setToast] = useState<{ open: boolean; message: string; severity: ToastSeverity }>({
     open: false,
     message: '',
     severity: ToastSeverity.Success,
   });
+
+  const queryClient = useQueryClient();
+  const numericEventId = Number(context?.eventId);
+  const numericActivityId = Number(context?.activityId);
+  const hasValidContext = Number.isFinite(numericEventId) && Number.isFinite(numericActivityId);
 
   useEffect(() => {
     const fallbackContext = requirePresenceContext(eventIdParam, activityIdParam);
@@ -72,80 +74,56 @@ export function ListParticipantsView() {
     };
   }, [eventIdParam, activityIdParam]);
 
-  // Busca o tipo de participação do usuário logado naquele evento
-  useEffect(() => {
-    if (!context?.eventId) return;
+  const {
+    data: participantType = null,
+    isLoading: isLoadingRole,
+  } = useQuery({
+    queryKey: ['participant-type', numericEventId, user?.id],
+    queryFn: () => participationService.getTipoParticipante(numericEventId),
+    enabled: hasValidContext && !!user,
+    retry: false,
+  });
 
-    const numericEventId = Number(context.eventId);
-    if (!Number.isFinite(numericEventId)) return;
+  const {
+    data: participants = [],
+    isLoading: isLoadingParticipants,
+    isError,
+    error: queryError,
+  } = useQuery({
+    queryKey: ['activity-participants', numericEventId, numericActivityId],
+    queryFn: () => participationService.getActivityParticipants(numericEventId, numericActivityId),
+    enabled: hasValidContext,
+    staleTime: 0,
+    refetchOnMount: 'always',
+  });
 
-    let isMounted = true;
+  const error = isError ? (queryError instanceof Error ? queryError.message : 'Erro ao carregar participantes') : null;
 
-    participationService
-      .getTipoParticipante(numericEventId)
-      .then((tipo) => {
-        if (isMounted) {
-          setParticipantType(tipo);
-        }
-      })
-      .catch(() => {
-        if (isMounted) {
-          setParticipantType(null);
-        }
-      })
-      .finally(() => {
-        if (isMounted) {
-          setIsLoadingRole(false);
-        }
+  const removePresenceMutation = useMutation({
+    mutationFn: () => presenceService.removePresence({
+      participantId: selectedParticipant!.id,
+      eventId: context!.eventId,
+      activityId: context!.activityId,
+    }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['activity-participants', numericEventId, numericActivityId] });
+      setToast({
+        open: true,
+        message: 'Presença removida com sucesso.',
+        severity: ToastSeverity.Success,
       });
-
-    return () => {
-      isMounted = false;
-    };
-  }, [context?.eventId, user?.id]);
-
-  // Busca os participantes da atividade
-  useEffect(() => {
-    if (!context?.eventId || !context?.activityId) return;
-
-    const numericEventId = Number(context.eventId);
-    const numericActivityId = Number(context.activityId);
-
-    if (!Number.isFinite(numericEventId) || !Number.isFinite(numericActivityId)) return;
-
-    let isMounted = true;
-
-    queueMicrotask(() => {
-      if (isMounted) {
-        setIsLoadingParticipants(true);
-        setError(null);
-      }
-    });
-
-    participationService
-      .getActivityParticipants(numericEventId, numericActivityId)
-      .then((data) => {
-        if (isMounted) {
-          setParticipants(data);
-        }
-      })
-      .catch((err) => {
-        if (isMounted) {
-          const errorMessage = err instanceof Error ? err.message : 'Erro ao carregar participantes';
-          setError(errorMessage);
-          setParticipants([]);
-        }
-      })
-      .finally(() => {
-        if (isMounted) {
-          setIsLoadingParticipants(false);
-        }
+      closeRemoveModal();
+    },
+    onError: (err) => {
+      const errorMessage = err instanceof Error ? err.message : 'Erro ao remover presença';
+      setToast({
+        open: true,
+        message: errorMessage,
+        severity: ToastSeverity.Error,
       });
-
-    return () => {
-      isMounted = false;
-    };
-  }, [context?.eventId, context?.activityId]);
+      console.error(errorMessage);
+    },
+  });
 
   if (!context) {
     return <PresenceContextMissing />;
@@ -177,39 +155,11 @@ export function ListParticipantsView() {
     setSelectedParticipant(null);
   }
 
-  async function handleRemovePresence() {
+
+
+  function handleRemovePresence() {
     if (!selectedParticipant || !context?.eventId || !context?.activityId) return;
-
-    try {
-      await presenceService.removePresence({
-        participantId: selectedParticipant.id,
-        eventId: context.eventId,
-        activityId: context.activityId,
-      });
-
-      setParticipants((current) =>
-        current.map((participant) =>
-          participant.id === selectedParticipant.id
-            ? { ...participant, presenceStatus: 'pending' }
-            : participant,
-        ),
-      );
-      setError(null);
-      setToast({
-        open: true,
-        message: 'Presença removida com sucesso.',
-        severity: ToastSeverity.Success,
-      });
-      closeRemoveModal();
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Erro ao remover presença';
-      setToast({
-        open: true,
-        message: errorMessage,
-        severity: ToastSeverity.Error,
-      });
-      console.error(errorMessage);
-    }
+    removePresenceMutation.mutate();
   }
 
   function renderParticipantActions(participant: Participant) {

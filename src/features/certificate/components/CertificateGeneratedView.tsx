@@ -1,15 +1,20 @@
 'use client';
 
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Box, Divider, IconButton, Typography } from '@mui/material';
+import { Box, IconButton, Typography } from '@mui/material';
 import ArticleOutlinedIcon from '@mui/icons-material/ArticleOutlined';
-import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import { Searchbar } from '@/components/ui/Searchbar';
 import { Button } from '@/components/ui/Button';
+import { Toast } from '@/components/ui/Toast';
+import { ConfirmModal } from '@/components/modals';
 import { ContentCard } from '@/components/layout/ContentCard';
 import { CertificateManagementCard } from '@/components/certificate/CertificateManagementCard';
 import type { CertificateManagementItem } from '@/types/certificate-management';
+import { ToastSeverity } from '@/types/toast';
+import { certificateService } from '@/services/certificate.service';
+import { extractApiErrorMessage } from '@/utils/apiError';
 import { useCertificatesGenerated } from '../hooks/useCertificatesGenerated';
 import { CertificateStatsRow } from './CertificateStatsRow';
 import { CertificateSummaryCard } from './CertificateSummaryCard';
@@ -47,7 +52,16 @@ export function CertificatesGeneratedView({eventoId}: CertificatesGeneratedViewP
     isError,
     loadMore,
     hasMore,
+    refresh,
   } = useCertificatesGenerated(eventoId);
+
+  const [isSignModalOpen, setIsSignModalOpen] = useState(false);
+  const [isSigning, setIsSigning] = useState(false);
+  const [toast, setToast] = useState<{ open: boolean; message: string; severity: ToastSeverity }>({
+    open: false,
+    message: '',
+    severity: ToastSeverity.Success,
+  });
 
   const handleView = (certificate: CertificateManagementItem) =>
     router.push(`/certificate/${certificate.id}`);
@@ -55,7 +69,33 @@ export function CertificatesGeneratedView({eventoId}: CertificatesGeneratedViewP
     if (!certificate.imageUrl) return;
     window.open(certificate.imageUrl, '_blank', 'noopener,noreferrer');
   };
-  const handleSignBatch = () => console.log('TODO: assinar em lote');
+
+  const handleSignBatch = () => setIsSignModalOpen(true);
+
+  const confirmSignBatch = async () => {
+    setIsSigning(true);
+    try {
+      const result = await certificateService.signCertificatesBatch(eventoId);
+      setToast({
+        open: true,
+        message:
+          result.assinados > 0
+            ? `${result.assinados} certificado(s) assinado(s) por ${result.assinante}.`
+            : 'Nenhum certificado pendente para assinar.',
+        severity: result.assinados > 0 ? ToastSeverity.Success : ToastSeverity.Info,
+      });
+      refresh();
+    } catch (error) {
+      setToast({
+        open: true,
+        message: extractApiErrorMessage(error, 'Não foi possível assinar os certificados.'),
+        severity: ToastSeverity.Error,
+      });
+    } finally {
+      setIsSigning(false);
+    }
+  };
+
   const handleSendBatch = () => console.log('TODO: encaminhar certificados');
   const handleLoadMore = () => loadMore();
   const handleBack = () => router.back();
@@ -109,20 +149,6 @@ export function CertificatesGeneratedView({eventoId}: CertificatesGeneratedViewP
                 <Box component="span" sx={{ color: '#2EC4A0' }}>Gerados</Box>
               </Typography>
             </Box>
-            
-            {/* LINHA INFERIOR: Subtítulo alinhado com o texto do título */}
-            <Typography 
-              sx={{ 
-                fontSize: 12, 
-                color: '#64748B', 
-                mt: 0.5, 
-                ml: 2, 
-                maxWidth: 280, 
-                lineHeight: 1.5 
-              }}
-            >
-              Visualize e gerencie os certificados gerados para o seu evento.
-            </Typography>
 
           </Box>
         </Box>
@@ -156,7 +182,12 @@ export function CertificatesGeneratedView({eventoId}: CertificatesGeneratedViewP
         <CertificateSummaryCard totalIssued={totalIssued} statusTotals={statusTotals} />
       </Box>
 
-      <CertificateBatchActions onSignBatch={handleSignBatch} onSendBatch={handleSendBatch} />
+      <CertificateBatchActions
+        onSignBatch={handleSignBatch}
+        onSendBatch={handleSendBatch}
+        isSigning={isSigning}
+        signDisabled={isSigning}
+      />
 
       {/* Painel de filtros e busca */}
       <ContentCard sx={{ gap: 1.5 }}>
@@ -230,6 +261,25 @@ export function CertificatesGeneratedView({eventoId}: CertificatesGeneratedViewP
           Carregar mais
         </Button>
       )}
+
+      <ConfirmModal
+        open={isSignModalOpen}
+        onClose={() => setIsSignModalOpen(false)}
+        message="Deseja assinar em lote todos os certificados pendentes deste evento?"
+        emphasisEndText="Os certificados já assinados não serão afetados."
+        confirmText="Assinar"
+        cancelText="Cancelar"
+        onConfirm={confirmSignBatch}
+        isLoading={isSigning}
+        type="default"
+      />
+
+      <Toast
+        open={toast.open}
+        message={toast.message}
+        severity={toast.severity}
+        onClose={() => setToast((prev) => ({ ...prev, open: false }))}
+      />
     </>
   );
 }

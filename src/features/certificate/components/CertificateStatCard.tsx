@@ -24,7 +24,7 @@ export function CertificateStatCard({ role, label, value }: CertificateStatCardP
   return (
     <Box
       sx={{
-        flex: 1,
+        width: '100%',
         minWidth: 0,
         maxWidth: { xs: 'none', sm: 160 },
         display: 'flex',

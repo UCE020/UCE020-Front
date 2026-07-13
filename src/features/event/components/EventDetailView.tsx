@@ -10,7 +10,8 @@ import CalendarTodayRoundedIcon from '@mui/icons-material/CalendarTodayRounded';
 import ContentCopyRoundedIcon from '@mui/icons-material/ContentCopyRounded';
 import PlaceRoundedIcon from '@mui/icons-material/PlaceRounded';
 import PersonRoundedIcon from '@mui/icons-material/PersonRounded';
-import { ActivityModal } from '@/components/modals';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutlined';
+import { ActivityModal, ConfirmModal } from '@/components/modals';
 import { ContentCard } from '@/components/layout/ContentCard';
 import { AppPageContainer } from '@/components/layout/AppPageContainer';
 import { buildListParticipantsPath } from '@/features/participants/presence/utils/routes';
@@ -158,6 +159,9 @@ export function EventDetailView({ eventId }: EventDetailViewProps) {
     message: '',
     severity: ToastSeverity.Error,
   });
+
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isDeletingEvent, setIsDeletingEvent] = useState(false);
 
   useEffect(() => {
     const numericEventId = Number(eventId);
@@ -441,6 +445,28 @@ export function EventDetailView({ eventId }: EventDetailViewProps) {
     }
   }
 
+  const handleDeleteClick = () => {
+    setIsDeleteModalOpen(true);
+  };
+
+  const confirmDeleteEvent = async () => {
+    if (!event) return;
+    setIsDeletingEvent(true);
+    try {
+      await eventService.deleteEvent(Number(event.id));
+      setToast({ open: true, message: 'Evento excluído com sucesso!', severity: ToastSeverity.Success });
+      setIsDeleteModalOpen(false);
+      setTimeout(() => {
+        router.push('/home');
+      }, 1500);
+    } catch (error) {
+      console.error('Erro ao excluir evento:', error);
+      setToast({ open: true, message: 'Erro ao excluir o evento.', severity: ToastSeverity.Error });
+      setIsDeletingEvent(false);
+      setIsDeleteModalOpen(false);
+    }
+  };
+
   const isLoading = isLoadingEvent || isLoadingParticipation;
 
   if (isLoading) {
@@ -485,7 +511,7 @@ export function EventDetailView({ eventId }: EventDetailViewProps) {
           boxShadow: '0 18px 45px rgba(15, 29, 53, 0.08)',
         }}
       >
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <IconButton
             onClick={handleBack}
             aria-label="Voltar"
@@ -498,6 +524,16 @@ export function EventDetailView({ eventId }: EventDetailViewProps) {
           >
             <ArrowBackRoundedIcon />
           </IconButton>
+          {isOrganizer && event.status.toLowerCase() === 'pendente' && (
+            <IconButton
+              size="medium"
+              onClick={handleDeleteClick}
+              sx={{ color: '#F04438', padding: '8px', bgcolor: '#F044381A', '&:hover': { bgcolor: '#F0443833' } }}
+              aria-label="Excluir evento"
+            >
+              <DeleteOutlineIcon fontSize="medium" />
+            </IconButton>
+          )}
         </Box>
 
         <Box
@@ -810,6 +846,18 @@ export function EventDetailView({ eventId }: EventDetailViewProps) {
         message={toast.message}
         severity={toast.severity}
         onClose={() => setToast((prev) => ({ ...prev, open: false }))}
+      />
+
+      <ConfirmModal
+        open={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        message="Tem certeza que deseja excluir este evento?"
+        emphasisEndText="Esta ação não poderá ser desfeita."
+        confirmText="Excluir"
+        cancelText="Cancelar"
+        onConfirm={confirmDeleteEvent}
+        isLoading={isDeletingEvent}
+        type="error"
       />
     </AppPageContainer>
   );

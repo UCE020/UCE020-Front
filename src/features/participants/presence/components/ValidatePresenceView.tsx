@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { useQueryClient } from '@tanstack/react-query';
 import { Box, IconButton, Typography } from '@mui/material';
 import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded';
 import { AppPageContainer } from '@/components/layout/AppPageContainer';
@@ -102,6 +103,7 @@ function PresenceScannerPanel({
 export function ValidatePresenceView() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const queryClient = useQueryClient();
   const eventIdParam = searchParams.get('eventId');
   const activityIdParam = searchParams.get('activityId');
 
@@ -160,6 +162,8 @@ export function ValidatePresenceView() {
         eventId: payload.eventId,
         activityId: payload.activityId,
       });
+
+      queryClient.invalidateQueries({ queryKey: ['activity-participants'] });
 
       setToast({
         open: true,

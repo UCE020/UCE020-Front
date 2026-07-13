@@ -13,6 +13,7 @@ import { useAuth } from '@/providers/auth-provider';
 import { eventService } from '@/services/eventService';
 import { participationService } from '@/services/participationService';
 import { extractApiErrorMessage } from '@/utils/apiError';
+import { useQueryClient } from '@tanstack/react-query';
 
 type SearchState =
   | { status: 'idle' }
@@ -39,6 +40,7 @@ export default function HomePage() {
   const router = useRouter();
   const { user } = useAuth();
   const { filteredEvents, loading: eventsLoading } = useHomeEvents();
+  const queryClient = useQueryClient();
   const [code, setCode] = useState('');
   const [searchCode, setSearchCode] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
@@ -95,6 +97,8 @@ export default function HomePage() {
     isSubscribingRef.current = true;
     try {
       await participationService.subscribe(eventId);
+      queryClient.invalidateQueries({ queryKey: ['home-events'] });
+      queryClient.invalidateQueries({ queryKey: ['participating-events'] });
       setModalOpen(false);
       dispatch({ type: 'RESET' });
       setSearchCode('');

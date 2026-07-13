@@ -1,55 +1,23 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { Event } from "@/types/event";
+import { useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { eventService } from "@/services/eventService";
 import { useAuth } from "@/providers/auth-provider";
 
 export function useHomeEvents() {
-  const { user, isLoading } = useAuth();
-  const [events, setEvents] = useState<Event[]>([]);
-  const [isFetchingEvents, setIsFetchingEvents] = useState(false);
-  const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
+  const { user, isLoading: isAuthLoading } = useAuth();
 
-  useEffect(() => {
-    if (isLoading || !user) return;
+  const { data, isFetching, isLoading: isQueryLoading } = useQuery({
+    queryKey: ["home-events", user?.id],
+    queryFn: () => eventService.findParticipatingEvents('participante'),
+    enabled: !!user && !isAuthLoading,
+  });
 
-    let isMounted = true;
-    Promise.resolve().then(() => {
-      if (isMounted) {
-        setIsFetchingEvents(true);
-      }
-    });
-
-    eventService
-      .findParticipatingEvents('participante')
-      .then((events) => {
-        if (isMounted) {
-          setEvents(Array.isArray(events) ? events : []);
-        }
-      })
-      .catch(() => {
-        if (isMounted) {
-          setEvents([]);
-        }
-      })
-      .finally(() => {
-        if (isMounted) {
-          setIsFetchingEvents(false);
-          setHasLoadedOnce(true);
-        }
-      });
-
-    return () => {
-      isMounted = false;
-    };
-  }, [user, isLoading]);
-
+  const events = Array.isArray(data) ? data : [];
   const filteredEvents = useMemo(() => (user ? events : []), [events, user]);
 
-  // Só é "carregando" enquanto há uma sessão sendo resolvida ou os eventos
-  // ainda não terminaram de buscar pela primeira vez. Deslogado => não carrega.
-  const loading = isLoading || isFetchingEvents || (!!user && !hasLoadedOnce);
+  const loading = isAuthLoading || isQueryLoading;
 
-  return { filteredEvents, isFetchingEvents, loading };
+  return { filteredEvents, isFetchingEvents: isFetching, loading };
 }

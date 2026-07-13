@@ -77,11 +77,13 @@ export function OrganizerEventActions({ eventId, isFinalized = false, onFinalize
     <Box
       sx={{
         display: 'flex',
+        flexDirection: { xs: 'column', sm: 'row' },
         gap: 1.5,
         flexWrap: 'wrap',
         px: { xs: 2, sm: 3 },
         py: 2,
         justifyContent: 'flex-start',
+        alignItems: { xs: 'stretch', sm: 'center' },
       }}
     >
       <Button

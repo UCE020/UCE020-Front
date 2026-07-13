@@ -23,7 +23,7 @@ const STATUS_STYLES: Record<string, { bg: string; color: string; label: string }
 };
 
 export function EventCard({ event, onClick }: EventCardProps) {
-  const imageSrc = event.foto || "/images/certificadoVariacao2.png";
+  const initial = (event.nome || "?").trim().charAt(0).toUpperCase();
   const statusKey = (event.status || "").toLowerCase();
   const statusStyle = STATUS_STYLES[statusKey] || {
     bg: "#F1F2F6",
@@ -38,11 +38,17 @@ export function EventCard({ event, onClick }: EventCardProps) {
       className="group w-full text-left flex items-center gap-4 bg-white rounded-[22px] px-5 py-4 border border-black/[0.03] hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200"
     >
       <div className="relative w-[78px] h-[78px] flex-shrink-0 rounded-2xl overflow-hidden bg-[#f0faf7]">
-        <img
-          src={imageSrc}
-          alt={event.nome}
-          className="h-full w-full object-cover"
-        />
+        {event.foto ? (
+          <img
+            src={event.foto}
+            alt={event.nome}
+            className="h-full w-full object-cover"
+          />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center bg-[#E6F7F0] text-[#2EC4A0] font-bold text-3xl select-none">
+            {initial}
+          </div>
+        )}
       </div>
 
       <div className="flex-1 min-w-0">

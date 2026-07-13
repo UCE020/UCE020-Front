@@ -20,7 +20,9 @@ import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import AddRoundedIcon from '@mui/icons-material/AddRounded';
 
-import { Button, TextInput } from '@/components/ui';
+import EventOutlinedIcon from '@mui/icons-material/EventOutlined';
+import ScheduleOutlinedIcon from '@mui/icons-material/ScheduleOutlined';
+import { Button, TextInput, PageLoader } from '@/components/ui';
 import { ImageUpload } from '@/components/ui/inputs';
 import { colorTokens } from '@/lib/colors';
 import { useCreateEvent } from '../../evento/hooks/useCreateEvent';
@@ -368,6 +370,8 @@ function EventFormContent({
 
   function handleEditActivity(id: string) {
     setEditingActivityId(id);
+  if (isEdit && loadingEvent) {
+    return <PageLoader sx={{ background: colorTokens.surface.background }} />;
   }
 
   function handleUpdateActivityTitle(id: string, newTitle: string) {

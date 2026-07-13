@@ -89,7 +89,7 @@ function createTouchedState(): TouchedState {
   };
 }
 
-function getErrors(form: FormState, touched: TouchedState) {
+function getErrors(form: FormState, touched: TouchedState, isEdit: boolean) {
   return {
     nome:
       touched.nome && form.nome.trim().length < 3
@@ -103,13 +103,13 @@ function getErrors(form: FormState, touched: TouchedState) {
       touched.descricao && form.descricao.trim().length < 10 ? 'Descreva melhor o evento.' : '',
     startDate: (() => {
       if (touched.startDate && !form.startDate) return 'Selecione a data de início.';
-      if (touched.startDate && form.startDate && form.startDate < getTodayString())
+      if (!isEdit && touched.startDate && form.startDate && form.startDate < getTodayString())
         return 'A data de início não pode ser no passado.';
       return '';
     })(),
     endDate: (() => {
       if (touched.endDate && !form.endDate) return 'Selecione a data de término.';
-      if (touched.endDate && form.endDate && form.endDate < getTodayString())
+      if (!isEdit && touched.endDate && form.endDate && form.endDate < getTodayString())
         return 'A data de término não pode ser no passado.';
       return '';
     })(),
@@ -170,6 +170,8 @@ export default function EventForm({ mode, eventId }: EventFormProps) {
 
   const isSubmitting = createLoading || updateLoading;
   const submitError = createError || updateError;
+  const startDateMin = !isEdit ? getTodayString() : undefined;
+  const endDateMin = !isEdit ? form.startDate || getTodayString() : undefined;
 
   useEffect(() => {
     if (!existingEvent) return;
@@ -224,7 +226,7 @@ export default function EventForm({ mode, eventId }: EventFormProps) {
     });
   }, [existingEvent]);
 
-  const errors = useMemo(() => getErrors(form, touched), [form, touched]);
+  const errors = useMemo(() => getErrors(form, touched, isEdit), [form, touched, isEdit]);
   const canSubmit =
     Object.values(errors).every((e) => e === '') &&
     form.nome.trim().length >= 3 &&
@@ -233,6 +235,7 @@ export default function EventForm({ mode, eventId }: EventFormProps) {
     form.descricao.trim().length >= 10 &&
     form.startDate.length > 0 &&
     form.endDate.length > 0 &&
+    (!isEdit ? form.startDate >= getTodayString() : true) &&
     form.endDate >= form.startDate &&
     form.startTime.length > 0 &&
     form.endTime.length > 0 &&
@@ -270,8 +273,7 @@ export default function EventForm({ mode, eventId }: EventFormProps) {
     const allTouched = Object.fromEntries(Object.keys(form).map((k) => [k, true])) as TouchedState;
     setTouched(allTouched);
 
-    const today = getTodayString();
-    const currentErrors = getErrors(form, allTouched);
+    const currentErrors = getErrors(form, allTouched, isEdit);
     const isValid =
       Object.values(currentErrors).every((e) => e === '') &&
       form.nome.trim().length >= 3 &&
@@ -279,7 +281,6 @@ export default function EventForm({ mode, eventId }: EventFormProps) {
       form.responsavel.trim().length >= 3 &&
       form.descricao.trim().length >= 10 &&
       form.startDate.length > 0 &&
-      form.startDate >= today &&
       form.endDate.length > 0 &&
       form.endDate >= form.startDate &&
       form.startTime.length > 0 &&
@@ -299,23 +300,6 @@ export default function EventForm({ mode, eventId }: EventFormProps) {
       cargaHoraria: Number(form.cargaHoraria),
       status: form.status,
       foto: form.foto ?? undefined,
-      atividades: activities.map(({ id, ...activity }) => {
-        const backendId = Number(id);
-        const isExistingActivity = isEdit && !Number.isNaN(backendId);
-
-        return {
-          id: isExistingActivity ? backendId : undefined,
-          name: activity.name,
-          category: activity.category,
-          guests: activity.guests,
-          location: activity.location,
-          workload: Number(activity.workload) || 0,
-          description: activity.description,
-          eventId: isEdit && existingEvent ? existingEvent.id : undefined,
-          startDate: toISODateTime(activity.startDate, activity.startTime),
-          endDate: toISODateTime(activity.endDate, activity.endTime),
-        };
-      }),
     };
 
     if (isEdit) {
@@ -602,7 +586,7 @@ export default function EventForm({ mode, eventId }: EventFormProps) {
                     slotProps={{
                       inputLabel: { shrink: true },
                       input: {
-                        inputProps: { min: getTodayString() },
+                        inputProps: startDateMin ? { min: startDateMin } : undefined,
                         endAdornment: <InputAdornment position="end" />,
                       },
                     }}
@@ -627,7 +611,7 @@ export default function EventForm({ mode, eventId }: EventFormProps) {
                     slotProps={{
                       inputLabel: { shrink: true },
                       input: {
-                        inputProps: { min: form.startDate || getTodayString() },
+                        inputProps: endDateMin ? { min: endDateMin } : undefined,
                         endAdornment: <InputAdornment position="end" />,
                       },
                     }}

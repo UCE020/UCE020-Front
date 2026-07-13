@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { Box, Divider, Typography } from '@mui/material';
+import { Box, Divider, IconButton, Typography } from '@mui/material';
 import ArticleOutlinedIcon from '@mui/icons-material/ArticleOutlined';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import { Searchbar } from '@/components/ui/Searchbar';
@@ -16,6 +16,7 @@ import { CertificateBatchActions } from './CertificateBatchActions';
 import { CertificateFilterTabs } from './CertificateFilterTabs';
 import { CertificateFilters } from './CertificateFilters';
 import { CertificateListHeader } from './CertificateListHeader';
+import { ArrowBack } from '@mui/icons-material';
 
 interface CertificatesGeneratedViewProps {
   eventoId: number;
@@ -84,26 +85,64 @@ export function CertificatesGeneratedView({eventoId}: CertificatesGeneratedViewP
   return (
     <>
       {/* Header */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-        <Box>
-          <Typography
-            sx={{ fontWeight: 700, fontSize: { xs: '1.3rem', sm: '1.5rem' }, color: '#0F1D35' }}
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 2 }}>
+        {/* LADO ESQUERDO: Botão de voltar, Linha e Textos */}
+        <Box sx={{ display: "flex", flexDirection: "row", alignItems: "flex-start", gap: { xs: 1.5, sm: 2 } }}>
+          <IconButton
+            onClick={() => router.back()}
+            size="small"
+            sx={{ 
+              color: "text.secondary", 
+              "&:hover": { bgcolor: "background.default" }, 
+            }}
           >
-            Certificados{' '}
-            <Box component="span" sx={{ color: '#2EC4A0' }}>Gerados</Box>
-          </Typography>
-          <Typography sx={{ fontSize: 12, color: '#64748B', mt: 0.5, maxWidth: 280, lineHeight: 1.5 }}>
-            Visualize e gerencie os certificados gerados para o seu evento.
-          </Typography>
+            <ArrowBack />
+          </IconButton>
+          {/* Bloco de Textos */}
+          <Box sx={{ display: "flex", flexDirection: "column" }}>
+            
+            {/* LINHA SUPERIOR: Apenas Linha Verde e Título */}
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+              <Box sx={{ width: 4, height: 26, borderRadius: 4, bgcolor: "#2EC4A0" }} />
+              <Typography
+                sx={{ fontWeight: 700, fontSize: { xs: '1.3rem', sm: '1.5rem' }, color: '#0F1D35', lineHeight: 1.2 }}
+              >
+                Certificados{' '}
+                <Box component="span" sx={{ color: '#2EC4A0' }}>Gerados</Box>
+              </Typography>
+            </Box>
+            
+            {/* LINHA INFERIOR: Subtítulo alinhado com o texto do título */}
+            <Typography 
+              sx={{ 
+                fontSize: 12, 
+                color: '#64748B', 
+                mt: 0.5, 
+                ml: 2, 
+                maxWidth: 280, 
+                lineHeight: 1.5 
+              }}
+            >
+              Visualize e gerencie os certificados gerados para o seu evento.
+            </Typography>
+
+          </Box>
         </Box>
+        {/* LADO DIREITO: Ícone Decorativo */}
         <Box
           sx={{
-            width: 90, height: 90, bgcolor: '#E8F5F2', borderRadius: '12px',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            width: { xs: 70, sm: 90 },
+            height: { xs: 70, sm: 90 },
+            bgcolor: '#E8F5F2', 
+            borderRadius: '12px',
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center',
             border: '1.5px dashed #2EC4A0',
+            flexShrink: 0,
           }}
         >
-          <ArticleOutlinedIcon sx={{ fontSize: 40, color: '#2EC4A0' }} />
+          <ArticleOutlinedIcon sx={{ fontSize: { xs: 32, sm: 40 }, color: '#2EC4A0' }} />
         </Box>
       </Box>
 

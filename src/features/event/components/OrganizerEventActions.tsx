@@ -9,10 +9,6 @@ import { ConfirmModal } from '@/components/modals/confirm-modal';
 import { eventService } from '@/services/eventService';
 import { certificateService } from '@/services/certificate.service';
 
-interface OrganizerEventActionsProps {
-  eventId: number;
-}
-
 const actionButtonSx = {
   height: 36,
   fontSize: 'clamp(10px, 3vw, 12px)',
@@ -126,14 +122,14 @@ export function OrganizerEventActions({ eventId, isFinalized = false, onFinalize
           onClick={() => setIsConfirmOpen(true)}
           sx={{ ...actionButtonSx }}
         >
-          Finalizar Evento
+          Finalizar
         </Button>
       )}
 
       <ConfirmModal
         open={isConfirmOpen}
         onClose={() => setIsConfirmOpen(false)}
-        message="Você deseja finalizar o evento e gerar os certificados?"
+        message="Tem certeza que deseja finalizar este evento?"
         emphasisEndText="Essa ação não pode ser desfeita."
         confirmText="Finalizar"
         cancelText="Cancelar"

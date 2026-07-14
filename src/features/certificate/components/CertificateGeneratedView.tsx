@@ -149,25 +149,11 @@ export function CertificatesGeneratedView({eventoId}: CertificatesGeneratedViewP
                 <Box component="span" sx={{ color: '#2EC4A0' }}>Gerados</Box>
               </Typography>
             </Box>
+          
 
           </Box>
         </Box>
-        {/* LADO DIREITO: Ícone Decorativo */}
-        <Box
-          sx={{
-            width: { xs: 70, sm: 90 },
-            height: { xs: 70, sm: 90 },
-            bgcolor: '#E8F5F2', 
-            borderRadius: '12px',
-            display: 'flex', 
-            alignItems: 'center', 
-            justifyContent: 'center',
-            border: '1.5px dashed #2EC4A0',
-            flexShrink: 0,
-          }}
-        >
-          <ArticleOutlinedIcon sx={{ fontSize: { xs: 32, sm: 40 }, color: '#2EC4A0' }} />
-        </Box>
+      
       </Box>
 
       <Box

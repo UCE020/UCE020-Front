@@ -6,14 +6,23 @@ import { Button } from '@/components/ui/Button';
 interface CertificateBatchActionsProps {
   onSignBatch: () => void;
   onSendBatch: () => void;
+  isSigning?: boolean;
+  signDisabled?: boolean;
 }
 
-export function CertificateBatchActions({ onSignBatch, onSendBatch }: CertificateBatchActionsProps) {
+export function CertificateBatchActions({
+  onSignBatch,
+  onSendBatch,
+  isSigning = false,
+  signDisabled = false,
+}: CertificateBatchActionsProps) {
   return (
     <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 1.5 }}>
       <Button
         variant="contained"
         fullWidth
+        isLoading={isSigning}
+        disabled={signDisabled}
         leftIcon={<DrawOutlinedIcon sx={{ fontSize: 18 }} />}
         onClick={onSignBatch}
         sx={{
@@ -24,23 +33,7 @@ export function CertificateBatchActions({ onSignBatch, onSendBatch }: Certificat
           '&:hover': { bgcolor: '#1a2e50', boxShadow: '0 6px 16px rgba(15, 29, 53, 0.24)' },
         }}
       >
-        Assinar em lote
-      </Button>
-      <Button
-        variant="outlined"
-        fullWidth
-        leftIcon={<SendOutlinedIcon sx={{ fontSize: 18 }} />}
-        onClick={onSendBatch}
-        sx={{
-          py: 1.25,
-          borderRadius: '12px',
-          borderColor: '#2EC4A0',
-          borderWidth: 1.5,
-          color: '#2EC4A0',
-          '&:hover': { borderColor: '#25a98a', borderWidth: 1.5, bgcolor: '#f0fdf9' },
-        }}
-      >
-        Encaminhar
+        {isSigning ? 'Assinando...' : 'Assinar em lote'}
       </Button>
     </Box>
   );

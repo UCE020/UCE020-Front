@@ -31,7 +31,7 @@ export const MOCK_CERTIFICATE_MANAGEMENT_ITEMS: CertificateManagementItem[] = [
     participantName: 'Rafael Pereira',
     participantEmail: 'rafael.pereira@email.com',
     role: 'Organizador',
-    status: 'Encaminhado',
+    status: 'Pendente',
     issueDate: '2026-05-16',
   },
   {
@@ -82,5 +82,4 @@ export const CERTIFICATE_STATUS_META: Record<
 > = {
   Pendente: { label: 'Pendente de assinatura', bg: '#FEF9C3', color: '#854D0E' },
   Assinado: { label: 'Assinado', bg: '#DCFCE7', color: '#166534' },
-  Encaminhado: { label: 'Encaminhado', bg: '#DBEAFE', color: '#1E40AF' },
 };

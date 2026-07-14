@@ -4,18 +4,13 @@ import { CERTIFICATE_STATUS_META } from '@/mocks/certificate-management';
 
 interface CertificateSummaryCardProps {
   totalIssued: number;
-  statusTotals: { pendente: number; assinado: number; encaminhado: number };
+  statusTotals: { pendente: number; assinado: number };
 }
 
 export function CertificateSummaryCard({ totalIssued, statusTotals }: CertificateSummaryCardProps) {
   const badges = [
     { key: 'Pendentes', value: statusTotals.pendente, ...CERTIFICATE_STATUS_META.Pendente },
     { key: 'Assinados', value: statusTotals.assinado, ...CERTIFICATE_STATUS_META.Assinado },
-    {
-      key: 'Encaminhados',
-      value: statusTotals.encaminhado,
-      ...CERTIFICATE_STATUS_META.Encaminhado,
-    },
   ];
 
   return (

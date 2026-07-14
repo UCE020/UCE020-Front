@@ -44,6 +44,7 @@ export function useCertificatesGenerated(eventoId: number) {
   const [activityApplied, setActivityApplied]     = useState('Todas');
   const [statusApplied, setStatusApplied]         = useState('Todos');
   const [sortOrder, setSortOrder]                 = useState<SortOrder>('asc');
+  const [reloadToken, setReloadToken]             = useState(0);
 
   useEffect(() => {
     if (!eventoId) return;
@@ -74,9 +75,15 @@ export function useCertificatesGenerated(eventoId: number) {
     return () => {
       cancelled = true;
     };
-  }, [eventoId, page]);
+  }, [eventoId, page, reloadToken]);
 
   const loadMore = () => setPage(prev => prev + 1);
+
+  // Recarrega a lista (volta pra página 1) e as estatísticas — usado após assinar em lote.
+  const refresh = () => {
+    setPage(1);
+    setReloadToken(token => token + 1);
+  };
 
   useEffect(() => {
     if (!eventoId) return;
@@ -95,7 +102,7 @@ export function useCertificatesGenerated(eventoId: number) {
       .catch(() => {
         // mantém os totais zerados se a busca de estatísticas falhar
       });
-  }, [eventoId]);
+  }, [eventoId, reloadToken]);
 
   const filteredCertificates = useMemo(() => {
     const filtered = filterCertificates({
@@ -145,5 +152,6 @@ export function useCertificatesGenerated(eventoId: number) {
     toggleSortOrder,
     hasMore,
     loadMore,
+    refresh,
   };
 }

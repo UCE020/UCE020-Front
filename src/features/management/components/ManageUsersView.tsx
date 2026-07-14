@@ -56,6 +56,14 @@ export function ManageUsersView({ eventId }: ManageUsersViewProps) {
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<ManagedUser | null>(null);
 
+  const { data: event } = useQuery({
+    queryKey: ['event', numericEventId],
+    queryFn: () => eventService.findOne(numericEventId),
+    enabled: hasValidEventId,
+  });
+
+  const isEventFinalized = event?.status?.toLowerCase() === 'finalizada';
+
   const { data: users = [], isLoading, isError } = useQuery({
     queryKey: ['event-members', numericEventId],
     queryFn: () => eventService.getEventMembers(numericEventId).then(members =>
@@ -130,6 +138,7 @@ export function ManageUsersView({ eventId }: ManageUsersViewProps) {
 
   // --- Exclusão ---
   function openDeleteModal(userId: string) {
+    if (isEventFinalized) return;
     const user = users.find((item) => item.id === userId);
     if (!user) return;
     setSelectedUser(user);
@@ -148,6 +157,7 @@ export function ManageUsersView({ eventId }: ManageUsersViewProps) {
 
   // --- Edição de papel ---
   function openEditModal(userId: string) {
+    if (isEventFinalized) return;
     const user = users.find((item) => item.id === userId);
     if (!user) return;
     setEditingUser(user);
@@ -190,8 +200,8 @@ export function ManageUsersView({ eventId }: ManageUsersViewProps) {
               key={user.id}
               name={user.name}
               role={user.role}
-              onEdit={isCurrentUser ? undefined : () => openEditModal(user.id)}
-              onDelete={isCurrentUser ? undefined : () => openDeleteModal(user.id)}
+              onEdit={isCurrentUser || isEventFinalized ? undefined : () => openEditModal(user.id)}
+              onDelete={isCurrentUser || isEventFinalized ? undefined : () => openDeleteModal(user.id)}
             />
           );
         })}

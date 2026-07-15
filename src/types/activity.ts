@@ -46,6 +46,7 @@ export type Activity = {
   guests?: ActivityGuest[];
   createdAt?: string;
   updatedAt?: string;
+  photo?: string | null;
 }
 
 export type ActivityGuest = {

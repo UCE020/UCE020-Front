@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { authService } from '@/services/authService';
 import { UserRegister } from '@/features/auth/types/userRegister';
@@ -19,23 +19,19 @@ export type RegisterStep = 'form' | 'code' | 'success';
 export function useRegister() {
   const searchParams = useSearchParams();
 
-  const [step, setStep] = useState<RegisterStep>('form');
+  const initialStep: RegisterStep =
+    searchParams.get('step') === 'code' && searchParams.get('email') ? 'code' : 'form';
+  const initialEmail = searchParams.get('email')
+    ? decodeURIComponent(searchParams.get('email')!)
+    : null;
+
+  const [step, setStep] = useState<RegisterStep>(initialStep);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [code, setCode] = useState('');
   const [formData, setFormData] = useState<UserRegister | null>(null);
-  const [email, setEmail] = useState<string | null>(null);
+  const [email, setEmail] = useState<string | null>(initialEmail);
   const { loginGlobal } = useAuth();
-
-  useEffect(() => {
-    const stepParam = searchParams.get('step');
-    const emailParam = searchParams.get('email');
-
-    if (stepParam === 'code' && emailParam) {
-      setEmail(decodeURIComponent(emailParam));
-      setStep('code');
-    }
-  }, [searchParams]);
 
   async function submitForm(data: UserRegister) {
     setIsLoading(true);

@@ -764,6 +764,13 @@ export default function EventForm({ mode, eventId }: EventFormProps) {
                   color="secondary"
                   leftIcon={<AddRoundedIcon sx={{ fontSize: 16 }} />}
                   onClick={handleOpenNewActivity}
+                  disabled={
+                    !form.startDate ||
+                    !form.endDate ||
+                    !form.startTime ||
+                    !form.endTime ||
+                    !form.cargaHoraria
+                  }
                   sx={{
                     minWidth: 0,
                     px: 0,
@@ -784,7 +791,12 @@ export default function EventForm({ mode, eventId }: EventFormProps) {
 
               {activities.length === 0 ? (
                 <Typography
-                  sx={{ fontSize: 12, color: colorTokens.neutral.gray500, fontStyle: 'italic', textAlign: 'center'}}
+                  sx={{
+                    fontSize: 12,
+                    color: colorTokens.neutral.gray500,
+                    fontStyle: 'italic',
+                    textAlign: 'center',
+                  }}
                 >
                   Nenhuma atividade cadastrada ainda.
                 </Typography>
@@ -936,6 +948,15 @@ export default function EventForm({ mode, eventId }: EventFormProps) {
             mode={editingActivity ? 'edit' : 'create'}
             variant="embedded"
             eventInfo={activityEventInfo}
+            eventDateRange={
+              form.startDate && form.startTime && form.endDate && form.endTime
+                ? {
+                    start: `${form.startDate}T${form.startTime}`,
+                    end: `${form.endDate}T${form.endTime}`,
+                  }
+                : undefined
+            }
+            maxWorkload={form.cargaHoraria ? Number(form.cargaHoraria) : undefined}
             initialValues={editingActivity ?? undefined}
             onSubmit={handleActivitySubmit}
             onCancel={handleCloseDrawer}

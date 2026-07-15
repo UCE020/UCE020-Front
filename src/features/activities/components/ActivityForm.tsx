@@ -114,7 +114,29 @@ function getTodayString(): string {
   return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
 }
 
-function getErrors(form: ActivityFormState, touched: TouchedState) {
+function toDateTime(date: string, time: string): string {
+  if (!date || !time) return '';
+  return `${date}T${time}`;
+}
+
+function formatDateBR(iso: string): string {
+  if (!iso) return '';
+  const [y, m, d] = iso.split('-');
+  if (!y || !m || !d) return iso;
+  return `${d}/${m}/${y}`;
+}
+
+function getErrors(
+  form: ActivityFormState,
+  touched: TouchedState,
+  eventDateRange?: { start: string; end: string },
+  maxWorkload?: number
+) {
+  const minDate = eventDateRange ? eventDateRange.start.slice(0, 10) : getTodayString();
+  const maxDate = eventDateRange ? eventDateRange.end.slice(0, 10) : undefined;
+
+  const startDT = toDateTime(form.startDate, form.startTime);
+  const endDT = toDateTime(form.endDate, form.endTime);
   return {
     name:
       touched.name && form.name.trim().length < 3
@@ -125,34 +147,76 @@ function getErrors(form: ActivityFormState, touched: TouchedState) {
       touched.location && form.location.trim().length < 1
         ? 'Informe a localização da atividade.'
         : '',
-    workload:
-      touched.workload && form.workload !== '' && isNaN(Number(form.workload))
-        ? 'Informe um número válido de horas.'
-        : '',
+    workload: (() => {
+      if (!touched.workload) return '';
+      if (!form.workload.trim()) return 'Informe a carga horária.';
+      const num = Number(form.workload);
+      if (isNaN(num) || num <= 0) return 'Informe um número válido de horas.';
+      if (maxWorkload != null && num > maxWorkload)
+        return `A carga horária não pode ultrapassar ${maxWorkload}h (carga do evento).`;
+      return '';
+    })(),
     description:
       touched.description && form.description.trim().length < 10
         ? 'Descreva melhor a atividade (mínimo 10 caracteres).'
         : '',
     startDate: (() => {
       if (touched.startDate && !form.startDate) return 'Selecione a data de início.';
-      if (touched.startDate && form.startDate && form.startDate < getTodayString())
-        return 'A data de início não pode ser no passado.';
+      if (touched.startDate && form.startDate && form.startDate < minDate)
+        return `A data de início deve ser a partir de ${formatDateBR(minDate)}.`;
+      if (touched.startDate && form.startDate && maxDate && form.startDate > maxDate)
+        return `A data de início deve ser até ${formatDateBR(maxDate)}.`;
       return '';
     })(),
     endDate: (() => {
       if (touched.endDate && !form.endDate) return 'Selecione a data de término.';
-      const todayStr = getTodayString();
-      const minEndDate = form.startDate && form.startDate > todayStr ? form.startDate : todayStr;
-      if (touched.endDate && form.endDate && form.endDate < minEndDate)
+      const effectiveMin = form.startDate && form.startDate > minDate ? form.startDate : minDate;
+      if (touched.endDate && form.endDate && form.endDate < effectiveMin)
         return 'A data de término inválida.';
+      if (touched.endDate && form.endDate && maxDate && form.endDate > maxDate)
+        return `A data de término deve ser até ${formatDateBR(maxDate)}.`;
       return '';
     })(),
-    startTime: touched.startTime && !form.startTime ? 'Selecione o horário de início.' : '',
-    endTime: touched.endTime && !form.endTime ? 'Selecione o horário de término.' : '',
+    startTime: (() => {
+      if (touched.startTime && !form.startTime) return 'Selecione o horário de início.';
+      if (touched.startTime && eventDateRange && startDT && startDT < eventDateRange.start) {
+        const hora = eventDateRange.start.slice(11, 16);
+        return `A atividade não pode começar antes das ${hora} (início do evento).`;
+      }
+      if (touched.startTime && eventDateRange && startDT && startDT > eventDateRange.end) {
+        return 'O horário de início ultrapassa o término do evento.';
+      }
+      return '';
+    })(),
+    endTime: (() => {
+      if (touched.endTime && !form.endTime) return 'Selecione o horário de término.';
+      if (touched.endTime && eventDateRange && endDT && endDT > eventDateRange.end) {
+        const hora = eventDateRange.end.slice(11, 16);
+        return `A atividade não pode terminar depois das ${hora} (término do evento).`;
+      }
+      if (touched.endTime && startDT && endDT && endDT < startDT) {
+        return 'O término não pode ser antes do início.';
+      }
+      return '';
+    })(),
   };
 }
 
-function isFormValid(form: ActivityFormState, errors: ReturnType<typeof getErrors>) {
+function isFormValid(
+  form: ActivityFormState,
+  errors: ReturnType<typeof getErrors>,
+  eventDateRange?: { start: string; end: string },
+  maxWorkload?: number
+) {
+  const minDate = eventDateRange ? eventDateRange.start.slice(0, 10) : getTodayString();
+  const maxDate = eventDateRange ? eventDateRange.end.slice(0, 10) : undefined;
+  const workloadNum = Number(form.workload);
+
+  const startDT = toDateTime(form.startDate, form.startTime);
+  const endDT = toDateTime(form.endDate, form.endTime);
+
+  const withinEventRange =
+    !eventDateRange || (startDT >= eventDateRange.start && endDT <= eventDateRange.end);
   return (
     Object.values(errors).every((e) => e === '') &&
     form.name.trim().length >= 3 &&
@@ -161,10 +225,18 @@ function isFormValid(form: ActivityFormState, errors: ReturnType<typeof getError
     form.description.trim().length >= 10 &&
     form.startDate.length > 0 &&
     form.endDate.length > 0 &&
-    form.startDate >= getTodayString() &&
+    form.startDate >= minDate &&
+    (!maxDate || form.startDate <= maxDate) &&
     form.endDate >= form.startDate &&
+    (!maxDate || form.endDate <= maxDate) &&
     Boolean(form.startTime) &&
-    Boolean(form.endTime)
+    Boolean(form.endTime) &&
+    endDT >= startDT &&
+    withinEventRange &&
+    form.workload.trim().length > 0 &&
+    !isNaN(workloadNum) &&
+    workloadNum > 0 &&
+    (maxWorkload == null || workloadNum <= maxWorkload)
   );
 }
 
@@ -179,6 +251,8 @@ export interface ActivityFormProps {
   /** Valores iniciais (usado em modo de edição, ou para pré-preencher em variant="embedded"). */
   initialValues?: Partial<ActivityFormState>;
   /** Chamado com os dados válidos do formulário. Quem chama decide o que fazer (converter para o DTO, chamar API, etc). */
+  eventDateRange?: { start: string; end: string };
+  maxWorkload?: number;
   onSubmit?: (data: ActivityFormState) => void;
   /** Chamado ao cancelar/fechar. Em variant="embedded" deve fechar o Drawer/Modal. */
   onCancel?: () => void;
@@ -190,6 +264,8 @@ export default function ActivityForm({
   mode,
   variant = 'page',
   eventInfo,
+  eventDateRange,
+  maxWorkload,
   initialValues,
   onSubmit,
   onCancel,
@@ -208,8 +284,11 @@ export default function ActivityForm({
   const [guestModalOpen, setGuestModalOpen] = useState(false);
   const [editingGuestIndex, setEditingGuestIndex] = useState<number | null>(null);
 
-  const errors = useMemo(() => getErrors(form, touched), [form, touched]);
-  const canSubmit = isFormValid(form, errors);
+  const errors = useMemo(
+    () => getErrors(form, touched, eventDateRange, maxWorkload),
+    [form, touched, eventDateRange, maxWorkload]
+  );
+  const canSubmit = isFormValid(form, errors, eventDateRange, maxWorkload);
 
   const name = isEdit ? 'Edição de Atividade' : 'Cadastrar Atividade';
   const subtitle = isEdit
@@ -219,8 +298,11 @@ export default function ActivityForm({
   const displayedEvent = eventInfo ?? FALLBACK_EVENT_INFO;
 
   const todayStr = getTodayString();
-  const startDateMin = todayStr;
-  const endDateMin = form.startDate && form.startDate > todayStr ? form.startDate : todayStr;
+  const startDateMin = eventDateRange?.start || todayStr;
+  const startDateMax = eventDateRange?.end;
+  const endDateMin =
+    form.startDate && form.startDate > startDateMin ? form.startDate : startDateMin;
+  const endDateMax = eventDateRange?.end;
 
   function updateField(field: Exclude<keyof ActivityFormState, 'guests'>, value: string) {
     setForm((current) => ({ ...current, [field]: value }));
@@ -263,8 +345,8 @@ export default function ActivityForm({
     });
     setTouched(allTouched);
 
-    const currentErrors = getErrors(form, allTouched);
-    if (!isFormValid(form, currentErrors)) return;
+    const currentErrors = getErrors(form, allTouched, eventDateRange, maxWorkload);
+    if (!isFormValid(form, currentErrors, eventDateRange, maxWorkload)) return;
 
     onSubmit?.(form);
   }
@@ -489,25 +571,6 @@ export default function ActivityForm({
 
               <Box sx={{ minWidth: 0 }}>
                 <TextInput
-                  label="Carga horária (opcional)"
-                  value={form.workload}
-                  onChange={(value) => updateField('workload', value)}
-                  onBlur={() => markTouched('workload')}
-                  error={Boolean(errors.workload)}
-                  size="small"
-                  fullWidth
-                  type="number"
-                  slotProps={{ input: { inputProps: { min: 0 } } }}
-                />
-                {errors.workload && (
-                  <Typography sx={{ mt: 0.4, fontSize: 11, color: 'error.main' }}>
-                    {errors.workload}
-                  </Typography>
-                )}
-              </Box>
-
-              <Box sx={{ minWidth: 0 }}>
-                <TextInput
                   label="Descrição da atividade"
                   value={form.description}
                   onChange={(value) => updateField('description', value)}
@@ -545,7 +608,10 @@ export default function ActivityForm({
                     slotProps={{
                       inputLabel: { shrink: true },
                       input: {
-                        inputProps: startDateMin ? { min: startDateMin } : undefined,
+                        inputProps: {
+                          min: startDateMin,
+                          ...(startDateMax ? { max: startDateMax } : {}),
+                        },
                       },
                     }}
                   />
@@ -569,7 +635,10 @@ export default function ActivityForm({
                     slotProps={{
                       inputLabel: { shrink: true },
                       input: {
-                        inputProps: endDateMin ? { min: endDateMin } : undefined,
+                        inputProps: {
+                          min: endDateMin,
+                          ...(endDateMax ? { max: endDateMax } : {}),
+                        },
                       },
                     }}
                   />
@@ -617,6 +686,29 @@ export default function ActivityForm({
                     </Typography>
                   )}
                 </Box>
+              </Box>
+
+              <Box sx={{ minWidth: 0 }}>
+                <TextInput
+                  label="Carga horária (h)"
+                  value={form.workload}
+                  onChange={(value) => updateField('workload', value)}
+                  onBlur={() => markTouched('workload')}
+                  error={Boolean(errors.workload)}
+                  size="small"
+                  fullWidth
+                  type="number"
+                  slotProps={{ input: { inputProps: { min: 0 } } }}
+                />
+                {errors.workload ? (
+                  <Typography sx={{ mt: 0.4, fontSize: 11, color: 'error.main' }}>
+                    {errors.workload}
+                  </Typography>
+                ) : maxWorkload != null ? (
+                  <Typography sx={{ mt: 0.4, fontSize: 11, color: colorTokens.neutral.gray500 }}>
+                    Máximo: {maxWorkload}h (carga horária do evento)
+                  </Typography>
+                ) : null}
               </Box>
 
               {/* ── Convidados ── */}

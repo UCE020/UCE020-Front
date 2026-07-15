@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { authService } from '@/services/authService';
 import { UserRegister } from '@/features/auth/types/userRegister';
 import { useAuth } from '@/providers/auth-provider';
@@ -16,19 +17,33 @@ interface AxiosErrorResponse {
 export type RegisterStep = 'form' | 'code' | 'success';
 
 export function useRegister() {
+  const searchParams = useSearchParams();
+
   const [step, setStep] = useState<RegisterStep>('form');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [code, setCode] = useState('');
   const [formData, setFormData] = useState<UserRegister | null>(null);
+  const [email, setEmail] = useState<string | null>(null);
   const { loginGlobal } = useAuth();
+
+  useEffect(() => {
+    const stepParam = searchParams.get('step');
+    const emailParam = searchParams.get('email');
+
+    if (stepParam === 'code' && emailParam) {
+      setEmail(decodeURIComponent(emailParam));
+      setStep('code');
+    }
+  }, [searchParams]);
 
   async function submitForm(data: UserRegister) {
     setIsLoading(true);
     setError(null);
     try {
-      await authService.register(data); 
+      await authService.register(data);
       setFormData(data);
+      setEmail(data.email);
       setStep('code');
     } catch (err) {
       const axiosError = err as AxiosErrorResponse;
@@ -44,7 +59,7 @@ export function useRegister() {
       return;
     }
 
-    if (!formData || !formData.email) {
+    if (!email) {
       setError('Sessão expirada. Por favor, preencha o formulário novamente.');
       return;
     }
@@ -52,9 +67,9 @@ export function useRegister() {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await authService.verifyRegisterCode({ 
-        email: formData.email, 
-        code 
+      const response = await authService.verifyRegisterCode({
+        email,
+        code,
       });
 
       const token = response.data?.access_token || null;
@@ -62,7 +77,7 @@ export function useRegister() {
       if (token && response.data?.user) {
         loginGlobal(token, response.data.user);
       }
-      
+
       setStep('success');
     } catch (err) {
       const axiosError = err as AxiosErrorResponse;
@@ -76,6 +91,7 @@ export function useRegister() {
     setStep('form');
     setCode('');
     setFormData(null);
+    setEmail(null);
     setError(null);
   }
 
